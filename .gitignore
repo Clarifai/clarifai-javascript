@@ -1,0 +1,6 @@
+node_modules/*
+build/*
+.DS_Store
+aws.json
+npm-debug.log
+.awspublish*
