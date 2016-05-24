@@ -22,7 +22,7 @@ Clarifai.initialize({
 You can also use the SDK by adding this script to your HTML:
 
 ```js
-<script type="text/javascript" src="https://sdk.clarifai.com/js/clarifai-0.0.14.js"></script>
+<script type="text/javascript" src="https://sdk.clarifai.com/js/clarifai-1.2.0.js"></script>
 <script>
   Clarifai.initialize({
     'clientId': '{clientId}',
