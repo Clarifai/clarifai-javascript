@@ -175,9 +175,10 @@ var BROWSER_HEADER = (
   ' *\n' +
   ' * Copyright (c) 2016-present, Clarifai, Inc.\n' +
   ' * All rights reserved.\n' +
+  ' * Licensed under the Apache License, Version 2.0.\n' +
   ' *\n' +
   ' * The source tree of this library can be found at\n' +
-  ' *   https://github.com/Clarifai/js-SDK\n' +
+  ' *   https://github.com/Clarifai/clarifai-javascript\n' +
   ' */\n'
 );
 
