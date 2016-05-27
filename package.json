@@ -1,5 +1,5 @@
 {
-  "name": "@clarifai/clarifai-official",
+  "name": "clarifai",
   "version": "2.0.0",
   "description": "Official Clarifai Javascript SDK",
   "main": "index.js",
