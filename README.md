@@ -77,6 +77,7 @@ You can also use the SDK by adding this script to your HTML:
 * [Add an image via image bytes](#add-an-image-via-image-bytes)
 * [Add images via file](#add-images-via-file)
 * [Get all images](#get-all-images)
+* [Get all images with pagination](#get-all-images-with-pagination)
 * [Get a single image by id](#get-a-single-image-by-id)
 * [Delete a single image by id](#delete-a-single-image-by-id)
 * [Get images status](#get-images-status)
@@ -347,6 +348,18 @@ Clarifai.addImagesByFile(fs.createReadStream('test.csv')).then(
 
 ```js
 Clarifai.getImages().then(
+  handleResponse,
+  handleError
+);
+```
+
+### Get all images with pagination
+
+```js
+Clarifai.getImages({
+  'page': 2,
+  'perPage': 30 
+}).then(
   handleResponse,
   handleError
 );

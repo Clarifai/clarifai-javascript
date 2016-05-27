@@ -185,10 +185,6 @@ module.exports = global.Clarifai = {
   * @param {Object}    options  Object with keys explained below: (optional)
   *    @param {Number}    page  The page number (optional, default: 1)
   *    @param {Number}    perPage  Number of images to return per page (optional, default: 20)
-  *    @param {String}    similarImageUrl  A url to visually search against (optional)
-  *    @param {Array}    predictions  Restrict the images returned to match all predictions in the array
-  *    @param {Array}    matchAnyPrediction  Restrict the images returned to match any predictions in the array
-  *    @param {Array}    notPrediction  Restrict the images returned to match none of the predictions in the array
   * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
   */
   getImages: function(options, _callback) {
