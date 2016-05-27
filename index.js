@@ -225,5 +225,26 @@ module.exports = global.Clarifai = {
     var promise = image.search(options);
     callback.handle(promise, _callback);
     return promise;
+  },
+  /**
+  * Delete an image by id
+  * @method deleteImageById
+  * @param {String}    id  The image id
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  deleteImageById: function(id, _callback) {
+    var promise = image.deleteById(id);
+    callback.handle(promise, _callback);
+    return promise;
+  },
+  /**
+  * Get images status
+  * @method getImagesStatus
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  getImagesStatus: function(_callback) {
+    var promise = image.getStatus();
+    callback.handle(promise, _callback);
+    return promise;
   }
 };

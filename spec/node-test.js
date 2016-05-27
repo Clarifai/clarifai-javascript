@@ -63,7 +63,7 @@ describe('Clarifai JS SDK', function() {
     
   });
   
-/*
+
   describe('Tag', function() {
   
     it('Gets tags for an image via url', function(done) {
@@ -159,7 +159,7 @@ describe('Clarifai JS SDK', function() {
     });
     
   });
-  
+ 
   describe('Info', function() {
   
     it('Gets info from the API', function(done) {
@@ -277,7 +277,6 @@ describe('Clarifai JS SDK', function() {
     });
     
   });
-*/
   
   describe('Images', function() {
     
@@ -412,7 +411,7 @@ describe('Clarifai JS SDK', function() {
         errorHandler.bind(done)
       );
     });
-/*    
+    
     it('Visually searches images with crop area', function(done) {
       Clarifai.searchImages({
         'image': {
@@ -421,8 +420,10 @@ describe('Clarifai JS SDK', function() {
         }
       }).then(
         function(response) {
-          expect(response.length).toBeGreaterThan(0);
-          var image = response[0];
+          expect(response.images).toBeDefined();
+          var images = response.images;
+          expect(images.length).toBeGreaterThan(0);
+          var image = images[0];
           expect(image.id).toBeDefined();
           expect(image.created_at).toBeDefined();
           expect(image.url).toBeDefined();
@@ -435,11 +436,13 @@ describe('Clarifai JS SDK', function() {
     
     it('Searches images by all predictions matched', function(done) {
       Clarifai.searchImages({
-        'predictions': ['train']
+        'and_terms': ['train']
       }).then(
         function(response) {
-          expect(response.length).toBeGreaterThan(0);
-          var image = response[0];
+          expect(response.images).toBeDefined();
+          var images = response.images;
+          expect(images.length).toBeGreaterThan(0);
+          var image = images[0];
           expect(image.id).toBeDefined();
           expect(image.created_at).toBeDefined();
           expect(image.url).toBeDefined();
@@ -451,11 +454,13 @@ describe('Clarifai JS SDK', function() {
     
     it('Searches images by any predictions matched', function(done) {
       Clarifai.searchImages({
-        'matchAnyPrediction': ['train', 'foo']
+        'or_terms': ['train', 'foo']
       }).then(
         function(response) {
-          expect(response.length).toBeGreaterThan(0);
-          var image = response[0];
+          expect(response.images).toBeDefined();
+          var images = response.images;
+          expect(images.length).toBeGreaterThan(0);
+          var image = images[0];
           expect(image.id).toBeDefined();
           expect(image.created_at).toBeDefined();
           expect(image.url).toBeDefined();
@@ -467,11 +472,13 @@ describe('Clarifai JS SDK', function() {
     
     it('Searches images and exclude all predictions matched', function(done) {
       Clarifai.searchImages({
-        'notPrediction': ['doo', 'foo']
+        'not_terms': ['doo', 'foo']
       }).then(
         function(response) {
-          expect(response.length).toBeGreaterThan(0);
-          var image = response[0];
+          expect(response.images).toBeDefined();
+          var images = response.images;
+          expect(images.length).toBeGreaterThan(0);
+          var image = images[0];
           expect(image.id).toBeDefined();
           expect(image.created_at).toBeDefined();
           expect(image.url).toBeDefined();
@@ -490,19 +497,20 @@ describe('Clarifai JS SDK', function() {
         errorHandler.bind(done)
       );
     });
-    
-    it('Gets images count', function(done) {
-      Clarifai.getImagesCount().then(
+   
+    it('Gets images status', function(done) {
+      Clarifai.getImagesStatus().then(
         function(response) {
-          expect(response.processed).toBeDefined();
-          expect(response.to_process).toBeDefined();
-          expect(response.errors).toBeDefined();
+          expect(response.counts).toBeDefined();
+          var counts = response.counts;
+          expect(counts.processed).toBeDefined();
+          expect(counts.to_process).toBeDefined();
+          expect(counts.errors).toBeDefined();
           done();
         },
         errorHandler.bind(done)
       );
     });
-*/
     
   });
   
