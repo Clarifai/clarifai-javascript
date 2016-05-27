@@ -63,6 +63,7 @@ describe('Clarifai JS SDK', function() {
     
   });
   
+/*
   describe('Tag', function() {
   
     it('Gets tags for an image via url', function(done) {
@@ -276,6 +277,234 @@ describe('Clarifai JS SDK', function() {
     });
     
   });
+*/
+  
+  describe('Images', function() {
+    
+    var imageId = 'some_test_id';
+    
+    it('Adds an image via url', function(done) {
+      Clarifai.addImages({
+        'url': sampleImage
+      }).then(
+        function(response) {
+          expect(response.images).toBeDefined();
+          var images = response.images;
+          expect(images.length).toBe(1);
+          expect(images[0].created_at).toBeDefined();
+          expect(images[0].id).toBeDefined();
+          expect(images[0].url).toBe(sampleImage);
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Adds an image via url and id', function(done) {
+      Clarifai.addImages({
+        'url': sampleImage,
+        'id': imageId
+      }).then(
+        function(response) {
+          expect(response.images).toBeDefined();
+          var images = response.images;
+          expect(images.length).toBe(1);
+          expect(images[0].created_at).toBeDefined();
+          expect(images[0].id).toBe(imageId);
+          expect(images[0].url).toBe(sampleImage);
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+      
+    it('Adds multiple images via url', function(done) {
+      Clarifai.addImages([
+        {
+          'url': sampleImage
+        },
+        {
+          'url': sampleImage2
+        }
+      ]).then(
+        function(response) {
+          expect(response.images).toBeDefined();
+          var images = response.images;
+          expect(images.length).toBe(2);
+          var image = images[0];
+          var image2 = images[1];
+          expect(image.id).toBeDefined();
+          expect(image.created_at).toBeDefined();
+          expect(image.url).toBe(sampleImage);
+          expect(image2.id).toBeDefined();
+          expect(image2.created_at).toBeDefined();
+          expect(image2.url).toBe(sampleImage2);
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+
+    it('Creates an image via bytes', function(done) {
+      Clarifai.addImages({
+        'base64': imageBytes
+      }).then(
+        function(response) {
+          expect(response.images).toBeDefined();
+          var images = response.images;
+          expect(images.length).toBe(1);
+          expect(images[0].created_at).toBeDefined();
+          expect(images[0].id).toBeDefined();
+          expect(images[0].url).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Gets a single image by id', function(done) {
+      Clarifai.getImageById(imageId).then(
+        function(response) {
+          expect(response.image).toBeDefined();
+          expect(response.image.id).toBe(imageId);
+          expect(response.image.created_at).toBeDefined();
+          expect(response.image.url).toBe(sampleImage);
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Gets all images', function(done) {
+      Clarifai.getImages().then(
+        function(response) {
+          expect(response.images).toBeDefined();
+          var images = response.images;
+          expect(images.length).toBeGreaterThan(0);
+          var image = images[0];
+          expect(image.id).toBeDefined();
+          expect(image.created_at).toBeDefined();
+          expect(image.url).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Visually searches images', function(done) {
+      Clarifai.searchImages({
+        'image': {
+          'url': sampleImage
+        }
+      }).then(
+        function(response) {
+          expect(response.images).toBeDefined();
+          var images = response.images;
+          expect(images.length).toBeGreaterThan(0);
+          var image = images[0];
+          expect(image.id).toBeDefined();
+          expect(image.created_at).toBeDefined();
+          expect(image.url).toBeDefined();
+          expect(image.score).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+/*    
+    it('Visually searches images with crop area', function(done) {
+      Clarifai.searchImages({
+        'image': {
+          'url': sampleImage,
+          'crop': [0.25, 0.25, 0.75, 0.75]
+        }
+      }).then(
+        function(response) {
+          expect(response.length).toBeGreaterThan(0);
+          var image = response[0];
+          expect(image.id).toBeDefined();
+          expect(image.created_at).toBeDefined();
+          expect(image.url).toBeDefined();
+          expect(image.score).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Searches images by all predictions matched', function(done) {
+      Clarifai.searchImages({
+        'predictions': ['train']
+      }).then(
+        function(response) {
+          expect(response.length).toBeGreaterThan(0);
+          var image = response[0];
+          expect(image.id).toBeDefined();
+          expect(image.created_at).toBeDefined();
+          expect(image.url).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Searches images by any predictions matched', function(done) {
+      Clarifai.searchImages({
+        'matchAnyPrediction': ['train', 'foo']
+      }).then(
+        function(response) {
+          expect(response.length).toBeGreaterThan(0);
+          var image = response[0];
+          expect(image.id).toBeDefined();
+          expect(image.created_at).toBeDefined();
+          expect(image.url).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Searches images and exclude all predictions matched', function(done) {
+      Clarifai.searchImages({
+        'notPrediction': ['doo', 'foo']
+      }).then(
+        function(response) {
+          expect(response.length).toBeGreaterThan(0);
+          var image = response[0];
+          expect(image.id).toBeDefined();
+          expect(image.created_at).toBeDefined();
+          expect(image.url).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Deletes a single image by id', function(done) {
+      Clarifai.deleteImageById(imageId).then(
+        function(response) {
+          expect(response.status_code).toBe('OK');
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Gets images count', function(done) {
+      Clarifai.getImagesCount().then(
+        function(response) {
+          expect(response.processed).toBeDefined();
+          expect(response.to_process).toBeDefined();
+          expect(response.errors).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+*/
+    
+  });
   
 });
 
@@ -285,6 +514,7 @@ function responseHandler(response) {
 };
 
 function errorHandler(err) {
+  console.log(err);
   expect(err).toBe(true);
   this();
 };

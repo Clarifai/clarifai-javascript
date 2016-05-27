@@ -7,6 +7,7 @@ var callback = require('./lib/callback');
 var color = require('./lib/color');
 var feedback = require('./lib/feedback');
 var usage = require('./lib/usage');
+var image = require('./lib/image');
 
 module.exports = global.Clarifai = {
   initialize: function(options) {
@@ -161,6 +162,68 @@ module.exports = global.Clarifai = {
     };
     var promise = feedback.create(url, options);
     callback.handle(promise, callbackFn);
+    return promise;
+  },
+  /**
+  * Adds an image or multiple images
+  * @method addImage
+  * @param {Object OR Array}    options  Object or Array of Objects with keys explained below:
+  *   @param {String}    url  A publicly accessible url of the image. (required OR base64)
+  *   @param {String}    base64  image data as a base64 encoded string (required OR url)
+  *   @param {String}    id  set the id for this image (if not supplied, an id will be created)
+  *   @param {Array}    crop  array of crops points [top, left, bottom, right] eg. [0.2,0.3,0.7,0.8]
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  addImages: function(options, _callback) {
+    var promise = image.add(options);
+    callback.handle(promise, _callback);
+    return promise;
+  },
+  /**
+  * Get images
+  * @method getImages
+  * @param {Object}    options  Object with keys explained below: (optional)
+  *    @param {Number}    page  The page number (optional, default: 1)
+  *    @param {Number}    perPage  Number of images to return per page (optional, default: 20)
+  *    @param {String}    similarImageUrl  A url to visually search against (optional)
+  *    @param {Array}    predictions  Restrict the images returned to match all predictions in the array
+  *    @param {Array}    matchAnyPrediction  Restrict the images returned to match any predictions in the array
+  *    @param {Array}    notPrediction  Restrict the images returned to match none of the predictions in the array
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  getImages: function(options, _callback) {
+    var promise = image.get(options);
+    callback.handle(promise, _callback);
+    return promise;
+  },
+  /**
+  * Get image by id
+  * @method getImageById
+  * @param {String}    id  The image id
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  getImageById: function(id, _callback) {
+    var promise = image.getById(id);
+    callback.handle(promise, _callback);
+    return promise;
+  },
+  /**
+  * Search images
+  * @method searchImages
+  * @param {Object}    options  Object with keys explained below: (optional)
+  *    @param {Object}    image  Object with keys explained below:
+  *       @param {String}    url  A url to visually search against
+  *       @param {Array}     crop  [top, left, bottom, right], each specified in the range 0-1.0 (optional)
+  *    @param {Number}    page  The page number (optional, default: 1)
+  *    @param {Number}    perPage  Number of images to return per page (optional, default: 20)
+  *    @param {Array}    and_terms  Restrict the images returned to match all predictions in the array
+  *    @param {Array}    or_terms  Restrict the images returned to match any predictions in the array
+  *    @param {Array}    not_terms  Restrict the images returned to match none of the predictions in the array
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  searchImages: function(options, _callback) {
+    var promise = image.search(options);
+    callback.handle(promise, _callback);
     return promise;
   }
 };

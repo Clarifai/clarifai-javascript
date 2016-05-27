@@ -236,7 +236,7 @@ gulp.task('test', function() {
   return gulp.src('../spec/*.js')
     .pipe(jasmine({
       'verbose': true,
-      'timeout': 60000
+      'timeout': 5000 // 60000
     }).on('end', function() {
       process.exit();
     }).on('error', function() {
