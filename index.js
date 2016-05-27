@@ -7,7 +7,7 @@ var callback = require('./lib/callback');
 var color = require('./lib/color');
 var feedback = require('./lib/feedback');
 var usage = require('./lib/usage');
-var image = require('./lib/image');
+var images = require('./lib/images');
 
 module.exports = global.Clarifai = {
   initialize: function(options) {
@@ -175,7 +175,7 @@ module.exports = global.Clarifai = {
   * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
   */
   addImages: function(options, _callback) {
-    var promise = image.add(options);
+    var promise = images.add(options);
     callback.handle(promise, _callback);
     return promise;
   },
@@ -192,7 +192,7 @@ module.exports = global.Clarifai = {
   * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
   */
   getImages: function(options, _callback) {
-    var promise = image.get(options);
+    var promise = images.get(options);
     callback.handle(promise, _callback);
     return promise;
   },
@@ -203,7 +203,7 @@ module.exports = global.Clarifai = {
   * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
   */
   getImageById: function(id, _callback) {
-    var promise = image.getById(id);
+    var promise = images.getById(id);
     callback.handle(promise, _callback);
     return promise;
   },
@@ -222,7 +222,7 @@ module.exports = global.Clarifai = {
   * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
   */
   searchImages: function(options, _callback) {
-    var promise = image.search(options);
+    var promise = images.search(options);
     callback.handle(promise, _callback);
     return promise;
   },
@@ -233,7 +233,7 @@ module.exports = global.Clarifai = {
   * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
   */
   deleteImageById: function(id, _callback) {
-    var promise = image.deleteById(id);
+    var promise = images.deleteById(id);
     callback.handle(promise, _callback);
     return promise;
   },
@@ -243,7 +243,18 @@ module.exports = global.Clarifai = {
   * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
   */
   getImagesStatus: function(_callback) {
-    var promise = image.getStatus();
+    var promise = images.getStatus();
+    callback.handle(promise, _callback);
+    return promise;
+  },
+  /**
+  * Add images with a CSV or TSV file
+  * @method addImagesByFile
+  * @param {File}    file  CSV or TSV file
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  addImagesByFile: function(file, _callback) {
+    var promise = images.addFile(file);
     callback.handle(promise, _callback);
     return promise;
   }

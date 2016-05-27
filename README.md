@@ -75,6 +75,7 @@ You can also use the SDK by adding this script to your HTML:
 * [Add an image via url and id](#add-an-image-via-url-and-id)
 * [Add multiple images via url](#add-an-image-via-url)
 * [Add an image via image bytes](#add-an-image-via-image-bytes)
+* [Add images via file](#add-images-via-file)
 * [Get all images](#get-all-images)
 * [Get a single image by id](#get-a-single-image-by-id)
 * [Delete a single image by id](#delete-a-single-image-by-id)
@@ -317,6 +318,26 @@ Clarifai.addImages([
 Clarifai.addImages({
   'base64': '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAE...'
 }).then(
+  handleResponse,
+  handleError
+);
+```
+
+### Add images via file
+
+#### Browser
+
+```js
+Clarifai.addImagesByFile(file).then(
+  handleResponse,
+  handleError
+);
+```
+
+#### Node.js
+
+```js
+Clarifai.addImagesByFile(fs.createReadStream('test.csv')).then(
   handleResponse,
   handleError
 );

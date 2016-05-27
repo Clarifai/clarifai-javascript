@@ -1,3 +1,4 @@
+fs = require('fs');
 var Clarifai = require('./../index.js');
 var imageBytes = require('./image-bytes');
 
@@ -344,7 +345,40 @@ describe('Clarifai JS SDK', function() {
       );
     });
     
-
+/*
+    it('Adds images via csv file', function(done) {
+      Clarifai.addImagesByFile(fs.createReadStream('./../spec/test.csv')).then(
+        function(response) {
+          console.log(response);
+          expect(response.images).toBeDefined();
+          var images = response.images;
+          expect(images.length).toBe(1);
+          expect(images[0].created_at).toBeDefined();
+          expect(images[0].id).toBeDefined();
+          expect(images[0].url).toBe(sampleImage);
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Adds images via tsv file', function(done) {
+      Clarifai.addImagesByFile(fs.createReadStream('./../spec/test.tsv')).then(
+        function(response) {
+          console.log(response);
+          expect(response.images).toBeDefined();
+          var images = response.images;
+          expect(images.length).toBe(1);
+          expect(images[0].created_at).toBeDefined();
+          expect(images[0].id).toBeDefined();
+          expect(images[0].url).toBe(sampleImage);
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+*/
+    
     it('Creates an image via bytes', function(done) {
       Clarifai.addImages({
         'base64': imageBytes
