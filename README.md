@@ -71,10 +71,10 @@ You can also use the SDK by adding this script to your HTML:
 
 #### Images
 
-* [Add an image via url](#create-an-image-via-url)
-* [Add an image via url and id](#create-an-image-via-url-and-id)
-* [Add multiple images via url](#create-an-image-via-url)
-* [Add an image via image bytes](#create-an-image-via-image-bytes)
+* [Add an image via url](#add-an-image-via-url)
+* [Add an image via url and id](#add-an-image-via-url-and-id)
+* [Add multiple images via url](#add-an-image-via-url)
+* [Add an image via image bytes](#add-an-image-via-image-bytes)
 * [Get all images](#get-all-images)
 * [Get a single image by id](#get-a-single-image-by-id)
 * [Delete a single image by id](#delete-a-single-image-by-id)
