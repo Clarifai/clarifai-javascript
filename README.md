@@ -22,7 +22,7 @@ Clarifai.initialize({
 You can also use the SDK by adding this script to your HTML:
 
 ```js
-<script type="text/javascript" src="https://sdk.clarifai.com/js/clarifai-1.2.0.js"></script>
+<script type="text/javascript" src="https://sdk.clarifai.com/js/clarifai-2.0.0.js"></script>
 <script>
   Clarifai.initialize({
     'clientId': '{clientId}',
@@ -68,6 +68,25 @@ You can also use the SDK by adding this script to your HTML:
 * [Get a token](#get-a-token)
 * [Set a token](#set-a-token)
 * [Delete a token](#delete-a-token)
+
+#### Images
+
+* [Add an image via url](#create-an-image-via-url)
+* [Add an image via url and id](#create-an-image-via-url-and-id)
+* [Add multiple images via url](#create-an-image-via-url)
+* [Add an image via image bytes](#create-an-image-via-image-bytes)
+* [Get all images](#get-all-images)
+* [Get a single image by id](#get-a-single-image-by-id)
+* [Delete a single image by id](#delete-a-single-image-by-id)
+* [Get images status](#get-images-status)
+
+#### Search
+
+* [Visually search images](#visually-search-images)
+* [Visually search images with crop area](#visually-search-images-with-crop-area)
+* [Search images by all predictions matched](#search-images-by-all-predictions-matched)
+* [Search images by any predictions matched](#search-images-by-any-predictions-matched)
+* [Search images and exclude all predictions matched](#search-images-and-exclude-all-predictions-matched)
 
 #### Promises and Callbacks
 
@@ -249,6 +268,158 @@ var tokenSetBoolean = Clarifai.setToken('some-token-string');
 
 ```js
 Clarifai.deleteToken();
+```
+
+### Images
+
+### Add an image via url
+
+```js
+Clarifai.addImages({
+  'url': 'https://samples.clarifai.com/metro-north.jpg'
+}).then(
+  handleResponse,
+  handleError
+);
+```
+
+### Add an image via url and id
+
+```js
+Clarifai.addImages({
+  'url': 'https://samples.clarifai.com/metro-north.jpg',
+  'id': 'some_id'
+}).then(
+  handleResponse,
+  handleError
+);
+```
+
+### Add multiple images via url
+
+```js
+Clarifai.addImages([
+  {
+    'url': 'https://samples.clarifai.com/metro-north.jpg'
+  },
+  {
+    'url': 'https://samples.clarifai.com/wedding.jpg'
+  }
+]).then(
+  handleResponse,
+  handleError
+);
+```
+
+### Add an image via image bytes
+
+```js
+Clarifai.addImages({
+  'base64': '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAE...'
+}).then(
+  handleResponse,
+  handleError
+);
+```
+
+### Get all images
+
+```js
+Clarifai.getImages().then(
+  handleResponse,
+  handleError
+);
+```
+
+### Get a single image by id
+
+```js
+Clarifai.getImageById('aUNrZDyWTpWwUJlmcImuDA').then(
+  handleResponse,
+  handleError
+);
+```
+
+### Delete a single image by id
+
+```js
+Clarifai.deleteImageById('aUNrZDyWTpWwUJlmcImuDA').then(
+  handleResponse,
+  handleError
+);
+```
+
+### Get images status
+
+```js
+Clarifai.getImagesStatus().then(
+  handleResponse,
+  handleError
+);
+```
+
+### Search
+
+### Visually search images
+
+```js
+Clarifai.searchImages({
+  'image': {
+    'url': 'https://samples.clarifai.com/metro-north.jpg'
+  }
+}).then(
+  handleResponse,
+  handleError
+);
+```
+
+### Visually search images with crop area
+
+Crop parameter is an array of 4 floats in the range 0 - 1.0 that defines `[top, left, bottom, right]` respectively.
+
+```js
+Clarifai.searchImages({
+  'image': {
+    'url': 'https://samples.clarifai.com/metro-north.jpg',
+    'crop': [0.25, 0.25, 0.75, 0.75]
+  }
+}).then(
+  handleResponse,
+  handleError
+);
+```
+
+### Search images by all predictions matched
+
+```js
+Clarifai.searchImages({
+  'and_terms': ['sky', 'dress']
+}).then(
+  handleResponse,
+  handleError
+);
+```
+
+### Search images by any predictions matched
+
+```js
+Clarifai.searchImages({
+  'or_terms': ['sky', 'dress']
+}).then(
+  handleResponse,
+  handleError
+);
+```
+
+### Search images and exclude all predictions matched
+
+```js
+Clarifai.searchImages({
+  'not_terms': ['sky', 'dress']
+}).then(
+  handleResponse,
+  handleError
+);
 ```
 
 ### Promises and Callbacks
