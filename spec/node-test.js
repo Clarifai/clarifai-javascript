@@ -281,7 +281,7 @@ describe('Clarifai JS SDK', function() {
   
   describe('Images', function() {
     
-    var imageId = 'some_test_id';
+    var imageId = 'someId';
     
     it('Adds an image via url', function(done) {
       Clarifai.addImages({
@@ -470,7 +470,7 @@ describe('Clarifai JS SDK', function() {
     
     it('Searches images by all predictions matched', function(done) {
       Clarifai.searchImages({
-        'and_terms': ['train']
+        'andTerms': ['train']
       }).then(
         function(response) {
           expect(response.images).toBeDefined();
@@ -488,7 +488,7 @@ describe('Clarifai JS SDK', function() {
     
     it('Searches images by any predictions matched', function(done) {
       Clarifai.searchImages({
-        'or_terms': ['train', 'foo']
+        'orTerms': ['train', 'foo']
       }).then(
         function(response) {
           expect(response.images).toBeDefined();
@@ -506,7 +506,7 @@ describe('Clarifai JS SDK', function() {
     
     it('Searches images and exclude all predictions matched', function(done) {
       Clarifai.searchImages({
-        'not_terms': ['doo', 'foo']
+        'notTerms': ['doo', 'foo']
       }).then(
         function(response) {
           expect(response.images).toBeDefined();

@@ -290,7 +290,7 @@ Clarifai.addImages({
 ```js
 Clarifai.addImages({
   'url': 'https://samples.clarifai.com/metro-north.jpg',
-  'id': 'some_id'
+  'id': 'someId'
 }).then(
   handleResponse,
   handleError
@@ -427,7 +427,7 @@ Clarifai.searchImages({
 
 ```js
 Clarifai.searchImages({
-  'and_terms': ['sky', 'dress']
+  'andTerms': ['sky', 'dress']
 }).then(
   handleResponse,
   handleError
@@ -438,7 +438,7 @@ Clarifai.searchImages({
 
 ```js
 Clarifai.searchImages({
-  'or_terms': ['sky', 'dress']
+  'orTerms': ['sky', 'dress']
 }).then(
   handleResponse,
   handleError
@@ -449,7 +449,7 @@ Clarifai.searchImages({
 
 ```js
 Clarifai.searchImages({
-  'not_terms': ['sky', 'dress']
+  'notTerms': ['sky', 'dress']
 }).then(
   handleResponse,
   handleError
