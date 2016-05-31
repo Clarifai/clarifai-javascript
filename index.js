@@ -206,19 +206,20 @@ module.exports = global.Clarifai = {
   /**
   * Search images
   * @method searchImages
-  * @param {Object}    options  Object with keys explained below: (optional)
+  * @param {Object}    query  Object with keys explained below: (optional)
   *    @param {Object}    image  Object with keys explained below:
   *       @param {String}    url  A url to visually search against
   *       @param {Array}     crop  [top, left, bottom, right], each specified in the range 0-1.0 (optional)
+  *    @param {Array}    andTerms  Restrict the images returned to match all predictions in the array
+  *    @param {Array}    orTerms  Restrict the images returned to match any predictions in the array
+  *    @param {Array}    notTerms  Restrict the images returned to match none of the predictions in the array
+  * @param {Object}    pagination  Object with keys explained below: (optional)
   *    @param {Number}    page  The page number (optional, default: 1)
   *    @param {Number}    perPage  Number of images to return per page (optional, default: 20)
-  *    @param {Array}    and_terms  Restrict the images returned to match all predictions in the array
-  *    @param {Array}    or_terms  Restrict the images returned to match any predictions in the array
-  *    @param {Array}    not_terms  Restrict the images returned to match none of the predictions in the array
   * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
   */
-  searchImages: function(options, _callback) {
-    var promise = images.search(options);
+  searchImages: function(query, pagination, _callback) {
+    var promise = images.search(query, pagination);
     callback.handle(promise, _callback);
     return promise;
   },

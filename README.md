@@ -89,6 +89,7 @@ You can also use the SDK by adding this script to your HTML:
 * [Search images by all predictions matched](#search-images-by-all-predictions-matched)
 * [Search images by any predictions matched](#search-images-by-any-predictions-matched)
 * [Search images and exclude all predictions matched](#search-images-and-exclude-all-predictions-matched)
+* [Search images by all predictions matched with pagination](#search-images-by-all-predictions-matched-with-pagination)
 
 #### Promises and Callbacks
 
@@ -450,6 +451,20 @@ Clarifai.searchImages({
 ```js
 Clarifai.searchImages({
   'notTerms': ['sky', 'dress']
+}).then(
+  handleResponse,
+  handleError
+);
+```
+
+### Search images by all predictions matched with pagination
+
+```js
+Clarifai.searchImages({
+  'andTerms': ['sky', 'dress']
+}, {
+  'page': 2,
+  'perPage': 30 
 }).then(
   handleResponse,
   handleError

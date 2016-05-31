@@ -486,6 +486,23 @@ describe('Clarifai JS SDK', function() {
       );
     });
     
+    it('Searches images by all predictions matched with pagination', function(done) {
+      Clarifai.searchImages({
+        'andTerms': ['train']
+      }, {
+        'page': 5000,
+        'perPage': 100
+      }).then(
+        function(response) {
+          expect(response.images).toBeDefined();
+          var images = response.images;
+          expect(images.length).toBe(0);
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
     it('Searches images by any predictions matched', function(done) {
       Clarifai.searchImages({
         'orTerms': ['train', 'foo']
