@@ -4,13 +4,13 @@ The official JavaScript client for interacting with the [Clarifai API](https://d
 
 ## Basic Use
 
-To start, install the SDK via NPM: `npm install clarifai-official` and initialize with your clientId and
+To start, install the SDK via NPM: `npm install clarifai` and initialize with your clientId and
 clientSecret:
 
 *This will work in node.js and browsers via [Browserify](http://browserify.org/)*
 
 ```js
-var Clarifai = require('clarifai-official');
+var Clarifai = require('clarifai');
 
 Clarifai.initialize({
   'clientId': '{clientId}',
