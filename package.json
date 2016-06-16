@@ -3,7 +3,7 @@
   "version": "1.2.0",
   "description": "Official Clarifai Javascript SDK",
   "main": "index.js",
-  "repository": "https://github.com/Clarifai/javascript-sdk",
+  "repository": "https://github.com/Clarifai/clarifai-javascript",
   "author": "Clarifai Inc.",
   "license": "Apache-2.0",
   "dependencies": {
