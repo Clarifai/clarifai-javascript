@@ -425,120 +425,6 @@ describe('Clarifai JS SDK', function() {
       );
     });
     
-    it('Visually searches images', function(done) {
-      Clarifai.searchImages({
-        'image': {
-          'url': sampleImage
-        }
-      }).then(
-        function(response) {
-          expect(response.images).toBeDefined();
-          var images = response.images;
-          expect(images.length).toBeGreaterThan(0);
-          var image = images[0];
-          expect(image.id).toBeDefined();
-          expect(image.created_at).toBeDefined();
-          expect(image.url).toBeDefined();
-          expect(image.score).toBeDefined();
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-    
-    it('Visually searches images with crop area', function(done) {
-      Clarifai.searchImages({
-        'image': {
-          'url': sampleImage,
-          'crop': [0.25, 0.25, 0.75, 0.75]
-        }
-      }).then(
-        function(response) {
-          expect(response.images).toBeDefined();
-          var images = response.images;
-          expect(images.length).toBeGreaterThan(0);
-          var image = images[0];
-          expect(image.id).toBeDefined();
-          expect(image.created_at).toBeDefined();
-          expect(image.url).toBeDefined();
-          expect(image.score).toBeDefined();
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-    
-    it('Searches images by all predictions matched', function(done) {
-      Clarifai.searchImages({
-        'andTerms': ['train']
-      }).then(
-        function(response) {
-          expect(response.images).toBeDefined();
-          var images = response.images;
-          expect(images.length).toBeGreaterThan(0);
-          var image = images[0];
-          expect(image.id).toBeDefined();
-          expect(image.created_at).toBeDefined();
-          expect(image.url).toBeDefined();
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-    
-    it('Searches images by all predictions matched with pagination', function(done) {
-      Clarifai.searchImages({
-        'andTerms': ['train']
-      }, {
-        'page': 5000,
-        'perPage': 100
-      }).then(
-        function(response) {
-          expect(response.images).toBeDefined();
-          var images = response.images;
-          expect(images.length).toBe(0);
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-    
-    it('Searches images by any predictions matched', function(done) {
-      Clarifai.searchImages({
-        'orTerms': ['train', 'foo']
-      }).then(
-        function(response) {
-          expect(response.images).toBeDefined();
-          var images = response.images;
-          expect(images.length).toBeGreaterThan(0);
-          var image = images[0];
-          expect(image.id).toBeDefined();
-          expect(image.created_at).toBeDefined();
-          expect(image.url).toBeDefined();
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-    
-    it('Searches images and exclude all predictions matched', function(done) {
-      Clarifai.searchImages({
-        'notTerms': ['doo', 'foo']
-      }).then(
-        function(response) {
-          expect(response.images).toBeDefined();
-          var images = response.images;
-          expect(images.length).toBeGreaterThan(0);
-          var image = images[0];
-          expect(image.id).toBeDefined();
-          expect(image.created_at).toBeDefined();
-          expect(image.url).toBeDefined();
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-    
     it('Deletes a single image by id', function(done) {
       Clarifai.deleteImageById(imageId).then(
         function(response) {
@@ -562,6 +448,87 @@ describe('Clarifai JS SDK', function() {
         errorHandler.bind(done)
       );
     });
+  
+  });
+  
+  describe('Search', function() {
+    
+    it('Visually searches images', function(done) {
+      Clarifai.searchImages({
+        'image': {
+          'url': sampleImage
+        }
+      }).then(
+        function(response) {
+          testScoredImageResponse(response, done);
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Visually searches images with crop area', function(done) {
+      Clarifai.searchImages({
+        'image': {
+          'url': sampleImage,
+          'crop': [0.25, 0.25, 0.75, 0.75]
+        }
+      }).then(
+        function(response) {
+          testScoredImageResponse(response, done);
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Searches images by all predictions matched', function(done) {
+      Clarifai.searchImages({
+        'andTerms': ['train']
+      }).then(
+        function(response) {
+          testScoredImageResponse(response, done);
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Searches images by all predictions matched with pagination', function(done) {
+      Clarifai.searchImages({
+        'andTerms': ['train']
+      }, {
+        'page': 5000,
+        'perPage': 100
+      }).then(
+        function(response) {
+          expect(response.scored_items).toBeDefined();
+          var scoredItems = response.scored_items;
+          expect(scoredItems.length).toBe(0);
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Searches images by any predictions matched', function(done) {
+      Clarifai.searchImages({
+        'orTerms': ['train', 'foo']
+      }).then(
+        function(response) {
+          testScoredImageResponse(response, done);
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Searches images and exclude all predictions matched', function(done) {
+      Clarifai.searchImages({
+        'notTerms': ['doo', 'foo']
+      }).then(
+        function(response) {
+          testScoredImageResponse(response, done);
+        },
+        errorHandler.bind(done)
+      );
+    });
     
   });
   
@@ -580,4 +547,17 @@ function errorHandler(err) {
 
 function log(obj) {
   console.log(JSON.stringify(obj, null, 2));
-}
+};
+
+function testScoredImageResponse(response, done) {
+  expect(response.scored_items).toBeDefined();
+  var scoredItems = response.scored_items;
+  expect(scoredItems.length).toBeGreaterThan(0);
+  var scoredItem = scoredItems[0];
+  expect(scoredItem.score).toBeDefined();
+  expect(scoredItem.image).toBeDefined();
+  expect(scoredItem.image.id).toBeDefined();
+  expect(scoredItem.image.created_at).toBeDefined();
+  expect(scoredItem.image.url).toBeDefined();
+  done();
+};
