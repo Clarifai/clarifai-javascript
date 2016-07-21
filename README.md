@@ -92,6 +92,10 @@ You can also use the SDK by adding this script to your HTML:
 * [Search images and exclude all predictions matched](#search-images-and-exclude-all-predictions-matched)
 * [Search images by all predictions matched with pagination](#search-images-by-all-predictions-matched-with-pagination)
 
+#### Inputs
+
+* [Add an annotated input](#add-an-annotated-input)
+
 #### Promises and Callbacks
 
 * [Instructions](#promises-and-callbacks)
@@ -467,6 +471,34 @@ Clarifai.searchImages({
   'page': 2,
   'perPage': 30 
 }).then(
+  handleResponse,
+  handleError
+);
+```
+
+### Inputs
+
+#### Add an annotated input
+
+```js
+Clarifai.addInputs([
+  { 
+    "image": {
+        "url": "http://i.imgur.com/HEoT5xR.png"
+    },
+    "annotation":{
+        "tags": [{"id":"ferrari", "present":true}]
+    }
+  },
+  { 
+    "image": {
+        "url": "http://i.imgur.com/It5JRaj.jpg"
+    },
+    "annotation":{
+        "tags": [{"id":"ferrari", "present":true}]
+    }
+  }
+]).then(
   handleResponse,
   handleError
 );

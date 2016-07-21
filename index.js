@@ -8,6 +8,7 @@ var color = require('./lib/color');
 var feedback = require('./lib/feedback');
 var usage = require('./lib/usage');
 var images = require('./lib/images');
+var inputs = require('./lib/inputs');
 
 module.exports = global.Clarifai = {
   initialize: function(options) {
@@ -166,7 +167,7 @@ module.exports = global.Clarifai = {
   },
   /**
   * Adds an image or multiple images
-  * @method addImage
+  * @method addImages
   * @param {Object OR Array}    options  Object or Array of Objects with keys explained below:
   *   @param {String}    url  A publicly accessible url of the image. (required OR base64)
   *   @param {String}    base64  image data as a base64 encoded string (required OR url)
@@ -252,6 +253,24 @@ module.exports = global.Clarifai = {
   */
   addImagesByFile: function(file, _callback) {
     var promise = images.addFile(file);
+    callback.handle(promise, _callback);
+    return promise;
+  },
+  /**
+  * Adds an input or multiple inputs
+  * @method addInputs
+  * @param {Object OR Array}    options  Object or Array of Objects with keys explained below:
+  *    @param {Object}    image  Object with keys explained below:
+  *       @param {String}    url  A url to visually search against
+  *       @param {Array}     crop  [top, left, bottom, right], each specified in the range 0-1.0 (optional)
+  *    @param {Object}    annotation Object with keys explained below: 
+  *       @param {Array}    tags  An Array of objects with keys explained below:
+  *          @param {String}  id  A concept id
+  *          @param {Boolean}  present  Whether the concept is present or not in the input
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  addInputs: function(options, _callback) {
+    var promise = inputs.add(options);
     callback.handle(promise, _callback);
     return promise;
   }
