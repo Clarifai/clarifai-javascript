@@ -598,6 +598,27 @@ describe('Clarifai JS SDK', function() {
         errorHandler.bind(done)
       );
     });
+    
+    it('Trains a model', function(done) {
+      Clarifai.trainModel('vG0S5NEYSHCqKzZJQ5JfZA').then(
+        function(response) {
+          expect(response.train).toBeDefined();
+          var train = response.train;
+          expect(train.status).toBeDefined();
+          expect(train.model).toBeDefined();
+          var model = train.model;
+          expect(model.name).toBeDefined();
+          expect(model.id).toBeDefined();
+          expect(model.type).toBeDefined();
+          expect(model.created_at).toBeDefined();
+          expect(model.application_id).toBeDefined();
+          expect(model.output_info).toBeDefined();
+          expect(model.model_version).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
      
   });
   

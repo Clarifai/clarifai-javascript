@@ -288,5 +288,16 @@ module.exports = global.Clarifai = {
     var promise = models.create(options);
     callback.handle(promise, _callback);
     return promise;
+  },
+  /**
+  * Train a model
+  * @method trainModel
+  * @param {String}    modelId  The id of the model to train
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  trainModel: function(modelId, _callback) {
+    var promise = models.train(modelId);
+    callback.handle(promise, _callback);
+    return promise;
   }
 };

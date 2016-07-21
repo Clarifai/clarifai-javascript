@@ -99,6 +99,7 @@ You can also use the SDK by adding this script to your HTML:
 #### Models
 
 * [Create a model](#create-a-model)
+* [Train a model](#train-a-model)
 
 #### Promises and Callbacks
 
@@ -521,6 +522,15 @@ Clarifai.createModel({
     }
   ]
 }).then(
+  handleResponse,
+  handleError
+);
+```
+
+#### Train a model
+
+```js
+Clarifai.trainModel('vG0S5NEYSHCqKzZJQ5JfZA').then(
   handleResponse,
   handleError
 );
