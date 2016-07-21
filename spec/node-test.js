@@ -65,6 +65,7 @@ describe('Clarifai JS SDK', function() {
   });
   
 
+/*
   describe('Tag', function() {
   
     it('Gets tags for an image via url', function(done) {
@@ -344,6 +345,7 @@ describe('Clarifai JS SDK', function() {
         errorHandler.bind(done)
       );
     });
+*/
     
 /*
     it('Adds images via csv file', function(done) {
@@ -379,6 +381,7 @@ describe('Clarifai JS SDK', function() {
     });
 */
     
+/*
     it('Creates an image via bytes', function(done) {
       Clarifai.addImages({
         'base64': imageBytes
@@ -530,6 +533,72 @@ describe('Clarifai JS SDK', function() {
       );
     });
     
+  });
+*/
+  
+  describe('Inputs', function() {
+    
+    it('Adds an annotated input', function(done) {
+      Clarifai.addInputs([
+        { 
+          "image": {
+              "url": "http://i.imgur.com/HEoT5xR.png"
+          },
+          "annotation":{
+              "tags": [{"id":"ferrari", "present":true}]
+          }
+        },
+        { 
+          "image": {
+              "url": "http://i.imgur.com/It5JRaj.jpg"
+          },
+          "annotation":{
+              "tags": [{"id":"ferrari", "present":true}]
+          }
+        }
+      ]).then(
+        function(response) {
+          expect(response.inputs).toBeDefined();
+          var inputs = response.inputs;
+          expect(inputs.length).toBe(2);
+          expect(inputs[0].created_at).toBeDefined();
+          expect(inputs[0].id).toBeDefined();
+          expect(inputs[0].image).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+  });
+  
+  describe('Models', function() {
+    
+     it('Creates a new model', function(done) {
+      Clarifai.createModel({
+        'name': 'test',
+        'concepts': [
+          {
+            'id': 'ferrari'
+          }
+        ]
+      }).then(
+        function(response) {
+          expect(response.model).toBeDefined();
+          var model = response.model;
+          expect(model.name).toBeDefined();
+          expect(model.id).toBeDefined();
+          expect(model.type).toBeDefined();
+          expect(model.created_at).toBeDefined();
+          expect(model.application_id).toBeDefined();
+          expect(model.output_info).toBeDefined();
+          expect(model.model_version).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+     
   });
   
 });

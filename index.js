@@ -9,6 +9,7 @@ var feedback = require('./lib/feedback');
 var usage = require('./lib/usage');
 var images = require('./lib/images');
 var inputs = require('./lib/inputs');
+var models = require('./lib/models');
 
 module.exports = global.Clarifai = {
   initialize: function(options) {
@@ -271,6 +272,20 @@ module.exports = global.Clarifai = {
   */
   addInputs: function(options, _callback) {
     var promise = inputs.add(options);
+    callback.handle(promise, _callback);
+    return promise;
+  },
+  /**
+  * Create a new model
+  * @method createModel
+  * @param {Object}    options  Object with keys explained below:
+  *    @param {String}    name  The name of the model
+  *    @param {Array}    concepts  An Array of Objects with keys explained below:
+  *       @param {String}    id  The name of the concept you'd like to add to the model
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  createModel: function(options, _callback) {
+    var promise = models.create(options);
     callback.handle(promise, _callback);
     return promise;
   }

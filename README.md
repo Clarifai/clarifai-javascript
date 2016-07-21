@@ -96,6 +96,10 @@ You can also use the SDK by adding this script to your HTML:
 
 * [Add an annotated input](#add-an-annotated-input)
 
+#### Models
+
+* [Create a model](#create-a-model)
+
 #### Promises and Callbacks
 
 * [Instructions](#promises-and-callbacks)
@@ -499,6 +503,24 @@ Clarifai.addInputs([
     }
   }
 ]).then(
+  handleResponse,
+  handleError
+);
+```
+
+### Models
+
+#### Create a model
+
+```js
+Clarifai.createModel({
+  'name': 'test',
+  'concepts': [
+    {
+      'id': 'ferrari'
+    }
+  ]
+}).then(
   handleResponse,
   handleError
 );
