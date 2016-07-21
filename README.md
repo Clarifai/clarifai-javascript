@@ -100,6 +100,7 @@ You can also use the SDK by adding this script to your HTML:
 
 * [Create a model](#create-a-model)
 * [Train a model](#train-a-model)
+* [Predict](#predict)
 
 #### Promises and Callbacks
 
@@ -531,6 +532,28 @@ Clarifai.createModel({
 
 ```js
 Clarifai.trainModel('vG0S5NEYSHCqKzZJQ5JfZA').then(
+  handleResponse,
+  handleError
+);
+```
+
+#### Predict
+
+```js
+Clarifai.predict({
+  'modelId': 'vG0S5NEYSHCqKzZJQ5JfZA',
+  'inputs': [
+    {
+      'image': {
+        'url': 'http://www.ramtrucks.com/assets/towing_guide/images/before_you_buy/truck.png'}
+      },
+    {
+      'image': {
+        'url': 'http://www.planwallpaper.com/static/images/ferrari-9.jpg'
+      }
+    }
+  ]
+}).then(
   handleResponse,
   handleError
 );

@@ -299,5 +299,20 @@ module.exports = global.Clarifai = {
     var promise = models.train(modelId);
     callback.handle(promise, _callback);
     return promise;
+  },
+  /**
+  * Make a prediction
+  * @method predict
+  * @param {Object}    options  Object with keys explained below:
+  *    @param {String}    modelId  The id of the model to make a prediction from
+  *    @param {Array}    inputs  An Array of Objects with keys explained below:
+  *       @param {Object}    image  Object with keys explained below:
+  *          @param {String}  url  Url of an image to make a prediction on
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  predict: function(options, _callback) {
+    var promise = models.predict(options);
+    callback.handle(promise, _callback);
+    return promise;
   }
 };

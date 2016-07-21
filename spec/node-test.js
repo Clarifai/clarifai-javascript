@@ -619,6 +619,37 @@ describe('Clarifai JS SDK', function() {
         errorHandler.bind(done)
       );
     });
+    
+    it('Makes a prediction', function(done) {
+      Clarifai.predict({
+        'modelId': 'vG0S5NEYSHCqKzZJQ5JfZA',
+        'inputs': [
+          {
+            'image': {
+              'url': 'http://www.ramtrucks.com/assets/towing_guide/images/before_you_buy/truck.png'}
+            },
+          {
+            'image': {
+              'url': 'http://www.planwallpaper.com/static/images/ferrari-9.jpg'
+            }
+          }
+        ]
+      }).then(
+        function(response) {
+          expect(response.outputs).toBeDefined();
+          var outputs = response.outputs;
+          expect(outputs.length).toBe(2);
+          var output = outputs[0];
+          expect(output.status).toBeDefined();
+          expect(output.input).toBeDefined();
+          expect(output.model).toBeDefined();
+          expect(output.timestamp).toBeDefined();
+          expect(output.concept_predictions).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
      
   });
   
