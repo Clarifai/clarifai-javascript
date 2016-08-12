@@ -536,6 +536,7 @@ describe('Clarifai JS SDK', function() {
   });
 */
   
+
   describe('Inputs', function() {
     var id = 'test-id' + Math.random();
     it('Adds an input', function(done) {
@@ -763,7 +764,6 @@ describe('Clarifai JS SDK', function() {
         }
       }).then(
         function(response) {
-          console.log(resonse);
           expect(response.input).toBeDefined();
           expect(response.input.created_at).toBeDefined();
           expect(response.input.id).toBeDefined();
@@ -775,9 +775,8 @@ describe('Clarifai JS SDK', function() {
     });
     
   });
+
   
-  
-/*
   describe('Models', function() {
     
      it('Creates a new model', function(done) {
@@ -794,49 +793,46 @@ describe('Clarifai JS SDK', function() {
           var model = response.model;
           expect(model.name).toBeDefined();
           expect(model.id).toBeDefined();
-          expect(model.type).toBeDefined();
           expect(model.created_at).toBeDefined();
-          expect(model.application_id).toBeDefined();
+          expect(model.app).toBeDefined();
           expect(model.output_info).toBeDefined();
-          expect(model.model_version).toBeDefined();
+          expect(model.version).toBeDefined();
           done();
         },
         errorHandler.bind(done)
       );
     });
     
-    it('Trains a model', function(done) {
-      Clarifai.trainModel('vG0S5NEYSHCqKzZJQ5JfZA').then(
+
+    it('Creates a new model version', function(done) {
+      Clarifai.createModelVersion('eb3b792155a4487b82ce575458ff2475').then(
         function(response) {
-          expect(response.train).toBeDefined();
-          var train = response.train;
-          expect(train.status).toBeDefined();
-          expect(train.model).toBeDefined();
-          var model = train.model;
-          expect(model.name).toBeDefined();
-          expect(model.id).toBeDefined();
-          expect(model.type).toBeDefined();
-          expect(model.created_at).toBeDefined();
-          expect(model.application_id).toBeDefined();
-          expect(model.output_info).toBeDefined();
-          expect(model.model_version).toBeDefined();
+          expect(response.version).toBeDefined();
+          var version = response.version;
+          expect(version.status).toBeDefined();
+          expect(version.created_at).toBeDefined();
+          expect(version.version_id).toBeDefined();
           done();
         },
         errorHandler.bind(done)
       );
     });
     
-    it('Makes a prediction', function(done) {
-      Clarifai.predict({
-        'modelId': 'vG0S5NEYSHCqKzZJQ5JfZA',
+    it('Attatches model outputs', function(done) {
+      Clarifai.attachModelOutputs('eb3b792155a4487b82ce575458ff2475', {
         'inputs': [
           {
-            'image': {
-              'url': 'http://www.ramtrucks.com/assets/towing_guide/images/before_you_buy/truck.png'}
-            },
+            "data": {
+              'image': {
+                'url': 'http://www.ramtrucks.com/assets/towing_guide/images/before_you_buy/truck.png'
+              }
+            }
+          },
           {
-            'image': {
-              'url': 'http://www.planwallpaper.com/static/images/ferrari-9.jpg'
+            "data": {
+              'image': {
+                'url': 'http://www.planwallpaper.com/static/images/ferrari-9.jpg'
+              }
             }
           }
         ]
@@ -846,19 +842,20 @@ describe('Clarifai JS SDK', function() {
           var outputs = response.outputs;
           expect(outputs.length).toBe(2);
           var output = outputs[0];
+          expect(output.id).toBeDefined();
           expect(output.status).toBeDefined();
           expect(output.input).toBeDefined();
           expect(output.model).toBeDefined();
-          expect(output.timestamp).toBeDefined();
-          expect(output.concept_predictions).toBeDefined();
+          expect(output.created_at).toBeDefined();
+          expect(output.data).toBeDefined();
           done();
         },
         errorHandler.bind(done)
       );
     });
+
      
   });
-*/
   
 });
 
