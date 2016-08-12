@@ -264,10 +264,10 @@ module.exports = global.Clarifai = {
   *    @param {Object}    image  Object with keys explained below:
   *       @param {String}    url  A url to visually search against
   *       @param {Array}     crop  [top, left, bottom, right], each specified in the range 0-1.0 (optional)
-  *    @param {Object}    annotation Object with keys explained below: 
-  *       @param {Array}    tags  An Array of objects with keys explained below:
+  *    @param {Array}    tags  An Array of objects with keys explained below:
+  *       @param {Object}    concept  Object with keys explained below:
   *          @param {String}  id  A concept id
-  *          @param {Boolean}  present  Whether the concept is present or not in the input
+  *          @param {Boolean}  value  Whether the concept is present or not in the input
   * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
   */
   addInputs: function(options, _callback) {

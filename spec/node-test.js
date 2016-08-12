@@ -537,33 +537,67 @@ describe('Clarifai JS SDK', function() {
 */
   
   describe('Inputs', function() {
-    
-    it('Adds an annotated input', function(done) {
+    var id = 'test-id' + Math.random();
+    console.log('id', id);
+    it('Adds an input', function(done) {
       Clarifai.addInputs([
-        { 
-          "image": {
-              "url": "http://i.imgur.com/HEoT5xR.png"
+        {
+          "data": {
+            "image": {
+              "url": "https://samples.clarifai.com/metro-north.jpg"
+            }
           },
-          "annotation":{
-              "tags": [{"id":"ferrari", "present":true}]
-          }
-        },
-        { 
-          "image": {
-              "url": "http://i.imgur.com/It5JRaj.jpg"
-          },
-          "annotation":{
-              "tags": [{"id":"ferrari", "present":true}]
-          }
+          "id": id
         }
       ]).then(
         function(response) {
           expect(response.inputs).toBeDefined();
           var inputs = response.inputs;
-          expect(inputs.length).toBe(2);
+          expect(inputs.length).toBe(1);
           expect(inputs[0].created_at).toBeDefined();
           expect(inputs[0].id).toBeDefined();
-          expect(inputs[0].image).toBeDefined();
+          expect(inputs[0].data).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    var id2 = 'test-id' + Math.random();
+    console.log('id', id);
+    it('Adds an input with tags', function(done) {
+      Clarifai.addInputs([
+        {
+          "data": {
+            "image": {
+              "url": "https://samples.clarifai.com/metro-north.jpg"
+            },
+            "tags": [
+              {
+                "concept": {
+                  "id": "train"
+                },
+                "value": true
+              },
+              {
+                "concept": {
+                  "id": "car"
+                }, 
+                "value": false
+              }
+            ]
+          },
+          "id": id2
+        }
+      ]).then(
+        function(response) {
+          console.log(response);
+          expect(response.inputs).toBeDefined();
+          var inputs = response.inputs;
+          expect(inputs.length).toBe(1);
+          expect(inputs[0].created_at).toBeDefined();
+          expect(inputs[0].id).toBeDefined();
+          expect(inputs[0].data).toBeDefined();
           done();
         },
         errorHandler.bind(done)
@@ -572,6 +606,7 @@ describe('Clarifai JS SDK', function() {
     
   });
   
+/*
   describe('Models', function() {
     
      it('Creates a new model', function(done) {
@@ -652,6 +687,7 @@ describe('Clarifai JS SDK', function() {
     });
      
   });
+*/
   
 });
 
