@@ -538,7 +538,6 @@ describe('Clarifai JS SDK', function() {
   
   describe('Inputs', function() {
     var id = 'test-id' + Math.random();
-    console.log('id', id);
     it('Adds an input', function(done) {
       Clarifai.addInputs([
         {
@@ -564,7 +563,6 @@ describe('Clarifai JS SDK', function() {
     });
     
     var id2 = 'test-id' + Math.random();
-    console.log('id', id);
     it('Adds an input with tags', function(done) {
       Clarifai.addInputs([
         {
@@ -591,7 +589,6 @@ describe('Clarifai JS SDK', function() {
         }
       ]).then(
         function(response) {
-          console.log(response);
           expect(response.inputs).toBeDefined();
           var inputs = response.inputs;
           expect(inputs.length).toBe(1);
@@ -604,7 +601,181 @@ describe('Clarifai JS SDK', function() {
       );
     });
     
+    var id3 = 'test-id' + Math.random();
+    var id4 = 'test-id' + Math.random();
+    it('Bulk adds an input', function(done) {
+      Clarifai.addInputs([
+        {
+          "data": { 
+            "image": {
+              "url": "https://samples.clarifai.com/metro-north.jpg"
+            }
+          },
+          "id": id3
+        },
+        {
+          "data": { 
+            "image": {
+              "url": "https://samples.clarifai.com/dog.tiff"
+            }
+          },
+          "id": id4
+        }
+      ]).then(
+        function(response) {
+          expect(response.inputs).toBeDefined();
+          var inputs = response.inputs;
+          expect(inputs.length).toBe(2);
+          expect(inputs[0].created_at).toBeDefined();
+          expect(inputs[0].id).toBeDefined();
+          expect(inputs[0].data).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    var id5 = 'test-id' + Math.random();
+    var id6 = 'test-id' + Math.random();
+    it('Bulk adds an input with tags', function(done) {
+      Clarifai.addInputs([
+        {
+      "data": {
+        "image": {
+          "url": "http://i.imgur.com/HEoT5xR.png"
+        },
+        "tags": [
+          {
+            "concept": {
+              "id": "ferrari"
+            },
+            "value": true
+          },
+          {
+            "concept": {
+              "id": "outdoors"
+            }
+          }
+        ]
+      },
+      "id": id5
+    },
+    {
+      "data": {
+        "image": {
+          "url": "http://i.imgur.com/It5JRaj.jpg"
+        },
+        "tags": [
+          {
+            "concept": {
+              "id": "ferrari"
+            },
+            "value": true
+          },
+          {
+            "concept": {
+              "id": "outdoors"
+            },
+            "value": false
+          }
+        ]
+      },
+      "id": id6
+    }
+      ]).then(
+        function(response) {
+          expect(response.inputs).toBeDefined();
+          var inputs = response.inputs;
+          expect(inputs.length).toBe(2);
+          expect(inputs[0].created_at).toBeDefined();
+          expect(inputs[0].id).toBeDefined();
+          expect(inputs[0].data).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Gets all inputs', function(done) {
+      Clarifai.getInputs({
+        'page': 1,
+        'perPage': 5
+      }).then(
+        function(response) {
+          expect(response.inputs).toBeDefined();
+          var inputs = response.inputs;
+          expect(inputs.length).toBeGreaterThan(0);
+          expect(inputs.length).toBe(5);
+          var input = inputs[0];
+          expect(input.id).toBeDefined();
+          expect(input.created_at).toBeDefined();
+          expect(input.data).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Gets a single input by id', function(done) {
+      Clarifai.getInputById(id).then(
+        function(response) {
+          expect(response.input).toBeDefined();
+          expect(response.input.id).toBe(id);
+          expect(response.input.created_at).toBeDefined();
+          expect(response.input.data).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Gets inputs status', function(done) {
+      Clarifai.getInputsStatus().then(
+        function(response) {
+          expect(response.counts).toBeDefined();
+          var counts = response.counts;
+          expect(counts.processed).toBeDefined();
+          expect(counts.to_process).toBeDefined();
+          expect(counts.errors).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
+    it('Updates an input', function(done) {
+      Clarifai.updateInputById(id, {
+        "data": {
+          "tags": [
+            {
+              "concept": {
+                "id":"train"
+              }, 
+              "value": true
+            },
+            {
+              "concept": {
+                "id":"car"
+              }, 
+              "value": false
+            }
+          ]
+        }
+      }).then(
+        function(response) {
+          console.log(resonse);
+          expect(response.input).toBeDefined();
+          expect(response.input.created_at).toBeDefined();
+          expect(response.input.id).toBeDefined();
+          expect(response.input.data).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+    
   });
+  
   
 /*
   describe('Models', function() {

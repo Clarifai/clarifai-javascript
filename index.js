@@ -276,6 +276,60 @@ module.exports = global.Clarifai = {
     return promise;
   },
   /**
+  * Get inputs
+  * @method getInputs
+  * @param {Object}    options  Object with keys explained below: (optional)
+  *    @param {Number}    page  The page number (optional, default: 1)
+  *    @param {Number}    perPage  Number of images to return per page (optional, default: 20)
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  getInputs: function(options, _callback) {
+    var promise = inputs.get(options);
+    callback.handle(promise, _callback);
+    return promise;
+  },
+  /**
+  * Get input by id
+  * @method getInputById
+  * @param {String}    id  The input id
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  getInputById: function(id, _callback) {
+    var promise = inputs.getById(id);
+    callback.handle(promise, _callback);
+    return promise;
+  },
+  /**
+  * Get inputs status
+  * @method getInputsStatus
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  getInputsStatus: function(_callback) {
+    var promise = inputs.getStatus();
+    callback.handle(promise, _callback);
+    return promise;
+  },
+  /**
+  * Update input by id
+  * @method updateInputById
+  * @param {String}    id  The input id
+  * @param {Object}    options  Object with keys explained below:
+  *    @param {Object}    image  Object with keys explained below:
+  *       @param {String}    url  A url to visually search against
+  *       @param {Array}     crop  [top, left, bottom, right], each specified in the range 0-1.0 (optional)
+  *    @param {Array}    tags  An Array of objects with keys explained below:
+  *       @param {Object}    concept  Object with keys explained below:
+  *          @param {String}  id  A concept id
+  *          @param {Boolean}  value  Whether the concept is present or not in the input
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  updateInputById: function(id, options, _callback) {
+    var promise = inputs.updateById(id, options);
+    callback.handle(promise, _callback);
+    return promise;
+  },
+
+  /**
   * Create a new model
   * @method createModel
   * @param {Object}    options  Object with keys explained below:
