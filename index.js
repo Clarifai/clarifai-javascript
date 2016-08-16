@@ -7,7 +7,6 @@ var callback = require('./lib/callback');
 var color = require('./lib/color');
 var feedback = require('./lib/feedback');
 var usage = require('./lib/usage');
-var images = require('./lib/images');
 var inputs = require('./lib/inputs');
 var models = require('./lib/models');
 
@@ -167,97 +166,6 @@ module.exports = global.Clarifai = {
     return promise;
   },
   /**
-  * Adds an image or multiple images
-  * @method addImages
-  * @param {Object OR Array}    options  Object or Array of Objects with keys explained below:
-  *   @param {String}    url  A publicly accessible url of the image. (required OR base64)
-  *   @param {String}    base64  image data as a base64 encoded string (required OR url)
-  *   @param {String}    id  set the id for this image (if not supplied, an id will be created)
-  *   @param {Array}    crop  array of crops points [top, left, bottom, right] eg. [0.2,0.3,0.7,0.8]
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
-  */
-  addImages: function(options, _callback) {
-    var promise = images.add(options);
-    callback.handle(promise, _callback);
-    return promise;
-  },
-  /**
-  * Get images
-  * @method getImages
-  * @param {Object}    options  Object with keys explained below: (optional)
-  *    @param {Number}    page  The page number (optional, default: 1)
-  *    @param {Number}    perPage  Number of images to return per page (optional, default: 20)
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
-  */
-  getImages: function(options, _callback) {
-    var promise = images.get(options);
-    callback.handle(promise, _callback);
-    return promise;
-  },
-  /**
-  * Get image by id
-  * @method getImageById
-  * @param {String}    id  The image id
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
-  */
-  getImageById: function(id, _callback) {
-    var promise = images.getById(id);
-    callback.handle(promise, _callback);
-    return promise;
-  },
-  /**
-  * Search images
-  * @method searchImages
-  * @param {Object}    query  Object with keys explained below: (optional)
-  *    @param {Object}    image  Object with keys explained below:
-  *       @param {String}    url  A url to visually search against
-  *       @param {Array}     crop  [top, left, bottom, right], each specified in the range 0-1.0 (optional)
-  *    @param {Array}    andTerms  Restrict the images returned to match all predictions in the array
-  *    @param {Array}    orTerms  Restrict the images returned to match any predictions in the array
-  *    @param {Array}    notTerms  Restrict the images returned to match none of the predictions in the array
-  * @param {Object}    pagination  Object with keys explained below: (optional)
-  *    @param {Number}    page  The page number (optional, default: 1)
-  *    @param {Number}    perPage  Number of images to return per page (optional, default: 20)
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
-  */
-  searchImages: function(query, pagination, _callback) {
-    var promise = images.search(query, pagination);
-    callback.handle(promise, _callback);
-    return promise;
-  },
-  /**
-  * Delete an image by id
-  * @method deleteImageById
-  * @param {String}    id  The image id
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
-  */
-  deleteImageById: function(id, _callback) {
-    var promise = images.deleteById(id);
-    callback.handle(promise, _callback);
-    return promise;
-  },
-  /**
-  * Get images status
-  * @method getImagesStatus
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
-  */
-  getImagesStatus: function(_callback) {
-    var promise = images.getStatus();
-    callback.handle(promise, _callback);
-    return promise;
-  },
-  /**
-  * Add images with a CSV or TSV file
-  * @method addImagesByFile
-  * @param {File}    file  CSV or TSV file
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
-  */
-  addImagesByFile: function(file, _callback) {
-    var promise = images.addFile(file);
-    callback.handle(promise, _callback);
-    return promise;
-  },
-  /**
   * Adds an input or multiple inputs
   * @method addInputs
   * @param {Object OR Array}    options  Object or Array of Objects with keys explained below:
@@ -328,7 +236,17 @@ module.exports = global.Clarifai = {
     callback.handle(promise, _callback);
     return promise;
   },
-
+  /**
+  * Delete an input by id
+  * @method deleteInputById
+  * @param {String}    id  The input id
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  deleteInputById: function(id, _callback) {
+    var promise = inputs.deleteById(id);
+    callback.handle(promise, _callback);
+    return promise;
+  },
   /**
   * Create a new model
   * @method createModel
