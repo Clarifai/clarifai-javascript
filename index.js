@@ -7,7 +7,8 @@ var callback = require('./lib/callback');
 var color = require('./lib/color');
 var feedback = require('./lib/feedback');
 var usage = require('./lib/usage');
-var images = require('./lib/images');
+var inputs = require('./lib/inputs');
+var models = require('./lib/models');
 
 module.exports = global.Clarifai = {
   initialize: function(options) {
@@ -165,93 +166,124 @@ module.exports = global.Clarifai = {
     return promise;
   },
   /**
-  * Adds an image or multiple images
-  * @method addImage
+  * Adds an input or multiple inputs
+  * @method addInputs
   * @param {Object OR Array}    options  Object or Array of Objects with keys explained below:
-  *   @param {String}    url  A publicly accessible url of the image. (required OR base64)
-  *   @param {String}    base64  image data as a base64 encoded string (required OR url)
-  *   @param {String}    id  set the id for this image (if not supplied, an id will be created)
-  *   @param {Array}    crop  array of crops points [top, left, bottom, right] eg. [0.2,0.3,0.7,0.8]
+  *    @param {Object}    image  Object with keys explained below:
+  *       @param {String}    url  A url to visually search against
+  *       @param {Array}     crop  [top, left, bottom, right], each specified in the range 0-1.0 (optional)
+  *    @param {Array}    tags  An Array of objects with keys explained below:
+  *       @param {Object}    concept  Object with keys explained below:
+  *          @param {String}  id  A concept id
+  *          @param {Boolean}  value  Whether the concept is present or not in the input
   * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
   */
-  addImages: function(options, _callback) {
-    var promise = images.add(options);
+  addInputs: function(options, _callback) {
+    var promise = inputs.add(options);
     callback.handle(promise, _callback);
     return promise;
   },
   /**
-  * Get images
-  * @method getImages
+  * Get inputs
+  * @method getInputs
   * @param {Object}    options  Object with keys explained below: (optional)
   *    @param {Number}    page  The page number (optional, default: 1)
   *    @param {Number}    perPage  Number of images to return per page (optional, default: 20)
   * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
   */
-  getImages: function(options, _callback) {
-    var promise = images.get(options);
+  getInputs: function(options, _callback) {
+    var promise = inputs.get(options);
     callback.handle(promise, _callback);
     return promise;
   },
   /**
-  * Get image by id
-  * @method getImageById
-  * @param {String}    id  The image id
+  * Get input by id
+  * @method getInputById
+  * @param {String}    id  The input id
   * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
   */
-  getImageById: function(id, _callback) {
-    var promise = images.getById(id);
+  getInputById: function(id, _callback) {
+    var promise = inputs.getById(id);
     callback.handle(promise, _callback);
     return promise;
   },
   /**
-  * Search images
-  * @method searchImages
-  * @param {Object}    query  Object with keys explained below: (optional)
+  * Get inputs status
+  * @method getInputsStatus
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  getInputsStatus: function(_callback) {
+    var promise = inputs.getStatus();
+    callback.handle(promise, _callback);
+    return promise;
+  },
+  /**
+  * Update input by id
+  * @method updateInputById
+  * @param {String}    id  The input id
+  * @param {Object}    options  Object with keys explained below:
   *    @param {Object}    image  Object with keys explained below:
   *       @param {String}    url  A url to visually search against
   *       @param {Array}     crop  [top, left, bottom, right], each specified in the range 0-1.0 (optional)
-  *    @param {Array}    andTerms  Restrict the images returned to match all predictions in the array
-  *    @param {Array}    orTerms  Restrict the images returned to match any predictions in the array
-  *    @param {Array}    notTerms  Restrict the images returned to match none of the predictions in the array
-  * @param {Object}    pagination  Object with keys explained below: (optional)
-  *    @param {Number}    page  The page number (optional, default: 1)
-  *    @param {Number}    perPage  Number of images to return per page (optional, default: 20)
+  *    @param {Array}    tags  An Array of objects with keys explained below:
+  *       @param {Object}    concept  Object with keys explained below:
+  *          @param {String}  id  A concept id
+  *          @param {Boolean}  value  Whether the concept is present or not in the input
   * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
   */
-  searchImages: function(query, pagination, _callback) {
-    var promise = images.search(query, pagination);
+  updateInputById: function(id, options, _callback) {
+    var promise = inputs.updateById(id, options);
     callback.handle(promise, _callback);
     return promise;
   },
   /**
-  * Delete an image by id
-  * @method deleteImageById
-  * @param {String}    id  The image id
+  * Delete an input by id
+  * @method deleteInputById
+  * @param {String}    id  The input id
   * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
   */
-  deleteImageById: function(id, _callback) {
-    var promise = images.deleteById(id);
+  deleteInputById: function(id, _callback) {
+    var promise = inputs.deleteById(id);
     callback.handle(promise, _callback);
     return promise;
   },
   /**
-  * Get images status
-  * @method getImagesStatus
+  * Create a new model
+  * @method createModel
+  * @param {Object}    options  Object with keys explained below:
+  *    @param {String}    name  The name of the model
+  *    @param {Array}    concepts  An Array of Objects with keys explained below:
+  *       @param {String}    id  The name of the concept you'd like to add to the model
   * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
   */
-  getImagesStatus: function(_callback) {
-    var promise = images.getStatus();
+  createModel: function(options, _callback) {
+    var promise = models.create(options);
     callback.handle(promise, _callback);
     return promise;
   },
   /**
-  * Add images with a CSV or TSV file
-  * @method addImagesByFile
-  * @param {File}    file  CSV or TSV file
+  * Create a new model version
+  * @method createModelVersion
+  * @param {String}    modelId  The id of the model to train
   * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
   */
-  addImagesByFile: function(file, _callback) {
-    var promise = images.addFile(file);
+  createModelVersion: function(modelId, _callback) {
+    var promise = models.createVersion(modelId);
+    callback.handle(promise, _callback);
+    return promise;
+  },
+  /**
+  * Attach Model Outputs
+  * @method attachModelOutputs
+  * @param {String}    modelId  The id of the model to make a prediction from
+  * @param {Object}    options  Object with keys explained below:
+  *    @param {Array}    inputs  An Array of Objects with keys explained below:
+  *       @param {Object}    image  Object with keys explained below:
+  *          @param {String}  url  Url of an image to make a prediction on
+  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  attachModelOutputs: function(modelId, options, _callback) {
+    var promise = models.attachOutputs(modelId, options);
     callback.handle(promise, _callback);
     return promise;
   }
