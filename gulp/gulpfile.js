@@ -16,6 +16,7 @@ var gulp = require('gulp');
 var del = require('del');
 var fs = require('fs');
 var zip = require('gulp-zip');
+var jsdoc = require('gulp-jsdoc3');
 var awspublish = require('gulp-awspublish');
 var VERSION = require('../package.json').version;
 
@@ -297,4 +298,13 @@ gulp.task('zip', ['jslint'], function() {
   ],{ 'base': '../' })
 		.pipe(zip('clarifai-' + VERSION + '.zip'))
 		.pipe(gulp.dest('../build'));
+});
+
+gulp.task('jsdoc', function () {
+  return gulp.src(['../index.js'])
+    .pipe(jsdoc({
+      opts: {
+        destination: '../build/docs'
+      }
+    }));
 });

@@ -21,7 +21,7 @@ module.exports = global.Clarifai = {
   * Gets a token from the API using client credentials
   * @method getToken
   * @param {Function}    callback    A node-style calback function that accepts err, token (optional)
-  * @return {Promise(token, error} A Promise that is fulfilled with the token string or rejected with an error
+  * @return {Promise(token, error)} A Promise that is fulfilled with the token string or rejected with an error
   */
   getToken: function(_callback) {
     var promise = token.get();
@@ -54,7 +54,7 @@ module.exports = global.Clarifai = {
   *    @param {String} or {Array}   selectClasses   Restrict the tags returned
   *    @param {String} or {Array}   localId         Provide a localId for each url to simplify tracking requests (optional)
   * @param {Function}                               A node-style calback function that accepts err, token (optional)
-  * @return {Promise(token, error}                  A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)}                  A Promise that is fulfilled with the API response or rejected with an error
   */
   getTagsByUrl: function(url, options, _callback) {
     var callbackFn = _callback;
@@ -75,7 +75,7 @@ module.exports = global.Clarifai = {
   *    @param {String} or {Array}   selectClasses   Restrict the tags returned
   *    @param {String} or {Array}   localId         Provide a localId for each url to simplify tracking requests (optional)
   * @param {Function}                               A node-style calback function that accepts err, token (optional)
-  * @return {Promise(token, error}                  A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)}                  A Promise that is fulfilled with the API response or rejected with an error
   */
   getTagsByImageBytes: function(imageBytes, options, _callback) {
     var callbackFn = _callback;
@@ -90,7 +90,7 @@ module.exports = global.Clarifai = {
   * Gets API info
   * @method getInfo
   * @param {Function}    callback    A node-style calback function that accepts err, token (optional)
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   getInfo: function(_callback) {
     var promise = info.get();
@@ -101,7 +101,7 @@ module.exports = global.Clarifai = {
   * Gets languages supported by the API
   * @method getLanguages
   * @param {Function}    callback    A node-style calback function that accepts err, token (optional)
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   getLanguages: function(_callback) {
     var promise = languages.get();
@@ -113,7 +113,7 @@ module.exports = global.Clarifai = {
   * @method getColorByUrl
   * @param {String} or {Array}   url    A publicly accessible url of the image.
   * @param {Function} A node-style calback function that accepts err, token (optional)
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   getColorsByUrl: function(url, _callback) {
     var promise = color.getByUrl(url);
@@ -125,7 +125,7 @@ module.exports = global.Clarifai = {
   * @method getColorsByImageBytes
   * @param {String}                  url    A publicly accessible url of the image.
   * @param {Function}                       A node-style calback function that accepts err, token (optional)
-  * @return {Promise(token, error}          A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)}          A Promise that is fulfilled with the API response or rejected with an error
   */
   getColorsByImageBytes: function(imageBytes, _callback) {
     var promise = color.getByImageBytes(imageBytes);
@@ -136,7 +136,7 @@ module.exports = global.Clarifai = {
   * Gets API usage
   * @method getUsage
   * @param {Function}    callback    A node-style calback function that accepts err, token (optional)
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   getUsage: function(_callback) {
     var promise = usage.get();
@@ -154,7 +154,7 @@ module.exports = global.Clarifai = {
   *    @param {String} or {Array}    disSimilarUrls  Tell the system two or more images are dissimilar (optional)
   *    @param {String} or {Array}    searchClick    Tell the system that the search result was relevant to the query (optional)
   * @param {Function} A node-style calback function that accepts err, token (optional)
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   createFeedback: function(url, options, _callback) {
     var callbackFn = _callback;
@@ -168,7 +168,7 @@ module.exports = global.Clarifai = {
   /**
   * Adds an input or multiple inputs
   * @method addInputs
-  * @param {Object OR Array}    options  Object or Array of Objects with keys explained below:
+  * @param {Object|Array}    options  Object or Array of Objects with keys explained below:
   *    @param {Object}    image  Object with keys explained below:
   *       @param {String}    url  A url to visually search against
   *       @param {Array}     crop  [top, left, bottom, right], each specified in the range 0-1.0 (optional)
@@ -176,7 +176,7 @@ module.exports = global.Clarifai = {
   *       @param {Object}    concept  Object with keys explained below:
   *          @param {String}  id  A concept id
   *          @param {Boolean}  value  Whether the concept is present or not in the input
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   addInputs: function(options, _callback) {
     var promise = inputs.add(options);
@@ -189,7 +189,7 @@ module.exports = global.Clarifai = {
   * @param {Object}    options  Object with keys explained below: (optional)
   *    @param {Number}    page  The page number (optional, default: 1)
   *    @param {Number}    perPage  Number of images to return per page (optional, default: 20)
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   getInputs: function(options, _callback) {
     var promise = inputs.get(options);
@@ -200,7 +200,7 @@ module.exports = global.Clarifai = {
   * Get input by id
   * @method getInputById
   * @param {String}    id  The input id
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   getInputById: function(id, _callback) {
     var promise = inputs.getById(id);
@@ -210,7 +210,7 @@ module.exports = global.Clarifai = {
   /**
   * Get inputs status
   * @method getInputsStatus
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   getInputsStatus: function(_callback) {
     var promise = inputs.getStatus();
@@ -229,7 +229,7 @@ module.exports = global.Clarifai = {
   *       @param {Object}    concept  Object with keys explained below:
   *          @param {String}  id  A concept id
   *          @param {Boolean}  value  Whether the concept is present or not in the input
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   updateInputById: function(id, options, _callback) {
     var promise = inputs.updateById(id, options);
@@ -240,7 +240,7 @@ module.exports = global.Clarifai = {
   * Delete an input by id
   * @method deleteInputById
   * @param {String}    id  The input id
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   deleteInputById: function(id, _callback) {
     var promise = inputs.deleteById(id);
@@ -254,7 +254,7 @@ module.exports = global.Clarifai = {
   *    @param {String}    name  The name of the model
   *    @param {Array}    concepts  An Array of Objects with keys explained below:
   *       @param {String}    id  The name of the concept you'd like to add to the model
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   createModel: function(options, _callback) {
     var promise = models.create(options);
@@ -265,7 +265,7 @@ module.exports = global.Clarifai = {
   * Create a new model version
   * @method createModelVersion
   * @param {String}    modelId  The id of the model to train
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   createModelVersion: function(modelId, _callback) {
     var promise = models.createVersion(modelId);
@@ -280,7 +280,7 @@ module.exports = global.Clarifai = {
   *    @param {Array}    inputs  An Array of Objects with keys explained below:
   *       @param {Object}    image  Object with keys explained below:
   *          @param {String}  url  Url of an image to make a prediction on
-  * @return {Promise(token, error} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(token, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   attachModelOutputs: function(modelId, options, _callback) {
     var promise = models.attachOutputs(modelId, options);
