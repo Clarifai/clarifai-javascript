@@ -14,7 +14,7 @@ var concepts = require('./lib/concepts');
 
 module.exports = global.Clarifai = {
   initialize: function(options) {
-    config.set('apiEndpoint', options.apiEndpoint || process.env.API_ENDPOINT || 'https://api.clarifai.com');
+    config.set('apiEndpoint', options.apiEndpoint || process.env.API_ENDPOINT || 'https://api2-dev.clarifai.com');
     config.set('clientId', options.clientId || process.env.CLIENT_ID);
     config.set('clientSecret', options.clientSecret || process.env.CLIENT_SECRET);
     token.delete();
@@ -230,7 +230,7 @@ module.exports = global.Clarifai = {
   *   @param {object}           concept
   *     @param {string}           id        The concept id (required)
   *     @param {boolean}          value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
-  * @param {string}           action      Valid actions are "add" (appends new concepts, replacing overlapping concepts), "replace" (only replaces existing ones) and "remove" (delete concepts that match by id)
+  * @param {string}           action      Valid actions are "delete_concepts" or "merge_concepts" (required)
   * @return {Promise(token, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   updateInput: function(id, concepts, action, _callback) {
@@ -372,12 +372,12 @@ module.exports = global.Clarifai = {
   /**
   * Create a model
   * @method createModel
-  * @param {String}    name            The model's id
-  * @param {Array}     conceptIds      List of concept object with id
-  * @param {Object}    options  Object with keys explained below:
-  *   @param {Boolean}    oneVsAll        Optional
-  *   @param {Boolean}    useModelInWild  Optional
-  * @param {Function}   _callback       A node-style calback function that accepts err, token (optional)
+  * @param {string}         name            The model's id
+  * @param {array<object>}  conceptIds      List of concept object with id
+  * @param {Object}         options         Object with keys explained below:
+  *   @param {Boolean}        oneVsAll        Optional
+  *   @param {Boolean}        useModelInWild  Optional
+  * @param {Function}       _callback       A node-style calback function that accepts err, token (optional)
   * @return {Promise(token, error)}     A Promise that is fulfilled with the API response or rejected with an error
   */
   createModel: function(name, conceptIds, options, _callback) {
@@ -412,17 +412,19 @@ module.exports = global.Clarifai = {
     return promise;
   },
   /**
-  * Attach Model Outputs
-  * @method attachModelOutputs
-  * @param {String}    modelId  The id of the model to make a prediction from
-  * @param {Object}    options  Object with keys explained below:
-  *    @param {Array}    inputs  An Array of Objects with keys explained below:
-  *       @param {Object}    image  Object with keys explained below:
-  *          @param {String}  url  Url of an image to make a prediction on
+  * Create Model Outputs
+  * @method createOutputs
+  * @param {string|object}  id        If string is given, it is considered the id of the model to predict from. Otherwise, if object, it should have the following keys:
+  *   @param {string}         modelId   The model id (required)
+  *   @param {string}         versionId The id of the version of the model referred to above (optional)
+  * @param {array<object>}  inputs    An Array of Objects with keys explained below:
+  *    @param {object}        image     Object with keys explained below:
+  *       @param {string}       url       Url of an image to make a prediction on
+  * @param {string}         versionId The id of the model version to attach outputs to (optional)
   * @return {Promise(token, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
-  attachModelOutputs: function(modelId, options, _callback) {
-    var promise = models.attachOutputs(modelId, options);
+  createOutputs: function(modelId, inputs, _callback) {
+    var promise = models.createOutputs(modelId, inputs);
     callback.handle(promise, _callback);
     return promise;
   },
