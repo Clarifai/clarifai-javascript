@@ -14,7 +14,7 @@ var concepts = require('./lib/concepts');
 
 module.exports = global.Clarifai = {
   initialize: function(options) {
-    config.set('apiEndpoint', options.apiEndpoint || process.env.API_ENDPOINT || 'https://api2-dev.clarifai.com');
+    config.set('apiEndpoint', options.apiEndpoint || process.env.API_ENDPOINT || 'https://api2-prod.clarifai.com');
     config.set('clientId', options.clientId || process.env.CLIENT_ID);
     config.set('clientSecret', options.clientSecret || process.env.CLIENT_SECRET);
     token.delete();
@@ -443,6 +443,9 @@ module.exports = global.Clarifai = {
   *     @param {object}                  or
   *       @param {string}                  term      The concept term
   *       @param {boolean}                 value     Indicates whether or not the term should match with the prediction returned (default: true)
+  * @param {Object}     options     Object with keys explained below: (optional)
+  *    @param {Number}    page        The page number (optional, default: 1)
+  *    @param {Number}    perPage     Number of images to return per page (optional, default: 20)
   * @return {Promise(token, error)} A Promise that is fulfilled with the token string or rejected with an error
   */
   searchInputs: function(image, tags, options, _callback) {

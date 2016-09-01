@@ -328,6 +328,65 @@ describe('Clarifai JS SDK', function() {
       );
     });
   });
+
+
+  describe('Search', function() {
+    it('Filter by images/inputs only', function(done) {
+      Clarifai.searchInputs([
+        {
+          'url': 'https://samples.clarifai.com/metro-north.jpg'
+        }
+      ]).then(
+        function(response) {
+          expect(response.hits).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Filter by concepts/inputs only', function(done) {
+      Clarifai.searchInputs(null, {
+        'ors': [
+          {
+            'term': 'train'
+          },
+          {
+            'term': 'ferrari'
+          }
+        ]
+      }).then(
+        function(response) {
+          expect(response.hits).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Filter by images and concepts', function(done) {
+      Clarifai.searchInputs([
+        {
+          'url': 'https://samples.clarifai.com/metro-north.jpg'
+        }
+      ], {
+        'ands': [
+          {
+            'term': 'train'
+          },
+          {
+            'term': 'car'
+          }
+        ]
+      }).then(
+        function(response) {
+          expect(response.hits).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+  });
 });
 
 function responseHandler(response) {
