@@ -184,6 +184,9 @@ module.exports = global.Clarifai = {
   * @return {Promise(token, error)}             A Promise that is fulfilled with the API response or rejected with an error
   */
   addInputs: function(media, options, _callback) {
+    if (Object.prototype.toString.call(media) === '[object Object]') {
+      media = [media]
+    }
     var promise = inputs.add(media, options);
     callback.handle(promise, _callback);
     return promise;
