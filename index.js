@@ -433,7 +433,7 @@ module.exports = global.Clarifai = {
   },
   /**
   * @method searchInputs
-  * @param {object}                   tags          An object containing any of the following queries: (optional)
+  * @param {object}                   queries       An object containing any of the following queries: (optional)
   *   @param {array<object>}            ands          List of all predictions to match with
   *     @param {object}                   concept
   *       @param {string}                   term        The concept term
@@ -453,8 +453,8 @@ module.exports = global.Clarifai = {
   *    @param {Number}                  perPage       Number of images to return per page (optional, default: 20)
   * @return {Promise(token, error)}                 A Promise that is fulfilled with the token string or rejected with an error
   */
-  searchInputs: function(tags, options, _callback) {
-    var promise = search.searchInputs(tags, options);
+  searchInputs: function(queries, options, _callback) {
+    var promise = search.searchInputs(queries, options);
     callback.handle(promise, _callback);
     return promise;
   },
