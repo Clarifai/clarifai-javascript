@@ -332,11 +332,13 @@ describe('Clarifai JS SDK', function() {
 
   describe('Search', function() {
     it('Filter by images/inputs only', function(done) {
-      Clarifai.searchInputs([
-        {
-          'url': 'https://samples.clarifai.com/metro-north.jpg'
-        }
-      ]).then(
+      Clarifai.searchInputs({
+        ands: [
+          {
+            'url': 'https://samples.clarifai.com/metro-north.jpg'
+          }
+        ]
+      }).then(
         function(response) {
           expect(response.hits).toBeDefined();
           done();
@@ -346,7 +348,7 @@ describe('Clarifai JS SDK', function() {
     });
 
     it('Filter by concepts/inputs only', function(done) {
-      Clarifai.searchInputs(null, {
+      Clarifai.searchInputs({
         'ors': [
           {
             'term': 'train'
@@ -365,12 +367,11 @@ describe('Clarifai JS SDK', function() {
     });
 
     it('Filter by images and concepts', function(done) {
-      Clarifai.searchInputs([
-        {
-          'url': 'https://samples.clarifai.com/metro-north.jpg'
-        }
-      ], {
+      Clarifai.searchInputs({
         'ands': [
+          {
+            'url': 'https://samples.clarifai.com/metro-north.jpg'
+          },
           {
             'term': 'train'
           },
@@ -402,17 +403,4 @@ function errorHandler(err) {
 
 function log(obj) {
   console.log(JSON.stringify(obj, null, 2));
-};
-
-function testScoredImageResponse(response, done) {
-  expect(response.scored_items).toBeDefined();
-  var scoredItems = response.scored_items;
-  expect(scoredItems.length).toBeGreaterThan(0);
-  var scoredItem = scoredItems[0];
-  expect(scoredItem.score).toBeDefined();
-  expect(scoredItem.image).toBeDefined();
-  expect(scoredItem.image.id).toBeDefined();
-  expect(scoredItem.image.created_at).toBeDefined();
-  expect(scoredItem.image.url).toBeDefined();
-  done();
 };

@@ -433,26 +433,28 @@ module.exports = global.Clarifai = {
   },
   /**
   * @method searchInputs
-  * @param {array<string|object>}     images      An array of image urls to search for similar inputs (optional)
-  *   @param {object}                   image       An object that contains the following
-  *     @param {string}                   url         Publicly accessible url of image
-  *     @param {array<number>}            crop          An array containing the percent to be cropped from top, left, bottom and right (optional)
-  * @param {object}                   tags        An object containing any of the following queries: (optional)
-  *   @param {array<object>}            ands        List of all predictions to match with
-  *     @param {object}                   and
-  *       @param {string}                   term      The concept term
-  *       @param {boolean}                  value     Indicates whether or not the term should match with the prediction returned (default: true)
-  *   @param {array<object>}            ors         List of any predictions to match with
-  *     @param {object}                  or
-  *       @param {string}                  term      The concept term
-  *       @param {boolean}                 value     Indicates whether or not the term should match with the prediction returned (default: true)
-  * @param {Object}     options     Object with keys explained below: (optional)
-  *    @param {Number}    page        The page number (optional, default: 1)
-  *    @param {Number}    perPage     Number of images to return per page (optional, default: 20)
-  * @return {Promise(token, error)} A Promise that is fulfilled with the token string or rejected with an error
+  * @param {object}                   tags          An object containing any of the following queries: (optional)
+  *   @param {array<object>}            ands          List of all predictions to match with
+  *     @param {object}                   concept
+  *       @param {string}                   term        The concept term
+  *       @param {boolean}                  value       Indicates whether or not the term should match with the prediction returned (default: true)
+  *     @param {object}                   image
+  *       @param {string}                   (url|base64)  Can be a publicly accessibly url or base64 string representing image bytes (required)
+  *       @param {array<number>}            crop          An array containing the percent to be cropped from top, left, bottom and right (optional)
+  *   @param {array<concept|image>}     ors           List of any predictions to match with
+  *     @param {object}                   concept
+  *       @param {string}                   term          The concept term
+  *       @param {boolean}                  value         Indicates whether or not the term should match with the prediction returned (default: true)
+  *     @param {object}                   image
+  *       @param {string}                   (url|base64)  Can be a publicly accessibly url or base64 string representing image bytes (required)
+  *       @param {array<number>}            crop          An array containing the percent to be cropped from top, left, bottom and right (optional)
+  * @param {Object}                   options       Object with keys explained below: (optional)
+  *    @param {Number}                  page          The page number (optional, default: 1)
+  *    @param {Number}                  perPage       Number of images to return per page (optional, default: 20)
+  * @return {Promise(token, error)}                 A Promise that is fulfilled with the token string or rejected with an error
   */
-  searchInputs: function(image, tags, options, _callback) {
-    var promise = search.searchInputs(image, tags, options);
+  searchInputs: function(tags, options, _callback) {
+    var promise = search.searchInputs(tags, options);
     callback.handle(promise, _callback);
     return promise;
   },
