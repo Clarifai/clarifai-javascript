@@ -63,7 +63,7 @@ gulp.task('browserify', function() {
     .pipe(browserify({
       'insertGlobals': false,
       'debug': buildVars.browserifyDebug,
-      'transform': ['envify']
+      'transform': ['envify', 'babelify']
     })
     .on('error', notify.onError(function(error) {
       var message = 'Browserify error: ' + error.message;
