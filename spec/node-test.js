@@ -1,10 +1,13 @@
-fs = require('fs');
-var Clarifai = require('./../index.js');
+var fs = require('fs');
+var Clarifai = require('./../index');
+var Models = require('./../src/Models');
+var Inputs = require('./../src/Inputs');
 var imageBytes = require('./image-bytes');
 
 var sampleImage = 'https://samples.clarifai.com/metro-north.jpg';
 var sampleImage2 = 'https://samples.clarifai.com/wedding.jpg';
 var sampleImage3 = 'https://samples.clarifai.com/cookies.jpeg';
+var app;
 
 
 function generateRandomId() {
@@ -13,18 +16,21 @@ function generateRandomId() {
 
 describe('Clarifai JS SDK', function() {
   beforeAll(function() {
-    Clarifai.initialize({
-      'clientId': process.env.CLIENT_ID,
-      'clientSecret': process.env.CLIENT_SECRET
-      });
-    });
+    app = new Clarifai.App(
+      process.env.CLIENT_ID,
+      process.env.CLIENT_SECRET,
+      {
+        'apiEndpoint': process.env.API_ENDPOINT
+      }
+    );
+  });
 
   describe('Token', function() {
 
     it('Gets a token as a string', function(done) {
-      Clarifai.getToken().then(
+      app._config.token().then(
         function(response) {
-          expect(response).toEqual(jasmine.any(String));
+          expect(response['access_token']).toEqual(jasmine.any(String));
           done();
         },
         errorHandler.bind(done)
@@ -38,11 +44,11 @@ describe('Clarifai JS SDK', function() {
         'expires_in': 176400,
         'scope': 'api_access_write api_access api_access_read'
       };
-      var tokenSet = Clarifai.setToken(token);
-      Clarifai.getToken().then(
+      var tokenSet = app.setToken(token);
+      app._config.token().then(
           function(response) {
             expect(tokenSet).toEqual(true);
-            expect(response).toEqual(jasmine.any(String));
+            expect(response['access_token']).toEqual(jasmine.any(String));
             done();
           },
           errorHandler.bind(done)
@@ -50,39 +56,34 @@ describe('Clarifai JS SDK', function() {
       });
 
     it('Sets a token with a string', function(done) {
-      var tokenSet = Clarifai.setToken('foo');
-      Clarifai.getToken().then(
+      var tokenSet = app.setToken('foo');
+      app._config.token().then(
         function(response) {
           expect(tokenSet).toEqual(true);
-          expect(response).toEqual(jasmine.any(String));
+          expect(response['access_token']).toEqual(jasmine.any(String));
           done();
         },
         errorHandler.bind(done)
       );
     });
-
-    it('Deletes a token', function() {
-      Clarifai.deleteToken();
-    });
-
   });
 
   describe('Inputs', function() {
       var id = 'test-id' + generateRandomId();
       it('Adds an input', function(done) {
-        Clarifai.addInputs([
+        app.inputs.create([
           {
             "url": "https://samples.clarifai.com/metro-north.jpg",
-            "inputId": id
+            "id": id
           }
         ]).then(
-          function(response) {
-            expect(response.inputs).toBeDefined();
-            var inputs = response.inputs;
+          function(inputs) {
+            expect(inputs).toBeDefined();
+            expect(inputs instanceof Inputs).toBe(true);
             expect(inputs.length).toBe(1);
-            expect(inputs[0].created_at).toBeDefined();
+            expect(inputs[0].createdAt).toBeDefined();
             expect(inputs[0].id).toBeDefined();
-            expect(inputs[0].data).toBeDefined();
+            expect(inputs[0].toObject().data).toBeDefined();
             done();
           },
           errorHandler.bind(done)
@@ -91,10 +92,10 @@ describe('Clarifai JS SDK', function() {
 
       var id2 = 'test-id' + generateRandomId();
       it('Adds an input with tags', function(done) {
-        Clarifai.addInputs([
+        app.inputs.create([
           {
             "url": "https://samples.clarifai.com/metro-north.jpg",
-            "inputId": id2,
+            "id": id2,
             "concepts": [
               {
                 "id": "train",
@@ -107,13 +108,13 @@ describe('Clarifai JS SDK', function() {
             ]
           }
         ]).then(
-          function(response) {
-            expect(response.inputs).toBeDefined();
-            var inputs = response.inputs;
+          function(inputs) {
+            expect(inputs).toBeDefined();
+            expect(inputs instanceof Inputs).toBe(true);
             expect(inputs.length).toBe(1);
-            expect(inputs[0].created_at).toBeDefined();
+            expect(inputs[0].createdAt).toBeDefined();
             expect(inputs[0].id).toBeDefined();
-            expect(inputs[0].data).toBeDefined();
+            expect(inputs[0].toObject().data).toBeDefined();
             done();
           },
           errorHandler.bind(done)
@@ -123,7 +124,7 @@ describe('Clarifai JS SDK', function() {
       var id3 = 'test-id' + generateRandomId();
       var id4 = 'test-id' + generateRandomId();
       it('Bulk adds inputs', function(done) {
-        Clarifai.addInputs([
+        app.inputs.create([
           {
             "url": "https://samples.clarifai.com/metro-north.jpg",
             "id": id3
@@ -133,13 +134,13 @@ describe('Clarifai JS SDK', function() {
             "id": id4
           }
         ]).then(
-          function(response) {
-            expect(response.inputs).toBeDefined();
-            var inputs = response.inputs;
+          function(inputs) {
+            expect(inputs).toBeDefined();
+            expect(inputs instanceof Inputs).toBe(true);
             expect(inputs.length).toBe(2);
-            expect(inputs[0].created_at).toBeDefined();
+            expect(inputs[0].createdAt).toBeDefined();
             expect(inputs[0].id).toBeDefined();
-            expect(inputs[0].data).toBeDefined();
+            expect(inputs[0].toObject().data).toBeDefined();
             done();
           },
           errorHandler.bind(done)
@@ -149,7 +150,7 @@ describe('Clarifai JS SDK', function() {
       var id5 = 'test-id' + generateRandomId();
       var id6 = 'test-id' + generateRandomId();
       it('Bulk adds inputs with tags', function(done) {
-        Clarifai.addInputs([
+        app.inputs.create([
           {
             "url": "http://i.imgur.com/HEoT5xR.png",
             "id": id5,
@@ -178,13 +179,13 @@ describe('Clarifai JS SDK', function() {
             ]
           }
         ]).then(
-          function(response) {
-            expect(response.inputs).toBeDefined();
-            var inputs = response.inputs;
+          function(inputs) {
+            expect(inputs).toBeDefined();
+            expect(inputs instanceof Inputs).toBe(true);
             expect(inputs.length).toBe(2);
-            expect(inputs[0].created_at).toBeDefined();
+            expect(inputs[0].createdAt).toBeDefined();
             expect(inputs[0].id).toBeDefined();
-            expect(inputs[0].data).toBeDefined();
+            expect(inputs[0].toObject().data).toBeDefined();
             done();
           },
           errorHandler.bind(done)
@@ -192,19 +193,18 @@ describe('Clarifai JS SDK', function() {
       });
 
       it('Gets all inputs', function(done) {
-        Clarifai.getInputs({
+        app.inputs.list({
         'page': 1,
         'perPage': 5
         }).then(
-          function(response) {
-            expect(response.inputs).toBeDefined();
-            var inputs = response.inputs;
-            expect(inputs.length).toBeGreaterThan(0);
+          function(inputs) {
+            expect(inputs).toBeDefined();
+            expect(inputs instanceof Inputs).toBe(true);
             expect(inputs.length).toBe(5);
             var input = inputs[0];
             expect(input.id).toBeDefined();
-            expect(input.created_at).toBeDefined();
-            expect(input.data).toBeDefined();
+            expect(input.createdAt).toBeDefined();
+            expect(input.toObject().data).toBeDefined();
             done();
           },
           errorHandler.bind(done)
@@ -212,12 +212,12 @@ describe('Clarifai JS SDK', function() {
       });
 
       it('Gets a single input by id', function(done) {
-        Clarifai.getInputById(id).then(
-          function(response) {
-            expect(response.input).toBeDefined();
-            expect(response.input.id).toBe(id);
-            expect(response.input.created_at).toBeDefined();
-            expect(response.input.data).toBeDefined();
+        app.inputs.get(id).then(
+          function(input) {
+            expect(input).toBeDefined();
+            expect(input.id).toBe(id);
+            expect(input.createdAt).toBeDefined();
+            expect(input.toObject().data).toBeDefined();
             done();
           },
           errorHandler.bind(done)
@@ -225,7 +225,7 @@ describe('Clarifai JS SDK', function() {
       });
 
       it('Gets inputs status', function(done) {
-        Clarifai.getInputsStatus().then(
+        app.inputs.getStatus().then(
           function(response) {
             expect(response.counts).toBeDefined();
             var counts = response.counts;
@@ -239,21 +239,22 @@ describe('Clarifai JS SDK', function() {
       });
 
       it('Updates an input', function(done) {
-        Clarifai.updateInput(id, [
+        app.inputs.addConcepts([
           {
-            "id":"train",
-            "value": true
-          },
-          {
-            "id":"car",
-            "value": false
+            id,
+            concepts: [
+              { "id":"train", "value": true },
+              { "id":"car", "value": false }
+            ]
           }
-        ], 'merge_concepts').then(
-          function(response) {
-            expect(response.input).toBeDefined();
-            expect(response.input.created_at).toBeDefined();
-            expect(response.input.id).toBeDefined();
-            expect(response.input.data).toBeDefined();
+        ]).then(
+          function(inputs) {
+            expect(inputs).toBeDefined();
+            expect(inputs.length).toBe(1);
+            expect(inputs instanceof Inputs).toBe(true);
+            expect(inputs[0].createdAt).toBeDefined();
+            expect(inputs[0].id).toBeDefined();
+            expect(inputs[0].toObject().data).toBeDefined();
             done();
           },
           errorHandler.bind(done)
@@ -263,24 +264,25 @@ describe('Clarifai JS SDK', function() {
 
 
   describe('Models', function() {
-    var modelId;
+    var testModel;
+    var generalModel;
+    var generalModelId;
 
     it('Creates a new model', function(done) {
-      Clarifai.createModel('vroom-vroom', [
+      app.models.create('vroom-vroom', [
         {
           'id': 'ferrari'
         }
       ]).then(
-        function(response) {
-          expect(response.model).toBeDefined();
-          var model = response.model;
+        function(model) {
+          expect(model).toBeDefined();
           expect(model.name).toBeDefined();
           expect(model.id).toBeDefined();
-          modelId = model.id;
-          expect(model.created_at).toBeDefined();
-          expect(model.app_id).toBeDefined();
-          expect(model.output_info).toBeDefined();
-          expect(model.model_version).toBeDefined();
+          testModel = model;
+          expect(model.createdAt).toBeDefined();
+          expect(model.appId).toBeDefined();
+          expect(model.outputInfo).toBeDefined();
+          expect(model.modelVersion).toBeDefined();
           done();
         },
         errorHandler.bind(done)
@@ -289,11 +291,12 @@ describe('Clarifai JS SDK', function() {
 
 
     it('Creates a new model version', function(done) {
-      Clarifai.createModelVersion(modelId).then(
-        function(response) {
-          expect(response.model).toBeDefined();
-          expect(response.model.model_version).toBeDefined();
-          var version = response.model.model_version;
+      testModel.train().then(
+        function(model) {
+          expect(model).toBeDefined();
+          expect(model.modelVersion).toBeDefined();
+          expect(model.toObject()).toBeDefined();
+          var version = model.modelVersion;
           expect(version.id).toBeDefined();
           expect(version.created_at).toBeDefined();
           done();
@@ -302,8 +305,28 @@ describe('Clarifai JS SDK', function() {
       );
     });
 
-    it('Attaches model outputs', function(done) {
-      Clarifai.createOutputs(modelId, [
+    it('Searches for a model', function(done) {
+      app.models.search('general-v1.3', 'concept').then(
+        function(models) {
+          expect(models).toBeDefined();
+          var model = models[0];
+          expect(model).toBeDefined();
+          expect(model.name).toBe('general-v1.3');
+          expect(model.id).toBeDefined();
+          generalModelId = model.id;
+          generalModel = model;
+          expect(model.createdAt).toBeDefined();
+          expect(model.appId).toBeDefined();
+          expect(model.outputInfo).toBeDefined();
+          expect(model.modelVersion).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Call predict on models collection giving a model id', function(done) {
+      app.models.predict(generalModelId, [
         {
           'url': 'http://www.ramtrucks.com/assets/towing_guide/images/before_you_buy/truck.png'
         },
@@ -312,8 +335,34 @@ describe('Clarifai JS SDK', function() {
         }
       ]).then(
         function(response) {
-          expect(response.outputs).toBeDefined();
-          var outputs = response.outputs;
+          expect(response.data.outputs).toBeDefined();
+          var outputs = response.data.outputs;
+          expect(outputs.length).toBe(2);
+          var output = outputs[0];
+          expect(output.id).toBeDefined();
+          expect(output.status).toBeDefined();
+          expect(output.input).toBeDefined();
+          expect(output.model).toBeDefined();
+          expect(output.created_at).toBeDefined();
+          expect(output.data).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Attaches model outputs', function(done) {
+      generalModel.predict([
+        {
+          'url': 'http://www.ramtrucks.com/assets/towing_guide/images/before_you_buy/truck.png'
+        },
+        {
+          'url': 'http://www.planwallpaper.com/static/images/ferrari-9.jpg'
+        }
+      ]).then(
+        function(response) {
+          expect(response.data.outputs).toBeDefined();
+          var outputs = response.data.outputs;
           expect(outputs.length).toBe(2);
           var output = outputs[0];
           expect(output.id).toBeDefined();
@@ -332,15 +381,16 @@ describe('Clarifai JS SDK', function() {
 
   describe('Search', function() {
     it('Filter by images/inputs only', function(done) {
-      Clarifai.searchInputs({
+      app.inputs.search({
         ands: [
           {
             'url': 'https://samples.clarifai.com/metro-north.jpg'
           }
         ]
       }).then(
-        function(response) {
-          expect(response.hits).toBeDefined();
+        function(inputs) {
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs[0].score).toBeDefined();
           done();
         },
         errorHandler.bind(done)
@@ -348,18 +398,19 @@ describe('Clarifai JS SDK', function() {
     });
 
     it('Filter by concepts/inputs only', function(done) {
-      Clarifai.searchInputs({
-        'ors': [
+      app.inputs.search({
+        ands: [
           {
-            'term': 'train'
+            'url': 'https://samples.clarifai.com/metro-north.jpg'
           },
           {
-            'term': 'ferrari'
+            "url": "https://samples.clarifai.com/dog.tiff",
           }
         ]
       }).then(
-        function(response) {
-          expect(response.hits).toBeDefined();
+        function(inputs) {
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs[0].score).toBeDefined();
           done();
         },
         errorHandler.bind(done)
@@ -367,8 +418,8 @@ describe('Clarifai JS SDK', function() {
     });
 
     it('Filter by images and concepts', function(done) {
-      Clarifai.searchInputs({
-        'ands': [
+      var val = app.inputs.search({
+        ands: [
           {
             'url': 'https://samples.clarifai.com/metro-north.jpg'
           },
@@ -379,13 +430,15 @@ describe('Clarifai JS SDK', function() {
             'term': 'car'
           }
         ]
-      }).then(
-        function(response) {
-          expect(response.hits).toBeDefined();
+      });
+      val.then(
+        function(inputs) {
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs[0].score).toBeDefined();
           done();
         },
         errorHandler.bind(done)
-      );
+      )
     });
   });
 });

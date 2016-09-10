@@ -4,3 +4,5 @@ build/*
 aws.json
 npm-debug.log
 .awspublish*
+docs/*
+out/*

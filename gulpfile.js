@@ -12,19 +12,17 @@ var rename = require('gulp-rename');
 var insert = require('gulp-insert');
 var eslint = require('gulp-eslint');
 var jasmine = require('gulp-jasmine');
-var gulp = require('gulp');
 var del = require('del');
 var fs = require('fs');
 var zip = require('gulp-zip');
-var jsdoc = require('gulp-jsdoc3');
 var awspublish = require('gulp-awspublish');
-var VERSION = require('../package.json').version;
+var VERSION = require('./package.json').version;
 
 
 var tasks = [
-  'browserify',
+  'html',
   'jslint',
-  'html'
+  'browserify'
 ];
 
 gulp.task('build', tasks);
@@ -37,12 +35,12 @@ gulp.task(
 
 // will do an initial build, then build on any changes to src
 function watchFiles() {
-  gulp.watch('../index.js', ['jslint', 'browserify']);
-  gulp.watch('../lib/**', ['jslint', 'browserify']);
-  gulp.watch('../examples/**', ['html']);
+  gulp.watch('./index.js', ['jslint', 'browserify']);
+  gulp.watch('./src/**', ['jslint', 'browserify']);
+  gulp.watch('./examples/**', ['html']);
 }
 
-// browserify lib/js to build/js
+// browserify src/js to build/js
 gulp.task('browserify', function() {
   var buildVars = getBuildVars();
   var replacePatterns = [
@@ -59,13 +57,13 @@ gulp.task('browserify', function() {
       'replacement': VERSION
     }
   ];
-  return gulp.src('../index.js')
+
+  return gulp.src('./index.js')
     .pipe(browserify({
       'insertGlobals': false,
-      'debug': buildVars.browserifyDebug,
-      'transform': ['envify', 'babelify']
-    })
-    .on('error', notify.onError(function(error) {
+      'debug': false,
+      'transform': ['babelify']
+    }).on('error', notify.onError(function(error) {
       var message = 'Browserify error: ' + error.message;
       if ( buildVars.browserifyFailOnError === true ) {
         console.log(error);
@@ -81,7 +79,7 @@ gulp.task('browserify', function() {
       path.basename = 'clarifai-' + VERSION;
     }))
     .pipe(insert.prepend(BROWSER_HEADER))
-    .pipe(gulp.dest('../build/'))
+    .pipe(gulp.dest('./build/'));
 });
 
 // build examples
@@ -89,7 +87,7 @@ gulp.task('html', function() {
   var buildVars = getBuildVars();
   var CLIENT_ID = process.env.CLIENT_ID || '';
   var CLIENT_SECRET = process.env.CLIENT_SECRET || '';
-  return gulp.src('../examples/**.html')
+  return gulp.src('./examples/**.html')
     .pipe(gulpif( buildVars.uglify, htmlmin({collapseWhitespace: true}) ))
     .pipe(replace({
       patterns: [
@@ -107,13 +105,13 @@ gulp.task('html', function() {
         }
       ]
     }))
-    .pipe(gulp.dest('../build/examples'));
+    .pipe(gulp.dest('./build/examples'));
 });
 
 // webserver for examples
 gulp.task('webserver', function() {
   var port = gutil.env.port || '3000';
-  return gulp.src('../build')
+  return gulp.src('./build')
     .pipe(webserver({
       'livereload': false,
       'open': false,
@@ -217,14 +215,14 @@ gulp.task('jslint', function () {
 });
 
 function dontFailOnError() {
-  return gulp.src(['../lib/**/*.js'])
+  return gulp.src(['./src/**/*.js'])
     .pipe(eslint(lintOptions))
     .pipe(eslint.format())
     .pipe(eslint.failOnError().on('error', notify.onError("Error: <%= error.message %>")));
 };
 
 function failOnError() {
-  return gulp.src(['../lib/**/*.js'])
+  return gulp.src(['./src/**/*.js'])
     .pipe(eslint(lintOptions))
     .pipe(eslint.format())
     .pipe(eslint.failOnError().on('error', function(e) {
@@ -234,10 +232,16 @@ function failOnError() {
 };
 
 gulp.task('test', function() {
-  return gulp.src('../spec/*.js')
+  return gulp.src('./spec/*.js')
     .pipe(jasmine({
+      'includeStackTrace': true,
       'verbose': true,
-      'timeout': 5000 // 60000
+      'timeout': 60000,
+      'config': {
+        'helpers': [
+          './node_modules/babel-register/lib/node.js'
+        ]
+      }
     }).on('end', function() {
       process.exit();
     }).on('error', function() {
@@ -248,7 +252,7 @@ gulp.task('test', function() {
 // delete the contents of build folder
 gulp.task('cleanbuild', function() {
   return del([
-    '../build/**',
+    './build/**',
    ], {'force': true});
 });
 
@@ -261,14 +265,14 @@ gulp.task(
 
 // publish to S3
 function publish() {
-  var src = '../build/clarifai-' + VERSION + '.js';
+  var src = './build/clarifai-' + VERSION + '.js';
   var aws;
   if ( gutil.env.aws ) {
     console.log('Using aws:', 'vars');
     aws = JSON.parse(gutil.env.aws);
   } else {
     console.log('Using aws:', 'file');
-    aws = JSON.parse(fs.readFileSync('../aws.json'));
+    aws = JSON.parse(fs.readFileSync('./aws.json'));
   }
   console.log('Deploying to bucket:', aws.params.Bucket);
   var publisher = awspublish.create(aws);
@@ -277,8 +281,8 @@ function publish() {
     'Cache-Control': 'max-age=21600, no-transform, public'
   };
   return gulp.src([
-    '../build/clarifai-' + VERSION + '.js',
-    '../build/clarifai-' + VERSION + '.zip'
+    './build/clarifai-' + VERSION + '.js',
+    './build/clarifai-' + VERSION + '.zip'
   ])
     .pipe(rename(function (path) {
         path.dirname += '/js';
@@ -289,22 +293,13 @@ function publish() {
 
 gulp.task('zip', ['jslint'], function() {
   return gulp.src([
-    '../index.js',
-    '../README.md',
-    '../spec',
-    '../lib/*',
-    '../package.json',
-    '../examples/*'
-  ],{ 'base': '../' })
+    './index.js',
+    './README.md',
+    './spec',
+    './src/*',
+    './package.json',
+    './examples/*'
+  ],{ 'base': './' })
 		.pipe(zip('clarifai-' + VERSION + '.zip'))
-		.pipe(gulp.dest('../build'));
-});
-
-gulp.task('jsdoc', function () {
-  return gulp.src(['../index.js'])
-    .pipe(jsdoc({
-      opts: {
-        destination: '../build/docs'
-      }
-    }));
+		.pipe(gulp.dest('./build'));
 });
