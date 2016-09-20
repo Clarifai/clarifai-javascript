@@ -27,11 +27,14 @@ files. **These are not under source control.**
 
 #### Gulp command line optional params
 
-* `--stage` - if set will build with the env vars found in `gulpfile.js`. Possible values are: `dev` 
+* `--stage` - if set will build with the env vars found in `gulpfile.js`. Possible values are: `dev`
 (default), `test`, `staging`, `prod`
 * `--port 4000` - if set the webserver will run on the port passed in (default 3000)
 * `--lintFailOnError true` - if set to true, will terminate process on error (default false)
 
+#### JSDocs
+
+To compile docs, run `jsdoc src/* -t node_modules/minami -d build/docs` in the root folder.
 
 ## Examples
 

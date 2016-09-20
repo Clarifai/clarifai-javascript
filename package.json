@@ -6,17 +6,25 @@
   "repository": "https://github.com/Clarifai/clarifai-javascript",
   "author": "Clarifai Inc.",
   "license": "Apache-2.0",
+  "scripts": {
+    "jsdoc": "jsdoc src/* -t node_modules/minami -d build/docs"
+  },
   "dependencies": {
     "axios": "0.11.1",
     "es6-promise": "3.1.2",
     "form-data": "0.2.0"
   },
   "devDependencies": {
+    "babel-eslint": "^6.1.2",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-register": "^6.14.0",
+    "babelify": "^7.3.0",
     "del": "2.0.2",
     "envify": "3.4.0",
     "git-branch": "0.3.0",
     "gulp": "3.9.0",
     "gulp-awspublish": "3.0.1",
+    "gulp-babel": "^6.1.2",
     "gulp-browserify": "0.5.1",
     "gulp-concat": "2.6.0",
     "gulp-data": "1.2.1",
@@ -26,7 +34,6 @@
     "gulp-imagemin": "2.3.0",
     "gulp-insert": "0.5.0",
     "gulp-jasmine": "^2.2.1",
-    "gulp-jsdoc3": "^0.3.0",
     "gulp-newer": "0.5.1",
     "gulp-notify": "2.2.0",
     "gulp-rename": "1.2.2",
@@ -35,6 +42,8 @@
     "gulp-util": "3.0.6",
     "gulp-webserver": "0.9.1",
     "gulp-zip": "3.2.0",
+    "jsdoc": "^3.4.1",
+    "minami": "^1.1.1",
     "require-dir": "0.3.0",
     "serve-static": "1.10.0"
   }
