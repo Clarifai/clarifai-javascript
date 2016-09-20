@@ -6,6 +6,9 @@
   "repository": "https://github.com/Clarifai/clarifai-javascript",
   "author": "Clarifai Inc.",
   "license": "Apache-2.0",
+  "scripts": {
+    "jsdoc": "jsdoc src/* -t node_modules/minami -d build/docs"
+  },
   "dependencies": {
     "axios": "0.11.1",
     "es6-promise": "3.1.2",
@@ -30,7 +33,6 @@
     "gulp-imagemin": "2.3.0",
     "gulp-insert": "0.5.0",
     "gulp-jasmine": "^2.2.1",
-    "gulp-jsdoc3": "^0.3.0",
     "gulp-newer": "0.5.1",
     "gulp-notify": "2.2.0",
     "gulp-rename": "1.2.2",
@@ -39,6 +41,7 @@
     "gulp-util": "3.0.6",
     "gulp-webserver": "0.9.1",
     "gulp-zip": "3.2.0",
+    "jsdoc": "^3.4.1",
     "minami": "^1.1.1",
     "require-dir": "0.3.0",
     "serve-static": "1.10.0"
