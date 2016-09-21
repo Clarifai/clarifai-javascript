@@ -20,7 +20,6 @@ var VERSION = require('./../package.json').version;
 
 
 var tasks = [
-  'html',
   'jslint',
   'browserify'
 ];
@@ -265,7 +264,6 @@ gulp.task(
 
 // publish to S3
 function publish() {
-  var src = './../build/clarifai-' + VERSION + '.js';
   var aws;
   if ( gutil.env.aws ) {
     console.log('Using aws:', 'vars');
@@ -280,12 +278,9 @@ function publish() {
   var headers = {
     'Cache-Control': 'max-age=21600, no-transform, public'
   };
-  return gulp.src([
-    './../build/clarifai-' + VERSION + '.js',
-    './../build/clarifai-' + VERSION + '.zip'
-  ])
+  return gulp.src('./../build/**')
     .pipe(rename(function (path) {
-        path.dirname += '/js';
+        path.dirname = '/js/' + path.dirname;
     }))
     .pipe(publisher.publish(headers))
     .pipe(awspublish.reporter());
