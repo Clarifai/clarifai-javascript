@@ -64,7 +64,7 @@ class Inputs {
   * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
   */
   create(inputs) {
-    if (checkType(/Object/, inputs) {
+    if (checkType(/Object/, inputs)) {
       inputs = [inputs];
     }
     let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;

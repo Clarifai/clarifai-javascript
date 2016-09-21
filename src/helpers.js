@@ -16,7 +16,7 @@ module.exports = {
       }
     });
   },
-  checkType: (regex, val)={
+  checkType: (regex, val)=> {
     if ((regex instanceof RegExp) === false) {
       regex = new RegExp(regex);
     }

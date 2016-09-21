@@ -73,7 +73,7 @@ class Concepts {
   * @return {Promise(Concept, error)}             A Promise that is fulfilled with a Concept instance or rejected with an error
   */
   create(concepts=[]) {
-    if (checkType(/Object/, concepts) {
+    if (checkType(/Object/, concepts)) {
       concepts = [concepts];
     }
     let data = {
