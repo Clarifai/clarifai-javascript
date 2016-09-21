@@ -3,7 +3,7 @@ let Concept = require('./Concept');
 let {API, replaceVars} = require('./constants');
 let {CONCEPTS_PATH, CONCEPT_PATH, CONCEPT_SEARCH_PATH} = API;
 let {wrapToken} = require('./utils');
-let {isSuccess} = require('./helpers');
+let {isSuccess, checkType} = require('./helpers');
 
 /**
 * class representing a collection of concepts
@@ -73,7 +73,7 @@ class Concepts {
   * @return {Promise(Concept, error)}             A Promise that is fulfilled with a Concept instance or rejected with an error
   */
   create(concepts=[]) {
-    if (Object.prototype.toString.call(concepts) === '[object Object]') {
+    if (checkType(/Object/, concepts) {
       concepts = [concepts];
     }
     let data = {

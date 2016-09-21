@@ -3,7 +3,7 @@ let {Promise} = require('es6-promise');
 let Model = require('./Model');
 let Concepts = require('./Concepts');
 let {API, replaceVars} = require('./constants');
-let {isSuccess} = require('./helpers');
+let {isSuccess, checkType} = require('./helpers');
 let {wrapToken} = require('./utils');
 let {MODELS_PATH, MODEL_PATH, MODEL_SEARCH_PATH} = API;
 
@@ -32,7 +32,7 @@ class Models {
   initModel(model) {
     let data = {};
     let fn;
-    if (/String/.test(Object.prototype.toString.call(model))) {
+    if (checkType(/String/, model)) {
       data.id = model;
     } else {
       data = model;
@@ -118,7 +118,9 @@ class Models {
   }
   /**
    * Create a model
-   * @param {string}                  name                                     The model's id
+   * @param {string|object}           model                                    If string, it is assumed to be the model name. Otherwise, if object is given, it can have any of the following keys:
+   *   @param {string}                  model.id                                 Model id
+   *   @param {string}                  model.name                               Model name
    * @param {object[]|Concepts[]}     conceptsData                             List of objects with ids or an instance of Concepts object
    * @param {Object}                  options                                  Object with keys explained below:
    *   @param {Boolean}                 options.conceptsMutuallyExclusive        Optional
@@ -130,7 +132,7 @@ class Models {
       conceptsData.toObject('id'):
       conceptsData.map((concept)=> {
         let val = concept;
-        if (/String/.test(Object.prototype.toString.call(concept))) {
+        if (checkType(/String/, concept)) {
           val = { 'id': concept };
         }
         return val;

@@ -3,7 +3,7 @@ let Input = require('./Input');
 let {API, replaceVars} = require('./constants');
 let {INPUT_PATH, INPUTS_PATH, INPUTS_STATUS_PATH, SEARCH_PATH} = API;
 let {wrapToken, formatInput, formatImagesSearch, formatConceptsSearch} = require('./utils');
-let {isSuccess} = require('./helpers');
+let {isSuccess, checkType} = require('./helpers');
 const MAX_BATCH_SIZE = 128;
 
 /**
@@ -64,7 +64,7 @@ class Inputs {
   * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
   */
   create(inputs) {
-    if (Object.prototype.toString.call(inputs) === '[object Object]') {
+    if (checkType(/Object/, inputs) {
       inputs = [inputs];
     }
     let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
@@ -124,54 +124,60 @@ class Inputs {
     });
   }
   /**
-  * Delete an input by id or all inputs if id is not passed
+  * Delete an input or a list of inputs by id or all inputs if no id is passed
   * @param {String}    id           The id of input to delete (optional)
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
-  delete(id) {
-    let url;
-    if (id) {
-      url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSION_PATH, [id, versionId])}`;
+  delete(id=null) {
+    let val;
+    if (id === null) {
+      let url = `${this._config.apiEndpoint}${replaceVars(INPUT_PATH, [id])}`;
+      val = wrapToken(this._config, (headers)=> {
+        return axios.delete(url, {headers});
+      });
+    } else if (Array.isArray(id)) {
+      val = this._update('delete_inputs', inputs);
     } else {
-      url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
+      let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
+      val = wrapToken(this._config, (headers)=> {
+        return axios.delete(url, {headers});
+      });
     }
-    return wrapToken(this._config, (headers)=> {
-      return axios.delete(url, {headers});
-    });
+    return val;
   }
   /**
   * Add concepts to inputs in bulk
-  * @param {object[]}         concepts    List of concepts to update
-  *   @param {object}           concepts[].input
-  *     @param {string}           concepts[].input.id        The id of the input to update
-  *     @param {string}           concepts[].input.concepts  Object with keys explained below:
-  *       @param {object}           concepts[].input.concepts.concept
-  *         @param {string}           concepts[].input.concepts.concept.id        The concept id (required)
-  *         @param {boolean}          concepts[].input.concepts.concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+  * @param {object[]}         inputs    List of concepts to update
+  *   @param {object}           inputs[].input
+  *     @param {string}           inputs[].input.id        The id of the input to update
+  *     @param {string}           inputs[].input.concepts  Object with keys explained below:
+  *       @param {object}           inputs[].input.concepts[].concept
+  *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
+  *         @param {boolean}          inputs[].input.concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
   * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
   */
-  addConcepts(concepts) {
-    return this._update('merge_concepts', concepts);
+  addConcepts(inputs) {
+    return this._update('merge_concepts', inputs);
   }
   /**
   * Delete concepts to inputs in bulk
-  * @param {object[]}         concepts    List of concepts to update
-  *   @param {object}           concepts[].input
-  *     @param {string}           concepts[].input.id        The id of the input to update
-  *     @param {string}           concepts[].input.concepts  Object with keys explained below:
-  *       @param {object}           concepts[].input.concepts.concept
-  *         @param {string}           concepts[].input.concepts.concept.id        The concept id (required)
-  *         @param {boolean}          concepts[].input.concepts.concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+  * @param {object[]}         inputs    List of concepts to update
+  *   @param {object}           inputs[].input
+  *     @param {string}           inputs[].input.id        The id of the input to update
+  *     @param {string}           inputs[].input.concepts  Object with keys explained below:
+  *       @param {object}           inputs[].input.concepts[].concept
+  *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
+  *         @param {boolean}          inputs[].input.concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
   * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
   */
-  deleteConcepts(concepts) {
-    return this._update('delete_concepts', concepts);
+  deleteConcepts(inputs) {
+    return this._update('delete_concepts', inputs);
   }
-  _update(action, concepts) {
+  _update(action, inputs) {
     let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
     let data = {
       action,
-      'inputs': concepts.map((concept)=> formatInput(concept, false))
+      'inputs': inputs.map((input)=> formatInput(input, false))
     };
     return wrapToken(this._config, (headers)=> {
       return new Promise((resolve, reject)=> {
@@ -188,31 +194,30 @@ class Inputs {
   }
   /**
   * Search for inputs or outputs based on concepts or images
-  * @param {object[]}                 queries       An object containing any of the following queries: (optional)
-  *   @param {object[]}                 queries[].ands          List of all predictions to match with
-  *     @param {object}                   queries[].ands[].concept            An object with the following keys:
-  *       @param {string}                   queries[].ands[].concept.type        Search over 'input' or 'output' (default: 'output')
-  *       @param {string}                   queries[].ands[].concept.term        The concept term
-  *       @param {boolean}                  queries[].ands[].concept.value       Indicates whether or not the term should match with the prediction returned (default: true)
-  *     @param {object}                   queries[].ands[].image              An image object that contains the following keys:
-  *       @param {string}                   queries[].ands[].image.type          Search over 'input' or 'output' (default: 'output')
-  *       @param {string}                   queries[].ands[].image.(base64|url)  Can be a publicly accessibly url or base64 string representing image bytes (required)
-  *       @param {number[]}                 queries[].ands[].image.crop          An array containing the percent to be cropped from top, left, bottom and right (optional)
-  *   @param {concept[]|image[]}        queries[].ors           List of any predictions to match with
-  *     @param {object}                   queries[].ors[].concept            An object with the following keys:
-  *       @param {string}                   queries[].ors[].concept.type          Search over 'input' or 'output' (default: 'output')
-  *       @param {string}                   queries[].ors[].concept.term          The concept term
-  *       @param {boolean}                  queries[].ors[].concept.value         Indicates whether or not the term should match with the prediction returned (default: true)
-  *     @param {object}                   queries[].ors[].image              An image object that contains the following keys:
-  *       @param {string}                   queries[].ors[].image.type            Search over 'input' or 'output' (default: 'output')
-  *       @param {string}                   queries[].ors[].image.(base64|url)    Can be a publicly accessibly url or base64 string representing image bytes (required)
-  *       @param {number[]}                 queries[].ors[].image.crop            An array containing the percent to be cropped from top, left, bottom and right (optional)
+  *   @param {object[]}               ands          List of all predictions to match with
+  *     @param {object}                 ands[].concept            An object with the following keys:
+  *       @param {string}                 ands[].concept.type        Search over 'input' or 'output' (default: 'output')
+  *       @param {string}                 ands[].concept.name        The concept name
+  *       @param {boolean}                ands[].concept.value       Indicates whether or not the term should match with the prediction returned (default: true)
+  *     @param {object}                 ands[].image              An image object that contains the following keys:
+  *       @param {string}                 ands[].image.type          Search over 'input' or 'output' (default: 'output')
+  *       @param {string}                 ands[].image.(base64|url)  Can be a publicly accessibly url or base64 string representing image bytes (required)
+  *       @param {number[]}               ands[].image.crop          An array containing the percent to be cropped from top, left, bottom and right (optional)
+  *   @param {concept[]|image[]}      ors           List of any predictions to match with
+  *     @param {object}                 ors[].concept            An object with the following keys:
+  *       @param {string}                 ors[].concept.type          Search over 'input' or 'output' (default: 'output')
+  *       @param {string}                 ors[].concept.name          The concept name
+  *       @param {boolean}                ors[].concept.value         Indicates whether or not the term should match with the prediction returned (default: true)
+  *     @param {object}                 ors[].image              An image object that contains the following keys:
+  *       @param {string}                 ors[].image.type            Search over 'input' or 'output' (default: 'output')
+  *       @param {string}                 ors[].image.(base64|url)    Can be a publicly accessibly url or base64 string representing image bytes (required)
+  *       @param {number[]}               ors[].image.crop            An array containing the percent to be cropped from top, left, bottom and right (optional)
   * @param {Object}                   options       Object with keys explained below: (optional)
   *    @param {Number}                  options.page          The page number (optional, default: 1)
   *    @param {Number}                  options.perPage       Number of images to return per page (optional, default: 20)
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
-  search(queries={}, options={}) {
+  search(ands=[], ors=[], options={}) {
     let url = `${this._config.apiEndpoint}${SEARCH_PATH}`;
     let data = {
       'query': {
@@ -223,17 +228,24 @@ class Inputs {
         'per_page': options.perPage
       }
     };
-    if (queries && queries.ands && queries.ands.length > 0) {
-      data['query']['ands'] = queries.ands.map(function(andQuery) {
-        return andQuery.term?
+
+    if (!Array.isArray(ands)) {
+      ands = [ands];
+    }
+    if (!Array.isArray(ors)) {
+      ors = [ors];
+    }
+    if (ands.length > 0) {
+      data['query']['ands'] = ands.map(function(andQuery) {
+        return andQuery.name?
           formatConceptsSearch(andQuery):
           formatImagesSearch(andQuery);
       });
     }
-    if (queries && queries.ors && queries.ors.length > 0) {
+    if (ors.length > 0) {
       data['query']['ands'] = data['query']['ands'].concat({
-        'ors': queries.ors.map(function(orQuery) {
-          return orQuery.term?
+        'ors': ors.map(function(orQuery) {
+          return orQuery.name?
             formatConceptsSearch(orQuery):
             formatImagesSearch(orQuery);
         })

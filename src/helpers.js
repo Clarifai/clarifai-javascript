@@ -15,5 +15,11 @@ module.exports = {
         delete obj[key];
       }
     });
+  },
+  checkType: (regex, val)={
+    if ((regex instanceof RegExp) === false) {
+      regex = new RegExp(regex);
+    }
+    return regex.test(Object.prototype.toString.call(val));
   }
 };

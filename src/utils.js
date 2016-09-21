@@ -1,5 +1,6 @@
 let {Promise} = require('es6-promise');
 let {URL_REGEX} = require('./constants');
+let {checkType} = require('./helpers');
 
 module.exports = {
   wrapToken: (_config, requestFn)=> {
@@ -13,15 +14,16 @@ module.exports = {
     });
   },
   formatInput: (data, includeImage)=> {
-    let input = /(String)/.test(Object.prototype.toString.call(data))?
+    let input = checkType(/String/, data)?
       { 'url': data }:
       data;
     let formatted = {
       'id': input['id'] || null,
-      'data': {
-        'concepts': input['concepts'] || null
-      }
+      'data': {}
     };
+    if (input['concepts']) {
+      formatted['data']['concepts'] = input['concepts'];
+    }
     if (includeImage !== false) {
       formatted.data['image'] = {
         'url': input['url'],
@@ -33,7 +35,7 @@ module.exports = {
   },
   formatImagePredict: (data)=> {
     let image = data;
-    if (/(String)/.test(Object.prototype.toString.call(data))) {
+    if (checkType(/String/, data)) {
       if (URL_REGEX.test(image) === true) {
         image = {
           'url': data
@@ -77,13 +79,16 @@ module.exports = {
       };
   },
   formatConceptsSearch: (query)=> {
+    if (checkType(/String/, query)) {
+      query = {name: query};
+    }
     let v =  {};
     let type = query.type === 'input'? 'input': 'output';
     v[type] = {
       'data': {
         'concepts': [
           {
-            'name': query.term,
+            'name': query.name,
             'value': query.value === undefined? true: !!query.value
           }
         ]
