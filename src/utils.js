@@ -1,5 +1,6 @@
 let {Promise} = require('es6-promise');
 let {URL_REGEX} = require('./constants');
+let {checkType} = require('./helpers');
 
 module.exports = {
   wrapToken: (_config, requestFn)=> {
@@ -13,7 +14,7 @@ module.exports = {
     });
   },
   formatInput: (data, includeImage)=> {
-    let input = /(String)/.test(Object.prototype.toString.call(data))?
+    let input = checkType(/String/, data)?
       { 'url': data }:
       data;
     let formatted = {
@@ -34,7 +35,7 @@ module.exports = {
   },
   formatImagePredict: (data)=> {
     let image = data;
-    if (/(String)/.test(Object.prototype.toString.call(data))) {
+    if (checkType(/String/, data)) {
       if (URL_REGEX.test(image) === true) {
         image = {
           'url': data
@@ -78,7 +79,7 @@ module.exports = {
       };
   },
   formatConceptsSearch: (query)=> {
-    if (/(String)/.test(Object.prototype.toString.call(query))) {
+    if (checkType(/String/, query)) {
       query = {name: query};
     }
     let v =  {};

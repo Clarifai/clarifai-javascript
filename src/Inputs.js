@@ -3,7 +3,7 @@ let Input = require('./Input');
 let {API, replaceVars} = require('./constants');
 let {INPUT_PATH, INPUTS_PATH, INPUTS_STATUS_PATH, SEARCH_PATH} = API;
 let {wrapToken, formatInput, formatImagesSearch, formatConceptsSearch} = require('./utils');
-let {isSuccess} = require('./helpers');
+let {isSuccess, checkType} = require('./helpers');
 const MAX_BATCH_SIZE = 128;
 
 /**
@@ -64,7 +64,7 @@ class Inputs {
   * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
   */
   create(inputs) {
-    if (Object.prototype.toString.call(inputs) === '[object Object]') {
+    if (checkType(/Object/, inputs) {
       inputs = [inputs];
     }
     let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;

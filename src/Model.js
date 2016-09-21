@@ -1,6 +1,6 @@
 let axios = require('axios');
 let Concepts = require('./Concepts');
-let {isSuccess} = require('./helpers');
+let {isSuccess, checkType} = require('./helpers');
 let {API, replaceVars} = require('./constants');
 let {wrapToken, formatImagePredict} = require('./utils');
 let {
@@ -97,7 +97,7 @@ class Model {
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   predict(inputs) {
-    if (/(Object|String)/.test(Object.prototype.toString.call(inputs))) {
+    if (checkType(/(Object|String)/, inputs)) {
       inputs = [inputs];
     }
     let url = `${this._config.apiEndpoint}${this.versionId?
