@@ -381,13 +381,11 @@ describe('Clarifai JS SDK', function() {
 
   describe('Search', function() {
     it('Filter by images/inputs only', function(done) {
-      app.inputs.search({
-        ands: [
-          {
-            'url': 'https://samples.clarifai.com/metro-north.jpg'
-          }
-        ]
-      }).then(
+      app.inputs.search([
+        {
+          'url': 'https://samples.clarifai.com/metro-north.jpg'
+        }
+      ]).then(
         function(inputs) {
           expect(inputs instanceof Inputs).toBe(true);
           expect(inputs[0].score).toBeDefined();
@@ -398,16 +396,14 @@ describe('Clarifai JS SDK', function() {
     });
 
     it('Filter by concepts/inputs only', function(done) {
-      app.inputs.search({
-        ands: [
-          {
-            'url': 'https://samples.clarifai.com/metro-north.jpg'
-          },
-          {
-            "url": "https://samples.clarifai.com/dog.tiff",
-          }
-        ]
-      }).then(
+      app.inputs.search([
+        {
+          'url': 'https://samples.clarifai.com/metro-north.jpg'
+        },
+        {
+          "url": "https://samples.clarifai.com/dog.tiff",
+        }
+      ]).then(
         function(inputs) {
           expect(inputs instanceof Inputs).toBe(true);
           expect(inputs[0].score).toBeDefined();
@@ -418,19 +414,17 @@ describe('Clarifai JS SDK', function() {
     });
 
     it('Filter by images and concepts', function(done) {
-      var val = app.inputs.search({
-        ands: [
-          {
-            'url': 'https://samples.clarifai.com/metro-north.jpg'
-          },
-          {
-            'term': 'train'
-          },
-          {
-            'term': 'car'
-          }
-        ]
-      });
+      var val = app.inputs.search([
+        {
+          'url': 'https://samples.clarifai.com/metro-north.jpg'
+        },
+        {
+          'name': 'train'
+        },
+        {
+          'name': 'car'
+        }
+      ]);
       val.then(
         function(inputs) {
           expect(inputs instanceof Inputs).toBe(true);

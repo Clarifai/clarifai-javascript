@@ -118,7 +118,7 @@ class Models {
   }
   /**
    * Create a model
-   * @param {string}                  name                                     The model's id
+   * @param {string}                  name                                     The model's name
    * @param {object[]|Concepts[]}     conceptsData                             List of objects with ids or an instance of Concepts object
    * @param {Object}                  options                                  Object with keys explained below:
    *   @param {Boolean}                 options.conceptsMutuallyExclusive        Optional

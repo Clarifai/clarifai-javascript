@@ -18,10 +18,11 @@ module.exports = {
       data;
     let formatted = {
       'id': input['id'] || null,
-      'data': {
-        'concepts': input['concepts'] || null
-      }
+      'data': {}
     };
+    if (input['concepts']) {
+      formatted['data']['concepts'] = input['concepts'];
+    }
     if (includeImage !== false) {
       formatted.data['image'] = {
         'url': input['url'],
@@ -77,13 +78,16 @@ module.exports = {
       };
   },
   formatConceptsSearch: (query)=> {
+    if (/(String)/.test(Object.prototype.toString.call(query))) {
+      query = {name: query};
+    }
     let v =  {};
     let type = query.type === 'input'? 'input': 'output';
     v[type] = {
       'data': {
         'concepts': [
           {
-            'name': query.term,
+            'name': query.name,
             'value': query.value === undefined? true: !!query.value
           }
         ]

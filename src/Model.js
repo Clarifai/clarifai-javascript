@@ -42,7 +42,7 @@ class Model {
   * @param {object[]}      concepts    List of concept objects with id
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
-  addConcept(concepts=[]) {
+  addConcepts(concepts=[]) {
     return this._update('merge_concepts', concepts);
   }
   /**
@@ -50,12 +50,15 @@ class Model {
   * @param {object[]}      concepts    List of concept objects with id
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
-  deleteConcept(concepts=[]) {
+  deleteConcepts(concepts=[]) {
     return this._update('delete_concepts', concepts);
   }
   _update(action, conceptsData) {
+    if (!Array.isArray(conceptsData)) {
+      concepts = [conceptsData];
+    }
     let url = `${this._config.apiEndpoint}${replaceVars(MODEL_PATCH_PATH, [this.id])}`;
-    let concepts = conceptsData instanceof Concepts?
+    let concepts = conceptsData[0] instanceof Concepts?
       conceptsData.toObject('id'):
       conceptsData;
     let params = {
