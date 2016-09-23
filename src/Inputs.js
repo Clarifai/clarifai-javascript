@@ -194,30 +194,21 @@ class Inputs {
   }
   /**
   * Search for inputs or outputs based on concepts or images
-  *   @param {object[]}               ands          List of all predictions to match with
-  *     @param {object}                 ands[].concept            An object with the following keys:
-  *       @param {string}                 ands[].concept.type        Search over 'input' or 'output' (default: 'output')
-  *       @param {string}                 ands[].concept.name        The concept name
-  *       @param {boolean}                ands[].concept.value       Indicates whether or not the term should match with the prediction returned (default: true)
-  *     @param {object}                 ands[].image              An image object that contains the following keys:
-  *       @param {string}                 ands[].image.type          Search over 'input' or 'output' (default: 'output')
-  *       @param {string}                 ands[].image.(base64|url)  Can be a publicly accessibly url or base64 string representing image bytes (required)
-  *       @param {number[]}               ands[].image.crop          An array containing the percent to be cropped from top, left, bottom and right (optional)
-  *   @param {concept[]|image[]}      ors           List of any predictions to match with
-  *     @param {object}                 ors[].concept            An object with the following keys:
-  *       @param {string}                 ors[].concept.type          Search over 'input' or 'output' (default: 'output')
-  *       @param {string}                 ors[].concept.name          The concept name
-  *       @param {boolean}                ors[].concept.value         Indicates whether or not the term should match with the prediction returned (default: true)
-  *     @param {object}                 ors[].image              An image object that contains the following keys:
-  *       @param {string}                 ors[].image.type            Search over 'input' or 'output' (default: 'output')
-  *       @param {string}                 ors[].image.(base64|url)    Can be a publicly accessibly url or base64 string representing image bytes (required)
-  *       @param {number[]}               ors[].image.crop            An array containing the percent to be cropped from top, left, bottom and right (optional)
+  *   @param {object[]}               queries          List of all predictions to match with
+  *     @param {object}                 queries[].concept            An object with the following keys:
+  *       @param {string}                 queries[].concept.type        Search over 'input' or 'output' (default: 'output')
+  *       @param {string}                 queries[].concept.name        The concept name
+  *       @param {boolean}                queries[].concept.value       Indicates whether or not the term should match with the prediction returned (default: true)
+  *     @param {object}                 queries[].image              An image object that contains the following keys:
+  *       @param {string}                 queries[].image.type          Search over 'input' or 'output' (default: 'output')
+  *       @param {string}                 queries[].image.(base64|url)  Can be a publicly accessibly url or base64 string representing image bytes (required)
+  *       @param {number[]}               queries[].image.crop          An array containing the percent to be cropped from top, left, bottom and right (optional)
   * @param {Object}                   options       Object with keys explained below: (optional)
   *    @param {Number}                  options.page          The page number (optional, default: 1)
   *    @param {Number}                  options.perPage       Number of images to return per page (optional, default: 20)
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
-  search(ands=[], ors=[], options={}) {
+  search(ands=[], options={}) {
     let url = `${this._config.apiEndpoint}${SEARCH_PATH}`;
     let data = {
       'query': {
@@ -232,23 +223,11 @@ class Inputs {
     if (!Array.isArray(ands)) {
       ands = [ands];
     }
-    if (!Array.isArray(ors)) {
-      ors = [ors];
-    }
     if (ands.length > 0) {
       data['query']['ands'] = ands.map(function(andQuery) {
         return andQuery.name?
           formatConceptsSearch(andQuery):
           formatImagesSearch(andQuery);
-      });
-    }
-    if (ors.length > 0) {
-      data['query']['ands'] = data['query']['ands'].concat({
-        'ors': ors.map(function(orQuery) {
-          return orQuery.name?
-            formatConceptsSearch(orQuery):
-            formatImagesSearch(orQuery);
-        })
       });
     }
     return wrapToken(this._config, (headers)=> {
