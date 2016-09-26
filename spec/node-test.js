@@ -239,7 +239,7 @@ describe('Clarifai JS SDK', function() {
       });
 
       it('Updates an input', function(done) {
-        app.inputs.addConcepts([
+        app.inputs.mergeConcepts([
           {
             id,
             concepts: [

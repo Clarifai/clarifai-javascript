@@ -23,14 +23,14 @@ class Input {
     return this._rawData;
   }
   /**
-  * Add concept to an input
+  * Merge concepts to an input
   * @param {object[]}         concepts    Object with keys explained below:
   *   @param {object}           concepts[].concept
   *     @param {string}           concepts[].concept.id        The concept id (required)
   *     @param {boolean}          concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
   * @return {Promise(input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
   */
-  addConcepts(concepts) {
+  mergeConcepts(concepts) {
     return this._update('merge_concepts', concepts);
   }
   /**

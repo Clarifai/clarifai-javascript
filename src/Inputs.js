@@ -146,7 +146,7 @@ class Inputs {
     return val;
   }
   /**
-  * Add concepts to inputs in bulk
+  * Merge concepts to inputs in bulk
   * @param {object[]}         inputs    List of concepts to update
   *   @param {object}           inputs[].input
   *     @param {string}           inputs[].input.id        The id of the input to update
@@ -156,7 +156,7 @@ class Inputs {
   *         @param {boolean}          inputs[].input.concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
   * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
   */
-  addConcepts(inputs) {
+  mergeConcepts(inputs) {
     return this._update('merge_concepts', inputs);
   }
   /**
