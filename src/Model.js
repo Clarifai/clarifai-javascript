@@ -38,15 +38,15 @@ class Model {
     return this._rawData;
   }
   /**
-  * Add tags from a model
+  * Merge concepts from a model
   * @param {object[]}      concepts    List of concept objects with id
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
-  addConcepts(concepts=[]) {
+  mergeConcepts(concepts=[]) {
     return this._update('merge_concepts', concepts);
   }
   /**
-  * Remove tags from a model
+  * Remove concepts from a model
   * @param {object[]}      concepts    List of concept objects with id
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */

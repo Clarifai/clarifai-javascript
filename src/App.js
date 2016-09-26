@@ -53,7 +53,7 @@ class App {
     this._config = {
       'apiEndpoint': options.apiEndpoint ||
         (process && process.env && process.env.API_ENDPOINT) ||
-        'https://api2-prod.clarifai.com',
+        'https://api.clarifai.com',
       'clientId': clientId,
       'clientSecret': clientSecret,
       '_token': null,
