@@ -13,6 +13,9 @@ let {
   MODEL_OUTPUT_PATH,
   MODEL_VERSION_INPUTS_PATH
 } = API;
+const MODEL_QUEUED_FOR_TRAINING = '21103';
+const MODEL_TRAINING = '21101';
+const POLLTIME = 2000;
 
 /**
 * class representing a model
@@ -101,8 +104,8 @@ class Model {
     clearTimeout(this.pollTimeout);
     this.getOutputInfo().then((model)=> {
       let modelStatusCode = model.modelVersion.status.code.toString();
-      if (modelStatusCode === '21103' || modelStatusCode === '21101') {
-        this.pollTimeout = setTimeout(()=> this._pollTrain(resolve, reject), 2500);
+      if (modelStatusCode === MODEL_QUEUED_FOR_TRAINING || modelStatusCode === MODEL_TRAINING) {
+        this.pollTimeout = setTimeout(()=> this._pollTrain(resolve, reject), POLLTIME);
       } else {
         resolve(model);
       }
@@ -139,7 +142,11 @@ class Model {
   getVersion(versionId) {
     let url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSION_PATH, [this.id, versionId])}`;
     return wrapToken(this._config, (headers)=> {
-      return axios.get(url, {headers});
+      return new Promise((resolve, reject)=> {
+        axios.get(url, {headers}).then((response)=> {
+          resolve(response.data);
+        }, reject);
+      });
     });
   }
   /**
