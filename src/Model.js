@@ -10,6 +10,7 @@ let {
   PREDICT_PATH,
   VERSION_PREDICT_PATH,
   MODEL_INPUTS_PATH,
+  MODEL_OUTPUT_PATH,
   MODEL_VERSION_INPUTS_PATH
 } = API;
 
@@ -66,28 +67,48 @@ class Model {
       'action': action
     };
     return wrapToken(this._config, (headers)=> {
-      data = headers;
-      data.params = params;
+      let data = {
+        headers,
+        params
+      };
       return axios.patch(url, data);
     });
   }
   /**
   * Create a new model version
+  * @param {boolean}       sync     If true, this returns after model has completely trained. If false, this immediately returns default api response.
   * @return {Promise(model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
   */
-  train() {
+  train(sync) {
     let url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSIONS_PATH, [this.id])}`;
     return wrapToken(this._config, (headers)=> {
       return new Promise((resolve, reject)=> {
         axios.post(url, null, {headers}).then((response)=> {
           if (isSuccess(response)) {
-            resolve(new Model(this._config, response.data.model));
+            if (sync) {
+              this._pollTrain(resolve, reject).bind(this);
+            } else {
+              resolve(new Model(this._config, response.data.model));
+            }
           } else {
             reject(response);
           }
         }, reject);
       });
     });
+  }
+  _pollTrain(resolve, reject) {
+    clearTimeout(this.pollTimeout);
+    this.getOutputInfo().then((model)=> {
+      let modelStatusCode = model.modelVersion.status.code.toString();
+      if (modelStatusCode === '21103' || modelStatusCode === '21101') {
+        this.pollTimeout = setTimeout(()=> this._pollTrain(resolve, reject), 2500);
+      } else {
+        resolve(model);
+      }
+    },
+    reject)
+    .catch(reject);
   }
   /**
   * Returns model ouputs according to inputs
@@ -118,7 +139,7 @@ class Model {
   getVersion(versionId) {
     let url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSION_PATH, [this.id, versionId])}`;
     return wrapToken(this._config, (headers)=> {
-      return axios.get(url, headers);
+      return axios.get(url, {headers});
     });
   }
   /**
@@ -131,27 +152,40 @@ class Model {
   getVersions(options) {
     let url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSIONS_PATH, [this.id])}`;
     return wrapToken(this._config, (headers)=> {
-      let data = headers;
-      data.params = options;
+      let data = {
+        headers,
+        params: options
+      };
       return axios.get(url, data);
     });
   }
   /**
   * Returns all the model's output info
-  * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(Model, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   getOutputInfo() {
     let url = `${this._config.apiEndpoint}${replaceVars(MODEL_OUTPUT_PATH, [this.id])}`;
     return wrapToken(this._config, (headers)=> {
-      return axios.get(url, headers);
+      return new Promise((resolve, reject)=> {
+        axios.get(url, {headers}).then((response)=> {
+          resolve(new Model(this._config, response.data.model));
+        }, reject);
+      });
     });
   }
+  /**
+  * Returns all the model's inputs
+  * @param {object}     options     Object with keys explained below: (optional)
+  *   @param {number}     options.page        The page number (optional, default: 1)
+  *   @param {number}     options.perPage     Number of images to return per page (optional, default: 20)
+  * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+  */
   getInputs(options) {
     let url = `${this._config.apiEndpoint}${roptions.versionId?
       replaceVars(MODEL_VERSION_INPUTS_PATH, [this.id, options.versionId]):
       replaceVars(MODEL_INPUTS_PATH, [this.id])}`;
     return wrapToken(this._config, (headers)=> {
-      return axios.get(url, headers);
+      return axios.get(url, {headers});
     });
   }
 };

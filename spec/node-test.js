@@ -305,6 +305,22 @@ describe('Clarifai JS SDK', function() {
       );
     });
 
+    it('Creates a new model version and returns after it has finished', function(done) {
+      testModel.train(true).then(
+        function(model) {
+          expect(model).toBeDefined();
+          expect(model.modelVersion).toBeDefined();
+          expect(model.toObject()).toBeDefined();
+          var version = model.modelVersion;
+          expect(version.id).toBeDefined();
+          expect(version.created_at).toBeDefined();
+          expect(version.status.code).toBe(21100);
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
     it('Searches for a model', function(done) {
       app.models.search('general-v1.3', 'concept').then(
         function(models) {
@@ -419,10 +435,7 @@ describe('Clarifai JS SDK', function() {
           'url': 'https://samples.clarifai.com/metro-north.jpg'
         },
         {
-          'name': 'train'
-        },
-        {
-          'name': 'car'
+          'name': 'ferrari'
         }
       ]);
       val.then(

@@ -84,12 +84,13 @@ class Models {
    *   @param {string}                   model.name        Model name
    *   @param {string}                   model.version     Model version
    *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+   * @param {boolean}                  sync        If true, this returns after model has completely trained. If false, this immediately returns default api response.
    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
    */
-  train(model, inputs, options={}) {
+  train(model, sync=false) {
     return new Promise((resolve, reject)=> {
       this.initModel(data).then((model)=> {
-        model.train()
+        model.train(sync)
           .then(resolve, reject)
           .catch(reject);
       }, reject);
@@ -204,7 +205,7 @@ class Models {
       url = `${this._config.apiEndpoint}${MODELS_PATH}`;
     }
     return wrapToken(this._config, (headers)=> {
-      return axios.delete(url, headers);
+      return axios.delete(url, {headers});
     });
   }
   /**
