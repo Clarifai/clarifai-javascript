@@ -27,11 +27,16 @@ class Model {
     this.data = data;
     this.name = data.name;
     this.id = data.id;
-    this.createdAt = data.created_at;
-    this.appId = data.app_id;
-    this.outputInfo = data.output_info;
-    this.modelVersion = data.model_version;
-    this.versionId = (this.modelVersion || {}).id;
+    this.createdAt = data.created_at || data.createdAt;
+    this.appId = data.app_id || data.appId;
+    this.outputInfo = data.output_info || data.outputInfo;
+    if (checkType(/(String)/, data.version)) {
+      this.modelVersion = {};
+      this.versionId = data.version;
+    } else {
+      this.modelVersion = data.model_version || data.modelVersion || data.version;
+      this.versionId = (this.modelVersion || {}).id;
+    }
     this._rawData = data;
   }
   /**
@@ -188,8 +193,8 @@ class Model {
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   getInputs(options={}) {
-    let url = `${this._config.apiEndpoint}${options.versionId?
-      replaceVars(MODEL_VERSION_INPUTS_PATH, [this.id, options.versionId]):
+    let url = `${this._config.apiEndpoint}${this.versionId?
+      replaceVars(MODEL_VERSION_INPUTS_PATH, [this.id, this.versionId]):
       replaceVars(MODEL_INPUTS_PATH, [this.id])}`;
     return wrapToken(this._config, (headers)=> {
       return axios.get(url, {headers});
