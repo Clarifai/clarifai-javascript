@@ -52,7 +52,7 @@ class Inputs {
   }
   /**
   * Adds an input or multiple inputs
-  * @param {object|object[]}        inputs                                Can be a single media object or an array of media objects
+  * @param {object|object[]}        inputs                                Can be a single media object or an array of media objects (max of 128 inputs/call; inputs in excess of that will be ignored)
   *   @param {object|string}          inputs[].input                        If string, is given, this is assumed to be an image url
   *     @param {string}                 inputs[].input.(url|base64)           Can be a publicly accessibly url or base64 string representing image bytes (required)
   *     @param {string}                 inputs[].input.inputId                ID of input (optional)
@@ -64,44 +64,27 @@ class Inputs {
   * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
   */
   create(inputs) {
-    if (checkType(/Object/, inputs)) {
+    if (checkType(/(String|Object)/, inputs)) {
       inputs = [inputs];
     }
     let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
+    if (inputs.length > MAX_BATCH_SIZE) {
+      throw new Error('Number of inputs exceeded maximum of 128');
+    }
     return wrapToken(this._config, (headers)=> {
-      let requests = [];
-      inputs = inputs.map(formatInput);
-      let batches = Math.ceil(inputs.length/MAX_BATCH_SIZE);
-      for (let batch = 0; batch < batches; batch++) {
-        let start = batch * MAX_BATCH_SIZE;
-        let end = start + MAX_BATCH_SIZE;
-        let data = {
-          'inputs': inputs.slice(start, end)
-        };
-        requests.push(
-          new Promise((resolve, reject)=> {
-            axios.post(url, data, {headers})
-            .then((response)=> {
-              if (isSuccess(response)) {
-                resolve(new Inputs(this._config, response.data.inputs));
-              } else {
-                reject(response);
-              }
-            }, reject);
-          })
-        );
-      }
+      let data = {
+        'inputs': inputs.slice(0, MAX_BATCH_SIZE).map(formatInput)
+      };
       return new Promise((resolve, reject)=> {
-        Promise.all(requests).then((responses)=> {
-          let data = responses[0];
-          responses.slice(1).forEach((response)=> {
-            if (response['inputs']) {
-              data['inputs'].push(response['inputs']);
-            }
-          });
-          resolve(data);
-        }).catch(reject);
-      });
+        axios.post(url, data, {headers})
+        .then((response)=> {
+          if (isSuccess(response)) {
+            resolve(new Inputs(this._config, response.data.inputs));
+          } else {
+            reject(response);
+          }
+        }, reject);
+      })
     });
   }
   /**
@@ -136,7 +119,7 @@ class Inputs {
         return axios.delete(url, {headers});
       });
     } else if (Array.isArray(id)) {
-      val = this._update('delete_inputs', inputs);
+      val = this._update('delete_inputs', id);
     } else {
       let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
       val = wrapToken(this._config, (headers)=> {
@@ -177,6 +160,9 @@ class Inputs {
     let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
     if (checkType(/Object/, inputs)) {
       inputs = [inputs];
+    }
+    if (inputs.length > MAX_BATCH_SIZE) {
+      throw new Error('Number of inputs exceeded maximum of 128');
     }
     let data = {
       action,
