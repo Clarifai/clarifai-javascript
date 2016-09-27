@@ -84,7 +84,7 @@ class Inputs {
             reject(response);
           }
         }, reject);
-      })
+      });
     });
   }
   /**
