@@ -2,7 +2,7 @@ let axios = require('axios');
 let Concept = require('./Concept');
 let {API, replaceVars} = require('./constants');
 let {CONCEPTS_PATH, CONCEPT_PATH, CONCEPT_SEARCH_PATH} = API;
-let {wrapToken} = require('./utils');
+let {wrapToken, formatConcept} = require('./utils');
 let {isSuccess, checkType} = require('./helpers');
 
 /**
@@ -25,7 +25,7 @@ class Concepts {
   *    @param {number}    options.perPage     Number of images to return per page (optional, default: 20)
   * @return {Promise(Concepts, error)} A Promise that is fulfilled with a Concepts instance or rejected with an error
   */
-  list(options) {
+  list(options={}) {
     let url = `${this._config.apiEndpoint}${CONCEPTS_PATH}`;
     return wrapToken(this._config, (headers)=> {
       return new Promise((resolve, reject)=> {
@@ -73,11 +73,11 @@ class Concepts {
   * @return {Promise(Concept, error)}             A Promise that is fulfilled with a Concept instance or rejected with an error
   */
   create(concepts=[]) {
-    if (checkType(/Object/, concepts)) {
+    if (checkType(/(Object|String)/, concepts)) {
       concepts = [concepts];
     }
     let data = {
-      'concepts': concepts
+      'concepts': concepts.map(formatConcept)
     };
     let url = `${this._config.apiEndpoint}${CONCEPTS_PATH}`;
     return wrapToken(this._config, (headers)=> {

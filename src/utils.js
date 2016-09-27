@@ -78,6 +78,16 @@ module.exports = {
         'output': input
       };
   },
+  formatConcept: (concept)=> {
+    let formatted = concept;
+    if (checkType(/String/, concept)) {
+      formatted = {
+        id: concept,
+        name: concept
+      };
+    }
+    return formatted;
+  },
   formatConceptsSearch: (query)=> {
     if (checkType(/String/, query)) {
       query = {name: query};

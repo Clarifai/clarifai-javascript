@@ -30,7 +30,7 @@ class Inputs {
   *   @param {Number}    options.perPage  Number of images to return per page (optional, default: 20)
   * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
   */
-  list(options) {
+  list(options={}) {
     let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
     return wrapToken(this._config, (headers)=> {
       return new Promise((resolve, reject)=> {
@@ -175,6 +175,9 @@ class Inputs {
   }
   _update(action, inputs) {
     let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
+    if (checkType(/Object/, inputs)) {
+      inputs = [inputs];
+    }
     let data = {
       action,
       'inputs': inputs.map((input)=> formatInput(input, false))
