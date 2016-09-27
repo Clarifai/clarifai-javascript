@@ -1,32 +1,42 @@
-var Clarifai = require('./../index.js');
+var fs = require('fs');
+var Clarifai = require('./../index');
+var Models = require('./../src/Models');
+var Inputs = require('./../src/Inputs');
 var imageBytes = require('./image-bytes');
 
 var sampleImage = 'https://samples.clarifai.com/metro-north.jpg';
 var sampleImage2 = 'https://samples.clarifai.com/wedding.jpg';
 var sampleImage3 = 'https://samples.clarifai.com/cookies.jpeg';
+var app;
+
+
+function generateRandomId() {
+  return Math.floor(Math.random() * 1000000);
+}
 
 describe('Clarifai JS SDK', function() {
-  
   beforeAll(function() {
-    Clarifai.initialize({
-      'clientId': process.env.CLIENT_ID,
-      'clientSecret': process.env.CLIENT_SECRET
-    });
+    app = new Clarifai.App(
+      process.env.CLIENT_ID,
+      process.env.CLIENT_SECRET,
+      {
+        'apiEndpoint': process.env.API_ENDPOINT
+      }
+    );
   });
-  
-  
+
   describe('Token', function() {
-  
+
     it('Gets a token as a string', function(done) {
-      Clarifai.getToken().then(
+      app._config.token().then(
         function(response) {
-          expect(response).toEqual(jasmine.any(String));
+          expect(response['access_token']).toEqual(jasmine.any(String));
           done();
         },
         errorHandler.bind(done)
       );
     });
-    
+
     it('Sets a token with an object', function(done) {
       var token = {
         'access_token': 'foo',
@@ -34,249 +44,410 @@ describe('Clarifai JS SDK', function() {
         'expires_in': 176400,
         'scope': 'api_access_write api_access api_access_read'
       };
-      var tokenSet = Clarifai.setToken(token);
-      Clarifai.getToken().then(
-        function(response) {
-          expect(tokenSet).toEqual(true);
-          expect(response).toEqual(jasmine.any(String));
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-    
+      var tokenSet = app.setToken(token);
+      app._config.token().then(
+          function(response) {
+            expect(tokenSet).toEqual(true);
+            expect(response['access_token']).toEqual(jasmine.any(String));
+            done();
+          },
+          errorHandler.bind(done)
+        );
+      });
+
     it('Sets a token with a string', function(done) {
-      var tokenSet = Clarifai.setToken('foo');
-      Clarifai.getToken().then(
+      var tokenSet = app.setToken('foo');
+      app._config.token().then(
         function(response) {
           expect(tokenSet).toEqual(true);
-          expect(response).toEqual(jasmine.any(String));
+          expect(response['access_token']).toEqual(jasmine.any(String));
           done();
         },
         errorHandler.bind(done)
       );
     });
-    
-    it('Deletes a token', function() {
-      Clarifai.deleteToken();
-    });
-    
   });
-  
-  describe('Tag', function() {
-  
-    it('Gets tags for an image via url', function(done) {
-      Clarifai.getTagsByUrl(sampleImage2).then(
-        function(response) {
-          expect(response.status_msg).toBe('All images in request have completed successfully. ');
-          expect(response.results.length).toBe(1);
+
+  describe('Inputs', function() {
+      var id = 'test-id' + generateRandomId();
+      it('Adds an input', function(done) {
+        app.inputs.create([
+          {
+            "url": "https://samples.clarifai.com/metro-north.jpg",
+            "id": id
+          }
+        ]).then(
+          function(inputs) {
+            expect(inputs).toBeDefined();
+            expect(inputs instanceof Inputs).toBe(true);
+            expect(inputs.length).toBe(1);
+            expect(inputs[0].createdAt).toBeDefined();
+            expect(inputs[0].id).toBeDefined();
+            expect(inputs[0].toObject().data).toBeDefined();
+            done();
+          },
+          errorHandler.bind(done)
+        );
+      });
+
+      var id2 = 'test-id' + generateRandomId();
+      it('Adds an input with tags', function(done) {
+        app.inputs.create([
+          {
+            "url": "https://samples.clarifai.com/metro-north.jpg",
+            "id": id2,
+            "concepts": [
+              {
+                "id": "train",
+                "value": true
+              },
+              {
+                "id": "car",
+                "value": false
+              }
+            ]
+          }
+        ]).then(
+          function(inputs) {
+            expect(inputs).toBeDefined();
+            expect(inputs instanceof Inputs).toBe(true);
+            expect(inputs.length).toBe(1);
+            expect(inputs[0].createdAt).toBeDefined();
+            expect(inputs[0].id).toBeDefined();
+            expect(inputs[0].toObject().data).toBeDefined();
+            done();
+          },
+          errorHandler.bind(done)
+        );
+      });
+
+      var id3 = 'test-id' + generateRandomId();
+      var id4 = 'test-id' + generateRandomId();
+      it('Bulk adds inputs', function(done) {
+        app.inputs.create([
+          {
+            "url": "https://samples.clarifai.com/metro-north.jpg",
+            "id": id3
+          },
+          {
+            "url": "https://samples.clarifai.com/dog.tiff",
+            "id": id4
+          }
+        ]).then(
+          function(inputs) {
+            expect(inputs).toBeDefined();
+            expect(inputs instanceof Inputs).toBe(true);
+            expect(inputs.length).toBe(2);
+            expect(inputs[0].createdAt).toBeDefined();
+            expect(inputs[0].id).toBeDefined();
+            expect(inputs[0].toObject().data).toBeDefined();
+            done();
+          },
+          errorHandler.bind(done)
+        );
+      });
+
+      var id5 = 'test-id' + generateRandomId();
+      var id6 = 'test-id' + generateRandomId();
+      it('Bulk adds inputs with tags', function(done) {
+        app.inputs.create([
+          {
+            "url": "http://i.imgur.com/HEoT5xR.png",
+            "id": id5,
+            "concepts": [
+              {
+                "id": "ferrari",
+                "value": true
+              },
+              {
+                "id": "outdoors"
+              }
+            ]
+          },
+          {
+            "url": "http://i.imgur.com/It5JRaj.jpg",
+            "id": id6,
+            "concepts": [
+              {
+                "id": "ferrari",
+                "value": true
+              },
+              {
+                "id": "outdoors",
+                "value": false
+              }
+            ]
+          }
+        ]).then(
+          function(inputs) {
+            expect(inputs).toBeDefined();
+            expect(inputs instanceof Inputs).toBe(true);
+            expect(inputs.length).toBe(2);
+            expect(inputs[0].createdAt).toBeDefined();
+            expect(inputs[0].id).toBeDefined();
+            expect(inputs[0].toObject().data).toBeDefined();
+            done();
+          },
+          errorHandler.bind(done)
+        );
+      });
+
+      it('Gets all inputs', function(done) {
+        app.inputs.list({
+        'page': 1,
+        'perPage': 5
+        }).then(
+          function(inputs) {
+            expect(inputs).toBeDefined();
+            expect(inputs instanceof Inputs).toBe(true);
+            expect(inputs.length).toBe(5);
+            var input = inputs[0];
+            expect(input.id).toBeDefined();
+            expect(input.createdAt).toBeDefined();
+            expect(input.toObject().data).toBeDefined();
+            done();
+          },
+          errorHandler.bind(done)
+        );
+      });
+
+      it('Gets a single input by id', function(done) {
+        app.inputs.get(id).then(
+          function(input) {
+            expect(input).toBeDefined();
+            expect(input.id).toBe(id);
+            expect(input.createdAt).toBeDefined();
+            expect(input.toObject().data).toBeDefined();
+            done();
+          },
+          errorHandler.bind(done)
+        );
+      });
+
+      it('Gets inputs status', function(done) {
+        app.inputs.getStatus().then(
+          function(response) {
+            expect(response.counts).toBeDefined();
+            var counts = response.counts;
+            expect(counts.processed).toBeDefined();
+            expect(counts.to_process).toBeDefined();
+            expect(counts.errors).toBeDefined();
+            done();
+          },
+          errorHandler.bind(done)
+        );
+      });
+
+      it('Updates an input', function(done) {
+        app.inputs.mergeConcepts([
+          {
+            id,
+            concepts: [
+              { "id":"train", "value": true },
+              { "id":"car", "value": false }
+            ]
+          }
+        ]).then(
+          function(inputs) {
+            expect(inputs).toBeDefined();
+            expect(inputs.length).toBe(1);
+            expect(inputs instanceof Inputs).toBe(true);
+            expect(inputs[0].createdAt).toBeDefined();
+            expect(inputs[0].id).toBeDefined();
+            expect(inputs[0].toObject().data).toBeDefined();
+            done();
+          },
+          errorHandler.bind(done)
+        );
+      });
+  });
+
+
+  describe('Models', function() {
+    var testModel;
+    var generalModel;
+    var generalModelId;
+
+    it('Creates a new model', function(done) {
+      app.models.create('vroom-vroom', [
+        {
+          'id': 'ferrari'
+        }
+      ]).then(
+        function(model) {
+          expect(model).toBeDefined();
+          expect(model.name).toBeDefined();
+          expect(model.id).toBeDefined();
+          testModel = model;
+          expect(model.createdAt).toBeDefined();
+          expect(model.appId).toBeDefined();
+          expect(model.outputInfo).toBeDefined();
+          expect(model.modelVersion).toBeDefined();
           done();
         },
         errorHandler.bind(done)
       );
     });
-    
-    it('Gets tags for multiple images via url', function(done) {
-      Clarifai.getTagsByUrl([
-        sampleImage2,
-        sampleImage3
+
+
+    it('Creates a new model version', function(done) {
+      testModel.train().then(
+        function(model) {
+          expect(model).toBeDefined();
+          expect(model.modelVersion).toBeDefined();
+          expect(model.toObject()).toBeDefined();
+          var version = model.modelVersion;
+          expect(version.id).toBeDefined();
+          expect(version.created_at).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Creates a new model version and returns after it has finished', function(done) {
+      testModel.train(true).then(
+        function(model) {
+          expect(model).toBeDefined();
+          expect(model.modelVersion).toBeDefined();
+          expect(model.toObject()).toBeDefined();
+          var version = model.modelVersion;
+          expect(version.id).toBeDefined();
+          expect(version.created_at).toBeDefined();
+          expect(version.status.code).toBe(21100);
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Searches for a model', function(done) {
+      app.models.search('vroom-vroom').then(
+        function(models) {
+          expect(models).toBeDefined();
+          var model = models[0];
+          expect(model).toBeDefined();
+          expect(model.name).toBe('vroom-vroom');
+          expect(model.id).toBeDefined();
+          generalModelId = model.id;
+          generalModel = model;
+          expect(model.createdAt).toBeDefined();
+          expect(model.appId).toBeDefined();
+          expect(model.outputInfo).toBeDefined();
+          expect(model.modelVersion).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Call predict on models collection giving a model id', function(done) {
+      app.models.predict(generalModelId, [
+        {
+          'url': 'http://www.ramtrucks.com/assets/towing_guide/images/before_you_buy/truck.png'
+        },
+        {
+          'url': 'http://www.planwallpaper.com/static/images/ferrari-9.jpg'
+        }
       ]).then(
         function(response) {
-          expect(response.status_msg).toBe('All images in request have completed successfully. ');
-          expect(response.results.length).toBe(2);
+          expect(response.data.outputs).toBeDefined();
+          var outputs = response.data.outputs;
+          expect(outputs.length).toBe(2);
+          var output = outputs[0];
+          expect(output.id).toBeDefined();
+          expect(output.status).toBeDefined();
+          expect(output.input).toBeDefined();
+          expect(output.model).toBeDefined();
+          expect(output.created_at).toBeDefined();
+          expect(output.data).toBeDefined();
           done();
         },
         errorHandler.bind(done)
       );
     });
-    
-    it('Gets tags for an image via bytes', function(done) {
-      Clarifai.getTagsByImageBytes(imageBytes).then(
-        function(response) {
-          expect(response.status_msg).toBe('All images in request have completed successfully. ');
-          expect(response.results.length).toBe(1);
-          done();
+
+    it('Attaches model outputs', function(done) {
+      generalModel.predict([
+        {
+          'url': 'http://www.ramtrucks.com/assets/towing_guide/images/before_you_buy/truck.png'
         },
-        errorHandler.bind(done)
-      );
-    });
-    
-    it('Get tags for an image via url passing in a model', function(done) {
-      Clarifai.getTagsByUrl(sampleImage2, {
-        'model': 'nsfw-v0.1'
-      }).then(
-        function(response) {
-          expect(response.meta.tag.model).toBe('nsfw-v0.1');
-          expect(response.status_msg).toBe('All images in request have completed successfully. ');
-          expect(response.results.length).toBe(1);
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-    
-    it('Get tags for an image via url passing in a language', function(done) {
-      Clarifai.getTagsByUrl(sampleImage2, {
-        'language': 'es'
-      }).then(
-        function(response) {
-          expect(response.results[0].result.tag.classes[0]).toBe('ceremonia');
-          expect(response.status_msg).toBe('All images in request have completed successfully. ');
-          expect(response.results.length).toBe(1);
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-    
-    it('Get tags for an image via url and set a localId', function(done) {
-      Clarifai.getTagsByUrl(sampleImage2, {
-        'localId': 'myLocalId'
-      }).then(
-        function(response) {
-          expect(response.results[0].local_id).toBe('myLocalId');
-          expect(response.status_msg).toBe('All images in request have completed successfully. ');
-          expect(response.results.length).toBe(1);
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-    
-    it('Get tags for an image via url and restrict the tags returned', function(done) {
-      Clarifai.getTagsByUrl(sampleImage2, {
-        'selectClasses': ['people', 'wedding']
-      }).then(
-        function(response) {
-          expect(response.results[0].result.tag.classes.length).toBe(2);
-          expect(response.status_msg).toBe('All images in request have completed successfully. ');
-          expect(response.results.length).toBe(1);
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-    
-  });
-  
-  describe('Info', function() {
-  
-    it('Gets info from the API', function(done) {
-      Clarifai.getInfo().then(
-        function(response) {
-          expect(response.status_code).toBe('OK');
-          expect(response.results.max_image_size).toBeDefined();
-          expect(response.results.default_language).toBeDefined();
-          expect(response.results.max_video_size).toBeDefined();
-          expect(response.results.max_image_bytes).toBeDefined();
-          expect(response.results.min_image_size).toBeDefined();
-          expect(response.results.default_model).toBeDefined();
-          expect(response.results.max_video_bytes).toBeDefined();
-          expect(response.results.max_video_duration).toBeDefined();
-          expect(response.results.max_batch_size).toBeDefined();
-          expect(response.results.max_video_batch_size).toBeDefined();
-          expect(response.results.min_video_size).toBeDefined();
-          expect(response.results.api_version).toBeDefined();
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-    
-  });
-  
-  describe('Usage', function() {
-  
-    it('Gets usage from the API', function(done) {
-      Clarifai.getUsage().then(
-        function(response) {
-          expect(response.status_code).toBe('OK');
-          expect(response.results.user_throttles).toBeDefined();
-          expect(response.results.app_throttles).toBeDefined();
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-    
-  });
-  
-  describe('Languages', function() {
-  
-    it('Gets languages from the API', function(done) {
-      Clarifai.getLanguages().then(
-        function(response) {
-          expect(response.status_code).toBe('OK');
-          expect(response.languages).toBeDefined();
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-    
-  });
-  
-  describe('Color', function() {
-  
-    it('Gets color for an image via url', function(done) {
-      Clarifai.getColorsByUrl(sampleImage2).then(
-        function(response) {
-          expect(response.status_msg).toBe('All images in request have completed successfully. ');
-          expect(response.results.length).toBe(1);
-          expect(response.results[0].colors).toBeDefined();
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-    
-    it('Gets color for multiple images via url', function(done) {
-      Clarifai.getColorsByUrl([
-        sampleImage2,
-        sampleImage3
+        {
+          'url': 'http://www.planwallpaper.com/static/images/ferrari-9.jpg'
+        }
       ]).then(
         function(response) {
-          expect(response.status_msg).toBe('All images in request have completed successfully. ');
-          expect(response.results.length).toBe(2);
-          expect(response.results[0].colors).toBeDefined();
+          expect(response.data.outputs).toBeDefined();
+          var outputs = response.data.outputs;
+          expect(outputs.length).toBe(2);
+          var output = outputs[0];
+          expect(output.id).toBeDefined();
+          expect(output.status).toBeDefined();
+          expect(output.input).toBeDefined();
+          expect(output.model).toBeDefined();
+          expect(output.created_at).toBeDefined();
+          expect(output.data).toBeDefined();
           done();
         },
         errorHandler.bind(done)
       );
     });
-    
-    it('Gets color for an image via bytes', function(done) {
-      Clarifai.getColorsByImageBytes(imageBytes).then(
-        function(response) {
-          expect(response.status_msg).toBe('All images in request have completed successfully. ');
-          expect(response.results.length).toBe(1);
-          expect(response.results[0].colors).toBeDefined();
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-    
   });
-  
-  describe('Feedback', function() {
-  
-    it('Sends feedback to the API', function(done) {
-      Clarifai.createFeedback(sampleImage, {
-        'addTags': ['snow', 'evening',],
-        'removeTags': ['road', 'business'],
-      }).then(
-        function(response) {
-          expect(response.status_code).toBe('OK');
-          expect(response.status_msg).toBe('Feedback successfully recorded. ');
+
+
+  describe('Search', function() {
+    it('Filter by images/inputs only', function(done) {
+      app.inputs.search([
+        {
+          'url': 'https://samples.clarifai.com/metro-north.jpg'
+        }
+      ]).then(
+        function(inputs) {
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs[0].score).toBeDefined();
           done();
         },
         errorHandler.bind(done)
       );
     });
-    
+
+    it('Filter by concepts/inputs only', function(done) {
+      app.inputs.search([
+        {
+          'url': 'https://samples.clarifai.com/metro-north.jpg'
+        },
+        {
+          "url": "https://samples.clarifai.com/dog.tiff",
+        }
+      ]).then(
+        function(inputs) {
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs[0].score).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Filter by images and concepts', function(done) {
+      var val = app.inputs.search([
+        {
+          'url': 'https://samples.clarifai.com/metro-north.jpg'
+        },
+        {
+          'name': 'ferrari'
+        }
+      ]);
+      val.then(
+        function(inputs) {
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs[0].score).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      )
+    });
   });
-  
 });
 
 function responseHandler(response) {
@@ -285,10 +456,11 @@ function responseHandler(response) {
 };
 
 function errorHandler(err) {
+  console.log(err);
   expect(err).toBe(true);
   this();
 };
 
 function log(obj) {
   console.log(JSON.stringify(obj, null, 2));
-}
+};
