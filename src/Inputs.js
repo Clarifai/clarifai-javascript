@@ -69,7 +69,7 @@ class Inputs {
     }
     let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
     if (inputs.length > MAX_BATCH_SIZE) {
-      throw new Error('Number of inputs exceeded maximum of 128');
+      throw new Error(`Number of inputs exceeded maximum of ${MAX_BATCH_SIZE}`);
     }
     return wrapToken(this._config, (headers)=> {
       let data = {
@@ -162,7 +162,7 @@ class Inputs {
       inputs = [inputs];
     }
     if (inputs.length > MAX_BATCH_SIZE) {
-      throw new Error('Number of inputs exceeded maximum of 128');
+      throw new Error(`Number of inputs exceeded maximum of ${MAX_BATCH_SIZE}`);
     }
     let data = {
       action,
