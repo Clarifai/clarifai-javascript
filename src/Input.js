@@ -9,9 +9,9 @@ let {INPUT_PATCH_PATH} = API;
 class Input {
   constructor(_config, data) {
     this.id = data.id;
-    this.createdAt = data['created_at'];
-    this.imageUrl = data['data']['image']['url'];
-    this.score = data['score'];
+    this.createdAt = data.created_at || data.createdAt;
+    this.imageUrl = data.data.image.url;
+    this.score = data.score;
     this._config = _config;
     this._rawData = data;
   }

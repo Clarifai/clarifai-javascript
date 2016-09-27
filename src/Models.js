@@ -214,7 +214,7 @@ class Models {
   * @param {String}     type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
   * @return {Promise(models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
   */
-  search(name, type='') {
+  search(name, type=null) {
     let url = `${this._config.apiEndpoint}${MODEL_SEARCH_PATH}`;
     return wrapToken(this._config, (headers)=> {
       let params = {

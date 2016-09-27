@@ -322,12 +322,12 @@ describe('Clarifai JS SDK', function() {
     });
 
     it('Searches for a model', function(done) {
-      app.models.search('general-v1.3', 'concept').then(
+      app.models.search('vroom-vroom').then(
         function(models) {
           expect(models).toBeDefined();
           var model = models[0];
           expect(model).toBeDefined();
-          expect(model.name).toBe('general-v1.3');
+          expect(model.name).toBe('vroom-vroom');
           expect(model.id).toBeDefined();
           generalModelId = model.id;
           generalModel = model;
