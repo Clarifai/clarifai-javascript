@@ -103,11 +103,14 @@ class Models {
    *   @param {Number}     options.perPage     Number of images to return per page (optional, default: 20)
    * @return {Promise(models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
    */
-  list(options={}) {
+  list(options={page: 1, perPage: 20}) {
     let url = `${this._config.apiEndpoint}${MODELS_PATH}`;
     return wrapToken(this._config, (headers)=> {
       return new Promise((resolve, reject)=> {
-        axios.get(url, {params: options, headers}).then((response)=> {
+        axios.get(url, {
+          params: {'per_page': options.perPage, 'page': options.page},
+          headers
+        }).then((response)=> {
           if (isSuccess(response)) {
             resolve(new Models(this._config, response.models));
           } else {

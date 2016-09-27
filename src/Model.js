@@ -64,7 +64,7 @@ class Model {
   }
   _update(action, conceptsData) {
     if (!Array.isArray(conceptsData)) {
-      concepts = [conceptsData];
+      conceptsData = [conceptsData];
     }
     let url = `${this._config.apiEndpoint}${replaceVars(MODEL_PATCH_PATH, [this.id])}`;
     let concepts = conceptsData[0] instanceof Concepts?
@@ -161,12 +161,12 @@ class Model {
   *   @param {number}     options.perPage     Number of images to return per page (optional, default: 20)
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
-  getVersions(options={}) {
+  getVersions(options={page: 1, perPage: 20}) {
     let url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSIONS_PATH, [this.id])}`;
     return wrapToken(this._config, (headers)=> {
       let data = {
         headers,
-        params: options
+        params: {'per_page': options.perPage, 'page': options.page},
       };
       return axios.get(url, data);
     });
