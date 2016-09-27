@@ -1,6 +1,6 @@
 # Clarifai JavaScript Client
 
-The official JavaScript client for interacting with the [Clarifai API](https://developer.clarifai.com).
+The official JavaScript client for interacting with the [Clarifai API](https://developer-preview.clarifai.com).
 
 ## Basic Use
 
@@ -33,8 +33,8 @@ You can also use the SDK by adding this script to your HTML:
 
 ## Docs
 
-Dive right into code examples to get up and running as quickly as possible with our [quickstart](https://developer-preview.clarifai.com/quick-start/).
+Dive right into code examples to get up and running as quickly as possible with our [Quick Start](https://developer-preview.clarifai.com/quick-start/).
 
-Learn the basics — predicting the contents of an image, searching across a collection and creating your own models with our [guide](https://developer-preview.clarifai.com/guide/).
+Learn the basics — predicting the contents of an image, searching across a collection and creating your own models with our [Guide](https://developer-preview.clarifai.com/guide/).
 
 Looking for a different client? We have many languages available with lots of documentation [API Reference](https://developer-preview.clarifai.com/reference/)
