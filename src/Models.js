@@ -5,7 +5,7 @@ let Concepts = require('./Concepts');
 let {API, replaceVars} = require('./constants');
 let {isSuccess, checkType} = require('./helpers');
 let {wrapToken} = require('./utils');
-let {MODELS_PATH, MODEL_PATH, MODEL_SEARCH_PATH} = API;
+let {MODELS_PATH, MODEL_PATH, MODEL_SEARCH_PATH, MODEL_VERSION_PATH} = API;
 
 /**
 * class representing a collection of models
@@ -56,11 +56,11 @@ class Models {
   }
   /**
    * Calls predict given model info and inputs to predict on
-   * @param {string|object}            data       If string, it is assumed to be model id. Otherwise, if object is given, it can have any of the following keys:
-   *   @param {string}                   data.id          Model id
-   *   @param {string}                   data.name        Model name
-   *   @param {string}                   data.version     Model version
-   *   @param {string}                   data.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+   * @param {string|object}            model       If string, it is assumed to be model id. Otherwise, if object is given, it can have any of the following keys:
+   *   @param {string}                   model.id          Model id
+   *   @param {string}                   model.name        Model name
+   *   @param {string}                   model.version     Model version
+   *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
    * @param {object[]|object|string}   inputs    An array of objects/object/string pointing to an image resource. A string can either be a url or base64 image bytes. Object keys explained below:
    *    @param {object}                  inputs[].image     Object with keys explained below:
    *       @param {string}                 inputs[].image.(url|base64)  Can be a publicly accessibly url or base64 string representing image bytes (required)
@@ -68,9 +68,9 @@ class Models {
    *   @param {string}                   options.versionId The id of the model version to attach outputs to (optional)
    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
    */
-  predict(data, inputs, options={}) {
+  predict(model, inputs, options={}) {
     return new Promise((resolve, reject)=> {
-      this.initModel(data).then((model)=> {
+      this.initModel(model).then((model)=> {
         model.predict(inputs, options)
           .then(resolve, reject)
           .catch(reject);
@@ -89,7 +89,7 @@ class Models {
    */
   train(model, sync=false) {
     return new Promise((resolve, reject)=> {
-      this.initModel(data).then((model)=> {
+      this.initModel(model).then((model)=> {
         model.train(sync)
           .then(resolve, reject)
           .catch(reject);
@@ -103,7 +103,7 @@ class Models {
    *   @param {Number}     options.perPage     Number of images to return per page (optional, default: 20)
    * @return {Promise(models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
    */
-  list(options) {
+  list(options={}) {
     let url = `${this._config.apiEndpoint}${MODELS_PATH}`;
     return wrapToken(this._config, (headers)=> {
       return new Promise((resolve, reject)=> {
@@ -128,7 +128,7 @@ class Models {
    *   @param {Boolean}                 options.closedEnvironment                Optional
    * @return {Promise(model, error)} A Promise that is fulfilled with an instance of Model or rejected with an error
    */
-  create(name, conceptsData, options={}) {
+  create(name, conceptsData=[], options={}) {
     let concepts = conceptsData instanceof Concepts?
       conceptsData.toObject('id'):
       conceptsData.map((concept)=> {
@@ -179,9 +179,9 @@ class Models {
     let url = `${this._config.apiEndpoint}${replaceVars(MODEL_PATH, [id])}`;
     return wrapToken(this._config, (headers)=> {
       return new Promise((resolve, reject)=> {
-        axios.get(url, data).then((response)=> {
+        axios.get(url, {headers}).then((response)=> {
           if (isSuccess(response)) {
-            resolve(new Model(this._config, response.model));
+            resolve(new Model(this._config, response.data.model));
           } else {
             reject(response);
           }
@@ -198,9 +198,9 @@ class Models {
   delete(id, versionId) {
     let url;
     if (id) {
-      url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSION_PATH, [id, versionId])}`;
+      url = `${this._config.apiEndpoint}${replaceVars(MODEL_PATH, [id])}`;
     } else if (versionId) {
-      url = `${this._config.apiEndpoint}${replaceVars(MODEL_PATH, [id, versionId])}`;
+      url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSION_PATH, [id, versionId])}`;
     } else {
       url = `${this._config.apiEndpoint}${MODELS_PATH}`;
     }

@@ -89,7 +89,7 @@ class Model {
         axios.post(url, null, {headers}).then((response)=> {
           if (isSuccess(response)) {
             if (sync) {
-              this._pollTrain(resolve, reject).bind(this);
+              this._pollTrain.bind(this)(resolve, reject);
             } else {
               resolve(new Model(this._config, response.data.model));
             }
@@ -156,7 +156,7 @@ class Model {
   *   @param {number}     options.perPage     Number of images to return per page (optional, default: 20)
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
-  getVersions(options) {
+  getVersions(options={}) {
     let url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSIONS_PATH, [this.id])}`;
     return wrapToken(this._config, (headers)=> {
       let data = {
@@ -187,8 +187,8 @@ class Model {
   *   @param {number}     options.perPage     Number of images to return per page (optional, default: 20)
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
-  getInputs(options) {
-    let url = `${this._config.apiEndpoint}${roptions.versionId?
+  getInputs(options={}) {
+    let url = `${this._config.apiEndpoint}${options.versionId?
       replaceVars(MODEL_VERSION_INPUTS_PATH, [this.id, options.versionId]):
       replaceVars(MODEL_INPUTS_PATH, [this.id])}`;
     return wrapToken(this._config, (headers)=> {
