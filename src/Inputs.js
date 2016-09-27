@@ -52,7 +52,7 @@ class Inputs {
   }
   /**
   * Adds an input or multiple inputs
-  * @param {object|object[]}        inputs                                Can be a single media object or an array of media objects (max of 128 inputs/call; inputs in excess of that will be ignored)
+  * @param {object|object[]}        inputs                                Can be a single media object or an array of media objects (max of 128 inputs/call; passing > 128 will throw an exception)
   *   @param {object|string}          inputs[].input                        If string, is given, this is assumed to be an image url
   *     @param {string}                 inputs[].input.(url|base64)           Can be a publicly accessibly url or base64 string representing image bytes (required)
   *     @param {string}                 inputs[].input.inputId                ID of input (optional)
@@ -130,7 +130,7 @@ class Inputs {
   }
   /**
   * Merge concepts to inputs in bulk
-  * @param {object[]}         inputs    List of concepts to update
+  * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
   *   @param {object}           inputs[].input
   *     @param {string}           inputs[].input.id        The id of the input to update
   *     @param {string}           inputs[].input.concepts  Object with keys explained below:
@@ -144,7 +144,7 @@ class Inputs {
   }
   /**
   * Delete concepts to inputs in bulk
-  * @param {object[]}         inputs    List of concepts to update
+  * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
   *   @param {object}           inputs[].input
   *     @param {string}           inputs[].input.id        The id of the input to update
   *     @param {string}           inputs[].input.concepts  Object with keys explained below:
