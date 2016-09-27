@@ -192,12 +192,15 @@ class Model {
   *   @param {number}     options.perPage     Number of images to return per page (optional, default: 20)
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
-  getInputs(options={}) {
+  getInputs(options={page: 1, perPage: 20}) {
     let url = `${this._config.apiEndpoint}${this.versionId?
       replaceVars(MODEL_VERSION_INPUTS_PATH, [this.id, this.versionId]):
       replaceVars(MODEL_INPUTS_PATH, [this.id])}`;
     return wrapToken(this._config, (headers)=> {
-      return axios.get(url, {headers});
+      return axios.get(url, {
+        params: {'per_page': options.perPage, 'page': options.page},
+        headers
+      });
     });
   }
 };

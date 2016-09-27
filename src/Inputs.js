@@ -30,7 +30,7 @@ class Inputs {
   *   @param {Number}    options.perPage  Number of images to return per page (optional, default: 20)
   * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
   */
-  list(options={}) {
+  list(options={page: 1, perPage: 20}) {
     let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
     return wrapToken(this._config, (headers)=> {
       return new Promise((resolve, reject)=> {
@@ -73,7 +73,7 @@ class Inputs {
     }
     return wrapToken(this._config, (headers)=> {
       let data = {
-        'inputs': inputs.slice(0, MAX_BATCH_SIZE).map(formatInput)
+        'inputs': inputs.map(formatInput)
       };
       return new Promise((resolve, reject)=> {
         axios.post(url, data, {headers})
@@ -197,7 +197,7 @@ class Inputs {
   *    @param {Number}                  options.perPage       Number of images to return per page (optional, default: 20)
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
-  search(ands=[], options={}) {
+  search(ands=[], options={page: 1, perPage: 20}) {
     let url = `${this._config.apiEndpoint}${SEARCH_PATH}`;
     let data = {
       'query': {

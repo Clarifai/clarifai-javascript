@@ -44,7 +44,7 @@ class Input {
   deleteConcepts(concepts) {
     return this._update('delete_concepts', concepts);
   }
-  _update() {
+  _update(concepts) {
     let url = `${this._config.apiEndpoint}${replaceVars(INPUT_PATCH_PATH, [this.id])}`;
     let data = {
       action,

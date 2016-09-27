@@ -64,14 +64,12 @@ class Models {
    * @param {object[]|object|string}   inputs    An array of objects/object/string pointing to an image resource. A string can either be a url or base64 image bytes. Object keys explained below:
    *    @param {object}                  inputs[].image     Object with keys explained below:
    *       @param {string}                 inputs[].image.(url|base64)  Can be a publicly accessibly url or base64 string representing image bytes (required)
-   * @param {Object}                   options   Object with keys explained below: (optional)
-   *   @param {string}                   options.versionId The id of the model version to attach outputs to (optional)
    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
    */
-  predict(model, inputs, options={}) {
+  predict(model, inputs) {
     return new Promise((resolve, reject)=> {
       this.initModel(model).then((model)=> {
-        model.predict(inputs, options)
+        model.predict(inputs)
           .then(resolve, reject)
           .catch(reject);
       }, reject);

@@ -25,7 +25,7 @@ class Concepts {
   *    @param {number}    options.perPage     Number of images to return per page (optional, default: 20)
   * @return {Promise(Concepts, error)} A Promise that is fulfilled with a Concepts instance or rejected with an error
   */
-  list(options={}) {
+  list(options={page: 1, perPage: 20}) {
     let url = `${this._config.apiEndpoint}${CONCEPTS_PATH}`;
     return wrapToken(this._config, (headers)=> {
       return new Promise((resolve, reject)=> {
