@@ -456,7 +456,7 @@ function responseHandler(response) {
 };
 
 function errorHandler(err) {
-  expect(err).toBe(true);
+  expect(err.data).toBe(true);
   this();
 };
 
