@@ -456,7 +456,6 @@ function responseHandler(response) {
 };
 
 function errorHandler(err) {
-  console.log(err);
   expect(err).toBe(true);
   this();
 };
