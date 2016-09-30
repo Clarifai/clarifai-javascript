@@ -73,8 +73,9 @@ describe('Clarifai JS SDK', function() {
       it('Adds an input', function(done) {
         app.inputs.create([
           {
-            "url": "https://samples.clarifai.com/metro-north.jpg",
-            "id": id
+            url: "https://samples.clarifai.com/metro-north.jpg",
+            allowDupeUrl: true,
+            id: id
           }
         ]).then(
           function(inputs) {
@@ -94,16 +95,17 @@ describe('Clarifai JS SDK', function() {
       it('Adds an input with tags', function(done) {
         app.inputs.create([
           {
-            "url": "https://samples.clarifai.com/metro-north.jpg",
-            "id": id2,
-            "concepts": [
+            url: "https://samples.clarifai.com/metro-north.jpg",
+            allowDupeUrl: true,
+            id: id2,
+            concepts: [
               {
-                "id": "train",
-                "value": true
+                id: "train",
+                value: true
               },
               {
-                "id": "car",
-                "value": false
+                id: "car",
+                value: false
               }
             ]
           }
@@ -126,12 +128,14 @@ describe('Clarifai JS SDK', function() {
       it('Bulk adds inputs', function(done) {
         app.inputs.create([
           {
-            "url": "https://samples.clarifai.com/metro-north.jpg",
-            "id": id3
+            url: "https://samples.clarifai.com/metro-north.jpg",
+            allowDupeUrl: true,
+            id: id3
           },
           {
-            "url": "https://samples.clarifai.com/dog.tiff",
-            "id": id4
+            url: "https://samples.clarifai.com/dog.tiff",
+            allowDupeUrl: true,
+            id: id4
           }
         ]).then(
           function(inputs) {
@@ -152,29 +156,31 @@ describe('Clarifai JS SDK', function() {
       it('Bulk adds inputs with tags', function(done) {
         app.inputs.create([
           {
-            "url": "http://i.imgur.com/HEoT5xR.png",
-            "id": id5,
-            "concepts": [
+            url: "http://i.imgur.com/HEoT5xR.png",
+            allowDupeUrl: true,
+            id: id5,
+            concepts: [
               {
-                "id": "ferrari",
-                "value": true
+                id: "ferrari",
+                value: true
               },
               {
-                "id": "outdoors"
+                id: "outdoors"
               }
             ]
           },
           {
-            "url": "http://i.imgur.com/It5JRaj.jpg",
-            "id": id6,
-            "concepts": [
+            url: "http://i.imgur.com/It5JRaj.jpg",
+            allowDupeUrl: true,
+            id: id6,
+            concepts: [
               {
-                "id": "ferrari",
-                "value": true
+                id: "ferrari",
+                value: true
               },
               {
-                "id": "outdoors",
-                "value": false
+                id: "outdoors",
+                value: false
               }
             ]
           }
