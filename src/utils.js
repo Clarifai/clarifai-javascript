@@ -30,7 +30,7 @@ module.exports = {
         'base64': input['base64'],
         'crop': input['crop']
       };
-      if (data.allowDupeUrl) {
+      if (data.allowDuplicateUrl) {
         formatted.data.image['allow_duplicate_url'] = true;
       }
     }

@@ -74,7 +74,7 @@ describe('Clarifai JS SDK', function() {
         app.inputs.create([
           {
             url: "https://samples.clarifai.com/metro-north.jpg",
-            allowDupeUrl: true,
+            allowDuplicateUrl: true,
             id: id
           }
         ]).then(
@@ -96,7 +96,7 @@ describe('Clarifai JS SDK', function() {
         app.inputs.create([
           {
             url: "https://samples.clarifai.com/metro-north.jpg",
-            allowDupeUrl: true,
+            allowDuplicateUrl: true,
             id: id2,
             concepts: [
               {
@@ -129,12 +129,12 @@ describe('Clarifai JS SDK', function() {
         app.inputs.create([
           {
             url: "https://samples.clarifai.com/metro-north.jpg",
-            allowDupeUrl: true,
+            allowDuplicateUrl: true,
             id: id3
           },
           {
             url: "https://samples.clarifai.com/dog.tiff",
-            allowDupeUrl: true,
+            allowDuplicateUrl: true,
             id: id4
           }
         ]).then(
@@ -157,7 +157,7 @@ describe('Clarifai JS SDK', function() {
         app.inputs.create([
           {
             url: "http://i.imgur.com/HEoT5xR.png",
-            allowDupeUrl: true,
+            allowDuplicateUrl: true,
             id: id5,
             concepts: [
               {
@@ -171,7 +171,7 @@ describe('Clarifai JS SDK', function() {
           },
           {
             url: "http://i.imgur.com/It5JRaj.jpg",
-            allowDupeUrl: true,
+            allowDuplicateUrl: true,
             id: id6,
             concepts: [
               {
