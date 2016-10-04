@@ -9,11 +9,6 @@ var sampleImage2 = 'https://samples.clarifai.com/wedding.jpg';
 var sampleImage3 = 'https://samples.clarifai.com/cookies.jpeg';
 var app;
 
-
-function generateRandomId() {
-  return Date.now();
-}
-
 describe('Clarifai JS SDK', function() {
   beforeAll(function() {
     app = new Clarifai.App(
@@ -69,13 +64,12 @@ describe('Clarifai JS SDK', function() {
   });
 
   describe('Inputs', function() {
-      var id = 'test-id' + generateRandomId();
+      var inputId;
       it('Adds an input', function(done) {
         app.inputs.create([
           {
             url: "https://samples.clarifai.com/metro-north.jpg",
-            allowDuplicateUrl: true,
-            id: id
+            allowDuplicateUrl: true
           }
         ]).then(
           function(inputs) {
@@ -84,6 +78,7 @@ describe('Clarifai JS SDK', function() {
             expect(inputs.length).toBe(1);
             expect(inputs[0].createdAt).toBeDefined();
             expect(inputs[0].id).toBeDefined();
+            inputId = inputs[0].id;
             expect(inputs[0].toObject().data).toBeDefined();
             done();
           },
@@ -91,13 +86,11 @@ describe('Clarifai JS SDK', function() {
         );
       });
 
-      var id2 = 'test-id' + generateRandomId();
       it('Adds an input with tags', function(done) {
         app.inputs.create([
           {
             url: "https://samples.clarifai.com/metro-north.jpg",
             allowDuplicateUrl: true,
-            id: id2,
             concepts: [
               {
                 id: "train",
@@ -123,19 +116,15 @@ describe('Clarifai JS SDK', function() {
         );
       });
 
-      var id3 = 'test-id' + generateRandomId();
-      var id4 = 'test-id' + generateRandomId();
       it('Bulk adds inputs', function(done) {
         app.inputs.create([
           {
             url: "https://samples.clarifai.com/metro-north.jpg",
-            allowDuplicateUrl: true,
-            id: id3
+            allowDuplicateUrl: true
           },
           {
             url: "https://samples.clarifai.com/dog.tiff",
-            allowDuplicateUrl: true,
-            id: id4
+            allowDuplicateUrl: true
           }
         ]).then(
           function(inputs) {
@@ -151,14 +140,11 @@ describe('Clarifai JS SDK', function() {
         );
       });
 
-      var id5 = 'test-id' + generateRandomId();
-      var id6 = 'test-id' + generateRandomId();
       it('Bulk adds inputs with tags', function(done) {
         app.inputs.create([
           {
             url: "http://i.imgur.com/HEoT5xR.png",
             allowDuplicateUrl: true,
-            id: id5,
             concepts: [
               {
                 id: "ferrari",
@@ -172,7 +158,6 @@ describe('Clarifai JS SDK', function() {
           {
             url: "http://i.imgur.com/It5JRaj.jpg",
             allowDuplicateUrl: true,
-            id: id6,
             concepts: [
               {
                 id: "ferrari",
@@ -218,10 +203,10 @@ describe('Clarifai JS SDK', function() {
       });
 
       it('Gets a single input by id', function(done) {
-        app.inputs.get(id).then(
+        app.inputs.get(inputId).then(
           function(input) {
             expect(input).toBeDefined();
-            expect(input.id).toBe(id);
+            expect(input.id).toBe(inputId);
             expect(input.createdAt).toBeDefined();
             expect(input.toObject().data).toBeDefined();
             done();
@@ -247,7 +232,7 @@ describe('Clarifai JS SDK', function() {
       it('Updates an input', function(done) {
         app.inputs.mergeConcepts([
           {
-            id,
+            id: inputId,
             concepts: [
               { "id":"train", "value": true },
               { "id":"car", "value": false }
