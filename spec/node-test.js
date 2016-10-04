@@ -11,7 +11,7 @@ var app;
 
 
 function generateRandomId() {
-  return Math.floor(Math.random() * 1000000);
+  return Date.now();
 }
 
 describe('Clarifai JS SDK', function() {
