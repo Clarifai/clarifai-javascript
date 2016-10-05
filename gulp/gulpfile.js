@@ -12,7 +12,6 @@ var eslint = require('gulp-eslint');
 var jasmine = require('gulp-jasmine');
 var del = require('del');
 var fs = require('fs');
-var zip = require('gulp-zip');
 var awspublish = require('gulp-awspublish');
 var VERSION = require('./../package.json').version;
 
@@ -240,15 +239,3 @@ function publish() {
     .pipe(publisher.publish(headers))
     .pipe(awspublish.reporter());
 }
-
-gulp.task('zip', ['jslint'], function() {
-  return gulp.src([
-    './../index.js',
-    './../README.md',
-    './../spec',
-    './../src/*',
-    './../package.json',
-  ],{ 'base': './../' })
-		.pipe(zip('clarifai-' + VERSION + '.zip'))
-		.pipe(gulp.dest('./../build'));
-});
