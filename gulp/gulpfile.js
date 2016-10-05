@@ -6,15 +6,12 @@ var gulpif = require('gulp-if');
 var uglify = require('gulp-uglify');
 var replace = require('gulp-replace-task');
 var envify = require('envify');
-var htmlmin = require('gulp-htmlmin');
-var webserver = require('gulp-webserver');
 var rename = require('gulp-rename');
 var insert = require('gulp-insert');
 var eslint = require('gulp-eslint');
 var jasmine = require('gulp-jasmine');
 var del = require('del');
 var fs = require('fs');
-var zip = require('gulp-zip');
 var awspublish = require('gulp-awspublish');
 var VERSION = require('./../package.json').version;
 
@@ -36,7 +33,6 @@ gulp.task(
 function watchFiles() {
   gulp.watch('./../index.js', ['jslint', 'browserify']);
   gulp.watch('./../src/**', ['jslint', 'browserify']);
-  gulp.watch('./../examples/**', ['html']);
 }
 
 // browserify src/js to build/js
@@ -79,48 +75,6 @@ gulp.task('browserify', function() {
     }))
     .pipe(insert.prepend(BROWSER_HEADER))
     .pipe(gulp.dest('./../build/'));
-});
-
-// build examples
-gulp.task('html', function() {
-  var buildVars = getBuildVars();
-  var CLIENT_ID = process.env.CLIENT_ID || '';
-  var CLIENT_SECRET = process.env.CLIENT_SECRET || '';
-  return gulp.src('./../examples/**.html')
-    .pipe(gulpif( buildVars.uglify, htmlmin({collapseWhitespace: true}) ))
-    .pipe(replace({
-      patterns: [
-        {
-          'match': 'VERSION',
-          'replacement': VERSION
-        },
-        {
-          'match': 'CLIENT_ID',
-          'replacement': CLIENT_ID
-        },
-        {
-          'match': 'CLIENT_SECRET',
-          'replacement': CLIENT_SECRET
-        }
-      ]
-    }))
-    .pipe(gulp.dest('./../build/examples'));
-});
-
-// webserver for examples
-gulp.task('webserver', function() {
-  var port = gutil.env.port || '3000';
-  return gulp.src('./../build')
-    .pipe(webserver({
-      'livereload': false,
-      'open': false,
-      'host': '0.0.0.0',
-      'port': port,
-      'directoryListing': {
-        'enable':false,
-        'path': 'build'
-      }
-    }));
 });
 
 var buildVars = {};
@@ -285,16 +239,3 @@ function publish() {
     .pipe(publisher.publish(headers))
     .pipe(awspublish.reporter());
 }
-
-gulp.task('zip', ['jslint'], function() {
-  return gulp.src([
-    './../index.js',
-    './../README.md',
-    './../spec',
-    './../src/*',
-    './../package.json',
-    './../examples/*'
-  ],{ 'base': './../' })
-		.pipe(zip('clarifai-' + VERSION + '.zip'))
-		.pipe(gulp.dest('./../build'));
-});
