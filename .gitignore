@@ -1,8 +1,7 @@
-node_modules/*
 build/*
+node_modules/*
 .DS_Store
 aws.json
 npm-debug.log
 .awspublish*
-docs/*
 out/*

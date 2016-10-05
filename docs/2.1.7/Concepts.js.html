@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Concepts.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="App.html">App</a><ul class='methods'><li data-type='method'><a href="App.html#getToken">getToken</a></li><li data-type='method'><a href="App.html#setToken">setToken</a></li></ul></li><li><a href="Concept.html">Concept</a><ul class='methods'><li data-type='method'><a href="Concept.html#toObject">toObject</a></li></ul></li><li><a href="Concepts.html">Concepts</a><ul class='methods'><li data-type='method'><a href="Concepts.html#create">create</a></li><li data-type='method'><a href="Concepts.html#get">get</a></li><li data-type='method'><a href="Concepts.html#list">list</a></li><li data-type='method'><a href="Concepts.html#search">search</a></li></ul></li><li><a href="Input.html">Input</a><ul class='methods'><li data-type='method'><a href="Input.html#deleteConcepts">deleteConcepts</a></li><li data-type='method'><a href="Input.html#mergeConcepts">mergeConcepts</a></li><li data-type='method'><a href="Input.html#toObject">toObject</a></li></ul></li><li><a href="Inputs.html">Inputs</a><ul class='methods'><li data-type='method'><a href="Inputs.html#create">create</a></li><li data-type='method'><a href="Inputs.html#delete">delete</a></li><li data-type='method'><a href="Inputs.html#deleteConcepts">deleteConcepts</a></li><li data-type='method'><a href="Inputs.html#get">get</a></li><li data-type='method'><a href="Inputs.html#getStatus">getStatus</a></li><li data-type='method'><a href="Inputs.html#list">list</a></li><li data-type='method'><a href="Inputs.html#mergeConcepts">mergeConcepts</a></li><li data-type='method'><a href="Inputs.html#search">search</a></li></ul></li><li><a href="Model.html">Model</a><ul class='methods'><li data-type='method'><a href="Model.html#deleteConcepts">deleteConcepts</a></li><li data-type='method'><a href="Model.html#getInputs">getInputs</a></li><li data-type='method'><a href="Model.html#getOutputInfo">getOutputInfo</a></li><li data-type='method'><a href="Model.html#getVersion">getVersion</a></li><li data-type='method'><a href="Model.html#getVersions">getVersions</a></li><li data-type='method'><a href="Model.html#mergeConcepts">mergeConcepts</a></li><li data-type='method'><a href="Model.html#predict">predict</a></li><li data-type='method'><a href="Model.html#toObject">toObject</a></li><li data-type='method'><a href="Model.html#train">train</a></li></ul></li><li><a href="Models.html">Models</a><ul class='methods'><li data-type='method'><a href="Models.html#create">create</a></li><li data-type='method'><a href="Models.html#delete">delete</a></li><li data-type='method'><a href="Models.html#get">get</a></li><li data-type='method'><a href="Models.html#initModel">initModel</a></li><li data-type='method'><a href="Models.html#list">list</a></li><li data-type='method'><a href="Models.html#predict">predict</a></li><li data-type='method'><a href="Models.html#search">search</a></li><li data-type='method'><a href="Models.html#train">train</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Concepts.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>let axios = require('axios');
+let Concept = require('./Concept');
+let {API, replaceVars} = require('./constants');
+let {CONCEPTS_PATH, CONCEPT_PATH, CONCEPT_SEARCH_PATH} = API;
+let {wrapToken, formatConcept} = require('./utils');
+let {isSuccess, checkType} = require('./helpers');
+
+/**
+* class representing a collection of concepts
+* @class
+*/
+class Concepts {
+  constructor(_config, rawData=[]) {
+    this._config = _config;
+    this.rawData = rawData;
+    rawData.forEach((conceptData, index)=> {
+      this[index] = new Concept(this._config, conceptData);
+    });
+    this.length = rawData.length;
+  }
+  /**
+  * List all the concepts
+  * @param {object}     options     Object with keys explained below: (optional)
+  *    @param {number}    options.page        The page number (optional, default: 1)
+  *    @param {number}    options.perPage     Number of images to return per page (optional, default: 20)
+  * @return {Promise(Concepts, error)} A Promise that is fulfilled with a Concepts instance or rejected with an error
+  */
+  list(options={page: 1, perPage: 20}) {
+    let url = `${this._config.apiEndpoint}${CONCEPTS_PATH}`;
+    return wrapToken(this._config, (headers)=> {
+      return new Promise((resolve, reject)=> {
+        axios.get(url, {
+          headers,
+          params: {
+            'page': options.page,
+            'per_page': options.perPage,
+          }
+        }).then((response)=> {
+          if (isSuccess(response)) {
+            resolve(new Concepts(this._config, response.data.concepts));
+          } else {
+            reject(response);
+          }
+        }, reject);
+      });
+    });
+  }
+  /**
+  * List a single concept given an id
+  * @param {String}     id          The concept's id
+  * @return {Promise(Concept, error)} A Promise that is fulfilled with a Concept instance or rejected with an error
+  */
+  get(id) {
+    let url = `${this._config.apiEndpoint}${replaceVars(CONCEPT_PATH, [id])}`;
+    return wrapToken(this._config, (headers)=> {
+      return new Promise((resolve, reject)=> {
+        axios.get(url, {headers}).then((response)=> {
+          if (isSuccess(response)) {
+            resolve(new Concept(this._config, response.data.concept));
+          } else {
+            reject(response);
+          }
+        }, reject);
+      });
+    });
+  }
+  /**
+  * Add a list of concepts given an id and name
+  * @param {object|object[]}   concepts       Can be a single media object or an array of media objects
+  *   @param  {object}           concepts[].concept
+  *     @param  {object}           concepts[].concept.id      The new concept's id
+  *     @param  {object}           concepts[].concept.name    The new concept's name
+  * @return {Promise(Concept, error)}             A Promise that is fulfilled with a Concept instance or rejected with an error
+  */
+  create(concepts=[]) {
+    if (checkType(/(Object|String)/, concepts)) {
+      concepts = [concepts];
+    }
+    let data = {
+      'concepts': concepts.map(formatConcept)
+    };
+    let url = `${this._config.apiEndpoint}${CONCEPTS_PATH}`;
+    return wrapToken(this._config, (headers)=> {
+      return new Promise((resolve, reject)=> {
+        axios.post(url, data, {headers})
+        .then((response)=> {
+          if (isSuccess(response)) {
+            resolve(new Concept(this._config, response.data.concepts));
+          } else {
+            reject(response);
+          }
+        }, reject);
+      });
+    });
+  }
+  /**
+  * Search for a concept given a name. A wildcard can be given (example: The name "bo*" will match with "boat" and "bow" given those concepts exist
+  * @param  {string}   name  The name of the concept to search for
+  * @return {Promise(Models, error)} A Promise that is fulfilled with a Concepts instance or rejected with an error
+  */
+  search(name) {
+    let url = `${this._config.apiEndpoint}${CONCEPT_SEARCH_PATH}`;
+    return wrapToken(this._config, (headers)=> {
+      let params = {
+        'concept_query': {
+          name
+        }
+      };
+      return new Promise((resolve, reject)=> {
+        axios.post(url, params, {headers}).then((response)=> {
+          if (isSuccess(response)) {
+            resolve(new Concepts(this._config, response.data.concepts));
+          } else {
+            reject(response);
+          }
+        }, reject);
+      });
+    });
+  }
+  toObjects(...keys) {
+    return Array.prototype.map.call(this, (concept, i)=> {
+      let val;
+      if (keys.length > 0) {
+        val = {};
+        keys.forEach((k)=> {
+          val[k] = concept[k];
+        });
+      } else {
+        val = concept.toObject();
+      }
+      return val;
+    });
+  }
+};
+
+module.exports = Concepts;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a> on Wed Oct 05 2016 12:33:14 GMT-0400 (EDT) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

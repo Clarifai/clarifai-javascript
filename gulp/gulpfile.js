@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var browserify = require('gulp-browserify');
+var babel = require('gulp-babel');
 var notify = require('gulp-notify');
 var gulpif = require('gulp-if');
 var uglify = require('gulp-uglify');
@@ -18,7 +19,8 @@ var VERSION = require('./../package.json').version;
 
 var tasks = [
   'jslint',
-  'browserify'
+  'browserify',
+  'dist'
 ];
 
 gulp.task('build', tasks);
@@ -31,12 +33,18 @@ gulp.task(
 
 // will do an initial build, then build on any changes to src
 function watchFiles() {
-  gulp.watch('./../index.js', ['jslint', 'browserify']);
   gulp.watch('./../src/**', ['jslint', 'browserify']);
 }
 
-// browserify src/js to build/js
-gulp.task('browserify', function() {
+// delete the contents of build folder
+gulp.task('cleanbuild', function() {
+  return del([
+    './../dist/**',
+    ], {'force': true});
+});
+
+// browserify src/js to dist/browser/js
+gulp.task('browserify', ['cleanbuild'], function() {
   var buildVars = getBuildVars();
   var replacePatterns = [
     {
@@ -53,7 +61,7 @@ gulp.task('browserify', function() {
     }
   ];
 
-  return gulp.src('./../index.js')
+  return gulp.src('./../src/index.js')
     .pipe(browserify({
       'insertGlobals': false,
       'debug': false,
@@ -69,12 +77,24 @@ gulp.task('browserify', function() {
     .pipe(replace({
       patterns: replacePatterns
     }))
-    .pipe(gulpif( buildVars.uglify, uglify() ))
     .pipe(rename(function (path) {
       path.basename = 'clarifai-' + VERSION;
     }))
     .pipe(insert.prepend(BROWSER_HEADER))
-    .pipe(gulp.dest('./../build/'));
+    .pipe(gulp.dest('./../dist/browser'))
+    .pipe(uglify())
+    .pipe(rename(function (path) {
+      path.basename = 'clarifai-' + VERSION + '.min';
+    }))
+    .pipe(gulp.dest('./../dist/browser'));
+});
+
+gulp.task('dist', ['browserify'], function() {
+  return gulp.src('./../src/**/*.js')
+    .pipe(babel({
+      presets: ['es2015']
+    }))
+    .pipe(gulp.dest('./../dist/node'));
 });
 
 var buildVars = {};
@@ -202,13 +222,6 @@ gulp.task('test', function() {
     }));
 });
 
-// delete the contents of build folder
-gulp.task('cleanbuild', function() {
-  return del([
-    './../build/**',
-   ], {'force': true});
-});
-
 // deploy to the S3 bucket set in aws.json
 gulp.task(
   'deploy',
@@ -232,7 +245,7 @@ function publish() {
   var headers = {
     'Cache-Control': 'max-age=21600, no-transform, public'
   };
-  return gulp.src('./../build/**')
+  return gulp.src(['./../dist/browser/**', './../docs/*'])
     .pipe(rename(function (path) {
         path.dirname = '/js/' + path.dirname;
     }))
