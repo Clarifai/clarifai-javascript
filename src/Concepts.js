@@ -85,7 +85,7 @@ class Concepts {
         axios.post(url, data, {headers})
         .then((response)=> {
           if (isSuccess(response)) {
-            resolve(new Concept(this._config, response.data.concepts));
+            resolve(new Concepts(this._config, response.data.concepts));
           } else {
             reject(response);
           }

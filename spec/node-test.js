@@ -447,6 +447,7 @@ function responseHandler(response) {
 };
 
 function errorHandler(err) {
+  expect(err.status).toBe(true);
   expect(err.data).toBe(true);
   this();
 };
