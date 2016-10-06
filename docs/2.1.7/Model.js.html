@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Model.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="App.html">App</a><ul class='methods'><li data-type='method'><a href="App.html#getToken">getToken</a></li><li data-type='method'><a href="App.html#setToken">setToken</a></li></ul></li><li><a href="Concept.html">Concept</a><ul class='methods'><li data-type='method'><a href="Concept.html#toObject">toObject</a></li></ul></li><li><a href="Concepts.html">Concepts</a><ul class='methods'><li data-type='method'><a href="Concepts.html#create">create</a></li><li data-type='method'><a href="Concepts.html#get">get</a></li><li data-type='method'><a href="Concepts.html#list">list</a></li><li data-type='method'><a href="Concepts.html#search">search</a></li></ul></li><li><a href="Input.html">Input</a><ul class='methods'><li data-type='method'><a href="Input.html#deleteConcepts">deleteConcepts</a></li><li data-type='method'><a href="Input.html#mergeConcepts">mergeConcepts</a></li><li data-type='method'><a href="Input.html#toObject">toObject</a></li></ul></li><li><a href="Inputs.html">Inputs</a><ul class='methods'><li data-type='method'><a href="Inputs.html#create">create</a></li><li data-type='method'><a href="Inputs.html#delete">delete</a></li><li data-type='method'><a href="Inputs.html#deleteConcepts">deleteConcepts</a></li><li data-type='method'><a href="Inputs.html#get">get</a></li><li data-type='method'><a href="Inputs.html#getStatus">getStatus</a></li><li data-type='method'><a href="Inputs.html#list">list</a></li><li data-type='method'><a href="Inputs.html#mergeConcepts">mergeConcepts</a></li><li data-type='method'><a href="Inputs.html#search">search</a></li></ul></li><li><a href="Model.html">Model</a><ul class='methods'><li data-type='method'><a href="Model.html#deleteConcepts">deleteConcepts</a></li><li data-type='method'><a href="Model.html#getInputs">getInputs</a></li><li data-type='method'><a href="Model.html#getOutputInfo">getOutputInfo</a></li><li data-type='method'><a href="Model.html#getVersion">getVersion</a></li><li data-type='method'><a href="Model.html#getVersions">getVersions</a></li><li data-type='method'><a href="Model.html#mergeConcepts">mergeConcepts</a></li><li data-type='method'><a href="Model.html#predict">predict</a></li><li data-type='method'><a href="Model.html#toObject">toObject</a></li><li data-type='method'><a href="Model.html#train">train</a></li></ul></li><li><a href="Models.html">Models</a><ul class='methods'><li data-type='method'><a href="Models.html#create">create</a></li><li data-type='method'><a href="Models.html#delete">delete</a></li><li data-type='method'><a href="Models.html#get">get</a></li><li data-type='method'><a href="Models.html#initModel">initModel</a></li><li data-type='method'><a href="Models.html#list">list</a></li><li data-type='method'><a href="Models.html#predict">predict</a></li><li data-type='method'><a href="Models.html#search">search</a></li><li data-type='method'><a href="Models.html#train">train</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Model.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>let axios = require('axios');
+let Concepts = require('./Concepts');
+let {isSuccess, checkType} = require('./helpers');
+let {API, replaceVars} = require('./constants');
+let {wrapToken, formatImagePredict} = require('./utils');
+let {
+  MODEL_VERSIONS_PATH,
+  MODEL_VERSION_PATH,
+  MODEL_PATCH_PATH,
+  PREDICT_PATH,
+  VERSION_PREDICT_PATH,
+  MODEL_INPUTS_PATH,
+  MODEL_OUTPUT_PATH,
+  MODEL_VERSION_INPUTS_PATH
+} = API;
+const MODEL_QUEUED_FOR_TRAINING = '21103';
+const MODEL_TRAINING = '21101';
+const POLLTIME = 2000;
+
+/**
+* class representing a model
+* @class
+*/
+class Model {
+  constructor(_config, data) {
+    this._config = _config;
+    this.data = data;
+    this.name = data.name;
+    this.id = data.id;
+    this.createdAt = data.created_at || data.createdAt;
+    this.appId = data.app_id || data.appId;
+    this.outputInfo = data.output_info || data.outputInfo;
+    if (checkType(/(String)/, data.version)) {
+      this.modelVersion = {};
+      this.versionId = data.version;
+    } else {
+      this.modelVersion = data.model_version || data.modelVersion || data.version;
+      this.versionId = (this.modelVersion || {}).id;
+    }
+    this._rawData = data;
+  }
+  /**
+  * Returns a javascript object with the raw data attributes (from API)
+  * @return {object} An object that contains data about model from api
+  */
+  toObject() {
+    return this._rawData;
+  }
+  /**
+  * Merge concepts from a model
+  * @param {object[]}      concepts    List of concept objects with id
+  * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  mergeConcepts(concepts=[]) {
+    return this._update('merge_concepts', concepts);
+  }
+  /**
+  * Remove concepts from a model
+  * @param {object[]}      concepts    List of concept objects with id
+  * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  deleteConcepts(concepts=[]) {
+    return this._update('delete_concepts', concepts);
+  }
+  _update(action, conceptsData) {
+    if (!Array.isArray(conceptsData)) {
+      conceptsData = [conceptsData];
+    }
+    let url = `${this._config.apiEndpoint}${replaceVars(MODEL_PATCH_PATH, [this.id])}`;
+    let concepts = conceptsData[0] instanceof Concepts?
+      conceptsData.toObject('id'):
+      conceptsData;
+    let params = {
+      'concepts': concepts,
+      'action': action
+    };
+    return wrapToken(this._config, (headers)=> {
+      let data = {
+        headers,
+        params
+      };
+      return axios.patch(url, data);
+    });
+  }
+  /**
+  * Create a new model version
+  * @param {boolean}       sync     If true, this returns after model has completely trained. If false, this immediately returns default api response.
+  * @return {Promise(model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
+  */
+  train(sync) {
+    let url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSIONS_PATH, [this.id])}`;
+    return wrapToken(this._config, (headers)=> {
+      return new Promise((resolve, reject)=> {
+        axios.post(url, null, {headers}).then((response)=> {
+          if (isSuccess(response)) {
+            if (sync) {
+              this._pollTrain.bind(this)(resolve, reject);
+            } else {
+              resolve(new Model(this._config, response.data.model));
+            }
+          } else {
+            reject(response);
+          }
+        }, reject);
+      });
+    });
+  }
+  _pollTrain(resolve, reject) {
+    clearTimeout(this.pollTimeout);
+    this.getOutputInfo().then((model)=> {
+      let modelStatusCode = model.modelVersion.status.code.toString();
+      if (modelStatusCode === MODEL_QUEUED_FOR_TRAINING || modelStatusCode === MODEL_TRAINING) {
+        this.pollTimeout = setTimeout(()=> this._pollTrain(resolve, reject), POLLTIME);
+      } else {
+        resolve(model);
+      }
+    },
+    reject)
+    .catch(reject);
+  }
+  /**
+  * Returns model ouputs according to inputs
+  * @param {object[]|object|string}       inputs    An array of objects/object/string pointing to an image resource. A string can either be a url or base64 image bytes. Object keys explained below:
+  *    @param {object}                      inputs[].image     Object with keys explained below:
+  *       @param {string}                     inputs[].image.(url|base64)  Can be a publicly accessibly url or base64 string representing image bytes (required)
+  * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  predict(inputs) {
+    if (checkType(/(Object|String)/, inputs)) {
+      inputs = [inputs];
+    }
+    let url = `${this._config.apiEndpoint}${this.versionId?
+      replaceVars(VERSION_PREDICT_PATH, [this.id, this.versionId]):
+      replaceVars(PREDICT_PATH, [this.id])}`;
+    return wrapToken(this._config, (headers)=> {
+      let params = {
+        'inputs': inputs.map(formatImagePredict)
+      };
+      return axios.post(url, params, {headers});
+    });
+  }
+  /**
+  * Returns a version of the model specified by its id
+  * @param {string}     versionId   The model's id
+  * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  getVersion(versionId) {
+    let url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSION_PATH, [this.id, versionId])}`;
+    return wrapToken(this._config, (headers)=> {
+      return new Promise((resolve, reject)=> {
+        axios.get(url, {headers}).then((response)=> {
+          resolve(response.data);
+        }, reject);
+      });
+    });
+  }
+  /**
+  * Returns a list of versions of the model
+  * @param {object}     options     Object with keys explained below: (optional)
+  *   @param {number}     options.page        The page number (optional, default: 1)
+  *   @param {number}     options.perPage     Number of images to return per page (optional, default: 20)
+  * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  getVersions(options={page: 1, perPage: 20}) {
+    let url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSIONS_PATH, [this.id])}`;
+    return wrapToken(this._config, (headers)=> {
+      let data = {
+        headers,
+        params: {'per_page': options.perPage, 'page': options.page},
+      };
+      return axios.get(url, data);
+    });
+  }
+  /**
+  * Returns all the model's output info
+  * @return {Promise(Model, error)} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  getOutputInfo() {
+    let url = `${this._config.apiEndpoint}${replaceVars(MODEL_OUTPUT_PATH, [this.id])}`;
+    return wrapToken(this._config, (headers)=> {
+      return new Promise((resolve, reject)=> {
+        axios.get(url, {headers}).then((response)=> {
+          resolve(new Model(this._config, response.data.model));
+        }, reject);
+      });
+    });
+  }
+  /**
+  * Returns all the model's inputs
+  * @param {object}     options     Object with keys explained below: (optional)
+  *   @param {number}     options.page        The page number (optional, default: 1)
+  *   @param {number}     options.perPage     Number of images to return per page (optional, default: 20)
+  * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  getInputs(options={page: 1, perPage: 20}) {
+    let url = `${this._config.apiEndpoint}${this.versionId?
+      replaceVars(MODEL_VERSION_INPUTS_PATH, [this.id, this.versionId]):
+      replaceVars(MODEL_INPUTS_PATH, [this.id])}`;
+    return wrapToken(this._config, (headers)=> {
+      return axios.get(url, {
+        params: {'per_page': options.perPage, 'page': options.page},
+        headers
+      });
+    });
+  }
+};
+
+module.exports = Model;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a> on Wed Oct 05 2016 12:33:14 GMT-0400 (EDT) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

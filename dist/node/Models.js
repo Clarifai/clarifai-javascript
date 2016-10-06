@@ -1,0 +1,320 @@
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var axios = require('axios');
+
+var _require = require('es6-promise');
+
+var Promise = _require.Promise;
+
+var Model = require('./Model');
+var Concepts = require('./Concepts');
+
+var _require2 = require('./constants');
+
+var API = _require2.API;
+var replaceVars = _require2.replaceVars;
+
+var _require3 = require('./helpers');
+
+var isSuccess = _require3.isSuccess;
+var checkType = _require3.checkType;
+
+var _require4 = require('./utils');
+
+var wrapToken = _require4.wrapToken;
+var MODELS_PATH = API.MODELS_PATH;
+var MODEL_PATH = API.MODEL_PATH;
+var MODEL_SEARCH_PATH = API.MODEL_SEARCH_PATH;
+var MODEL_VERSION_PATH = API.MODEL_VERSION_PATH;
+
+/**
+* class representing a collection of models
+* @class
+*/
+
+var Models = function () {
+  function Models(_config) {
+    var _this = this;
+
+    var rawData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+    _classCallCheck(this, Models);
+
+    this._config = _config;
+    this.rawData = rawData;
+    rawData.forEach(function (modelData, index) {
+      _this[index] = new Model(_this._config, modelData);
+    });
+    this.length = rawData.length;
+  }
+  /**
+  * Returns a Model instance given model id or name without calling the backend
+  * @param {string|object}    model       If string, it is assumed to be model id. Otherwise, if object is given, it can have any of the following keys:
+  *   @param {string}           model.id          Model id
+  *   @param {string}           model.name        Model name
+  *   @param {string}           model.version     Model version
+  *   @param {string}           model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+  * @return {Model}       An instance of Model with the given id/name
+  */
+
+
+  _createClass(Models, [{
+    key: 'initModel',
+    value: function initModel(model) {
+      var _this2 = this;
+
+      var data = {};
+      var fn = void 0;
+      if (checkType(/String/, model)) {
+        data.id = model;
+      } else {
+        data = model;
+      }
+      if (data.id) {
+        fn = function fn(resolve, reject) {
+          resolve(new Model(_this2._config, data));
+        };
+      } else {
+        fn = function fn(resolve, reject) {
+          _this2.search(data.name, data.type).then(function (models) {
+            if (data.version) {
+              resolve(models.filter(function (model) {
+                return model.modelVersion.id === data.version;
+              }));
+            } else {
+              resolve(models[0]);
+            }
+          }, reject).catch(reject);
+        };
+      }
+      return new Promise(fn);
+    }
+    /**
+     * Calls predict given model info and inputs to predict on
+     * @param {string|object}            model       If string, it is assumed to be model id. Otherwise, if object is given, it can have any of the following keys:
+     *   @param {string}                   model.id          Model id
+     *   @param {string}                   model.name        Model name
+     *   @param {string}                   model.version     Model version
+     *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+     * @param {object[]|object|string}   inputs    An array of objects/object/string pointing to an image resource. A string can either be a url or base64 image bytes. Object keys explained below:
+     *    @param {object}                  inputs[].image     Object with keys explained below:
+     *       @param {string}                 inputs[].image.(url|base64)  Can be a publicly accessibly url or base64 string representing image bytes (required)
+     * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+     */
+
+  }, {
+    key: 'predict',
+    value: function predict(model, inputs) {
+      var _this3 = this;
+
+      return new Promise(function (resolve, reject) {
+        _this3.initModel(model).then(function (model) {
+          model.predict(inputs).then(resolve, reject).catch(reject);
+        }, reject);
+      });
+    }
+    /**
+     * Calls train on a model and creates a new model version given model info
+     * @param {string|object}            model       If string, it is assumed to be model id. Otherwise, if object is given, it can have any of the following keys:
+     *   @param {string}                   model.id          Model id
+     *   @param {string}                   model.name        Model name
+     *   @param {string}                   model.version     Model version
+     *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+     * @param {boolean}                  sync        If true, this returns after model has completely trained. If false, this immediately returns default api response.
+     * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+     */
+
+  }, {
+    key: 'train',
+    value: function train(model) {
+      var _this4 = this;
+
+      var sync = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+      return new Promise(function (resolve, reject) {
+        _this4.initModel(model).then(function (model) {
+          model.train(sync).then(resolve, reject).catch(reject);
+        }, reject);
+      });
+    }
+    /**
+     * Returns all the models
+     * @param {Object}     options     Object with keys explained below: (optional)
+     *   @param {Number}     options.page        The page number (optional, default: 1)
+     *   @param {Number}     options.perPage     Number of images to return per page (optional, default: 20)
+     * @return {Promise(models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
+     */
+
+  }, {
+    key: 'list',
+    value: function list() {
+      var _this5 = this;
+
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
+
+      var url = '' + this._config.apiEndpoint + MODELS_PATH;
+      return wrapToken(this._config, function (headers) {
+        return new Promise(function (resolve, reject) {
+          axios.get(url, {
+            params: { 'per_page': options.perPage, 'page': options.page },
+            headers: headers
+          }).then(function (response) {
+            if (isSuccess(response)) {
+              resolve(new Models(_this5._config, response.models));
+            } else {
+              reject(response);
+            }
+          }, reject);
+        });
+      });
+    }
+    /**
+     * Create a model
+     * @param {string|object}           model                                    If string, it is assumed to be the model name. Otherwise, if object is given, it can have any of the following keys:
+     *   @param {string}                  model.id                                 Model id
+     *   @param {string}                  model.name                               Model name
+     * @param {object[]|Concepts[]}     conceptsData                             List of objects with ids or an instance of Concepts object
+     * @param {Object}                  options                                  Object with keys explained below:
+     *   @param {Boolean}                 options.conceptsMutuallyExclusive        Optional
+     *   @param {Boolean}                 options.closedEnvironment                Optional
+     * @return {Promise(model, error)} A Promise that is fulfilled with an instance of Model or rejected with an error
+     */
+
+  }, {
+    key: 'create',
+    value: function create(name) {
+      var _this6 = this;
+
+      var conceptsData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+      var concepts = conceptsData instanceof Concepts ? conceptsData.toObject('id') : conceptsData.map(function (concept) {
+        var val = concept;
+        if (checkType(/String/, concept)) {
+          val = { 'id': concept };
+        }
+        return val;
+      });
+      var url = '' + this._config.apiEndpoint + MODELS_PATH;
+      var data = {
+        'model': {
+          'name': name,
+          'output_info': {
+            'data': {
+              concepts: concepts
+            },
+            'output_config': {
+              'concepts_mutually_exclusive': !!options.conceptsMutuallyExclusive,
+              'closed_environment': !!options.closedEnvironment
+            }
+          }
+        }
+      };
+      return wrapToken(this._config, function (headers) {
+        return new Promise(function (resolve, reject) {
+          axios({
+            'method': 'post',
+            'url': url,
+            'data': data,
+            'headers': headers
+          }).then(function (response) {
+            if (isSuccess(response)) {
+              resolve(new Model(_this6._config, response.data.model));
+            } else {
+              reject(response);
+            }
+          }, reject);
+        });
+      });
+    }
+    /**
+     * Returns a model specified by ID
+     * @param {String}     id          The model's id
+     * @return {Promise(model, error)} A Promise that is fulfilled with an instance of Model or rejected with an error
+     */
+
+  }, {
+    key: 'get',
+    value: function get(id) {
+      var _this7 = this;
+
+      var url = '' + this._config.apiEndpoint + replaceVars(MODEL_PATH, [id]);
+      return wrapToken(this._config, function (headers) {
+        return new Promise(function (resolve, reject) {
+          axios.get(url, { headers: headers }).then(function (response) {
+            if (isSuccess(response)) {
+              resolve(new Model(_this7._config, response.data.model));
+            } else {
+              reject(response);
+            }
+          }, reject);
+        });
+      });
+    }
+    /**
+     * Deletes all models or a model (if given id) or a model version (if given id and verion id)
+     * @param {String}     id          The model's id
+     * @param {String}     versionId   The model's version id
+     * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+     */
+
+  }, {
+    key: 'delete',
+    value: function _delete(id, versionId) {
+      var url = void 0;
+      if (id) {
+        url = '' + this._config.apiEndpoint + replaceVars(MODEL_PATH, [id]);
+      } else if (versionId) {
+        url = '' + this._config.apiEndpoint + replaceVars(MODEL_VERSION_PATH, [id, versionId]);
+      } else {
+        url = '' + this._config.apiEndpoint + MODELS_PATH;
+      }
+      return wrapToken(this._config, function (headers) {
+        return axios.delete(url, { headers: headers });
+      });
+    }
+    /**
+     * Search for models by name or type
+    * @param {String}     name        The model name
+    * @param {String}     type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+    * @return {Promise(models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
+    */
+
+  }, {
+    key: 'search',
+    value: function search(name) {
+      var _this8 = this;
+
+      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+      var url = '' + this._config.apiEndpoint + MODEL_SEARCH_PATH;
+      return wrapToken(this._config, function (headers) {
+        var params = {
+          'model_query': {
+            name: name,
+            type: type
+          }
+        };
+        return new Promise(function (resolve, reject) {
+          axios.post(url, params, { headers: headers }).then(function (response) {
+            if (isSuccess(response)) {
+              resolve(new Models(_this8._config, response.data.models));
+            } else {
+              reject(response);
+            }
+          }, reject);
+        });
+      });
+    }
+  }]);
+
+  return Models;
+}();
+
+;
+
+module.exports = Models;

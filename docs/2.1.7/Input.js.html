@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Input.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="App.html">App</a><ul class='methods'><li data-type='method'><a href="App.html#getToken">getToken</a></li><li data-type='method'><a href="App.html#setToken">setToken</a></li></ul></li><li><a href="Concept.html">Concept</a><ul class='methods'><li data-type='method'><a href="Concept.html#toObject">toObject</a></li></ul></li><li><a href="Concepts.html">Concepts</a><ul class='methods'><li data-type='method'><a href="Concepts.html#create">create</a></li><li data-type='method'><a href="Concepts.html#get">get</a></li><li data-type='method'><a href="Concepts.html#list">list</a></li><li data-type='method'><a href="Concepts.html#search">search</a></li></ul></li><li><a href="Input.html">Input</a><ul class='methods'><li data-type='method'><a href="Input.html#deleteConcepts">deleteConcepts</a></li><li data-type='method'><a href="Input.html#mergeConcepts">mergeConcepts</a></li><li data-type='method'><a href="Input.html#toObject">toObject</a></li></ul></li><li><a href="Inputs.html">Inputs</a><ul class='methods'><li data-type='method'><a href="Inputs.html#create">create</a></li><li data-type='method'><a href="Inputs.html#delete">delete</a></li><li data-type='method'><a href="Inputs.html#deleteConcepts">deleteConcepts</a></li><li data-type='method'><a href="Inputs.html#get">get</a></li><li data-type='method'><a href="Inputs.html#getStatus">getStatus</a></li><li data-type='method'><a href="Inputs.html#list">list</a></li><li data-type='method'><a href="Inputs.html#mergeConcepts">mergeConcepts</a></li><li data-type='method'><a href="Inputs.html#search">search</a></li></ul></li><li><a href="Model.html">Model</a><ul class='methods'><li data-type='method'><a href="Model.html#deleteConcepts">deleteConcepts</a></li><li data-type='method'><a href="Model.html#getInputs">getInputs</a></li><li data-type='method'><a href="Model.html#getOutputInfo">getOutputInfo</a></li><li data-type='method'><a href="Model.html#getVersion">getVersion</a></li><li data-type='method'><a href="Model.html#getVersions">getVersions</a></li><li data-type='method'><a href="Model.html#mergeConcepts">mergeConcepts</a></li><li data-type='method'><a href="Model.html#predict">predict</a></li><li data-type='method'><a href="Model.html#toObject">toObject</a></li><li data-type='method'><a href="Model.html#train">train</a></li></ul></li><li><a href="Models.html">Models</a><ul class='methods'><li data-type='method'><a href="Models.html#create">create</a></li><li data-type='method'><a href="Models.html#delete">delete</a></li><li data-type='method'><a href="Models.html#get">get</a></li><li data-type='method'><a href="Models.html#initModel">initModel</a></li><li data-type='method'><a href="Models.html#list">list</a></li><li data-type='method'><a href="Models.html#predict">predict</a></li><li data-type='method'><a href="Models.html#search">search</a></li><li data-type='method'><a href="Models.html#train">train</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Input.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>let axios = require('axios');
+let {API, replaceVars} = require('./constants');
+let {INPUT_PATCH_PATH} = API;
+
+/**
+* class representing an input
+* @class
+*/
+class Input {
+  constructor(_config, data) {
+    this.id = data.id;
+    this.createdAt = data.created_at || data.createdAt;
+    this.imageUrl = data.data.image.url;
+    this.score = data.score;
+    this._config = _config;
+    this._rawData = data;
+  }
+  /**
+  * Returns a javascript object with the raw data attributes (from API)
+  * @return {object} An object that contains data about input from api
+  */
+  toObject() {
+    return this._rawData;
+  }
+  /**
+  * Merge concepts to an input
+  * @param {object[]}         concepts    Object with keys explained below:
+  *   @param {object}           concepts[].concept
+  *     @param {string}           concepts[].concept.id        The concept id (required)
+  *     @param {boolean}          concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+  * @return {Promise(input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
+  */
+  mergeConcepts(concepts) {
+    return this._update('merge_concepts', concepts);
+  }
+  /**
+  * Delete concept to an input
+  * @param {object[]}         concepts    Object with keys explained below:
+  *   @param {object}           concepts[].concept
+  *     @param {string}           concepts[].concept.id        The concept id (required)
+  *     @param {boolean}          concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+  * @return {Promise(input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
+  */
+  deleteConcepts(concepts) {
+    return this._update('delete_concepts', concepts);
+  }
+  _update(concepts) {
+    let url = `${this._config.apiEndpoint}${replaceVars(INPUT_PATCH_PATH, [this.id])}`;
+    let data = {
+      action,
+      concepts
+    };
+    return wrapToken(this._config, (headers)=> {
+      return new Promise((resolve, reject)=> {
+        return axios.patch(url, data, {headers})
+        .then((response)=> {
+          if (isSuccess(response)) {
+            resolve(new Input(response.data.input));
+          } else {
+            reject(response);
+          }
+        }, reject);
+      });
+    });
+  }
+};
+
+module.exports = Input;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a> on Wed Oct 05 2016 12:33:14 GMT-0400 (EDT) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

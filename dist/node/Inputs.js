@@ -1,0 +1,338 @@
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var axios = require('axios');
+var Input = require('./Input');
+
+var _require = require('./constants');
+
+var API = _require.API;
+var replaceVars = _require.replaceVars;
+var INPUT_PATH = API.INPUT_PATH;
+var INPUTS_PATH = API.INPUTS_PATH;
+var INPUTS_STATUS_PATH = API.INPUTS_STATUS_PATH;
+var SEARCH_PATH = API.SEARCH_PATH;
+
+var _require2 = require('./utils');
+
+var wrapToken = _require2.wrapToken;
+var formatInput = _require2.formatInput;
+var formatImagesSearch = _require2.formatImagesSearch;
+var formatConceptsSearch = _require2.formatConceptsSearch;
+
+var _require3 = require('./helpers');
+
+var isSuccess = _require3.isSuccess;
+var checkType = _require3.checkType;
+
+var MAX_BATCH_SIZE = 128;
+
+/**
+* class representing a collection of inputs
+* @class
+*/
+
+var Inputs = function () {
+  function Inputs(_config) {
+    var _this = this;
+
+    var rawData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+    _classCallCheck(this, Inputs);
+
+    this._config = _config;
+    this.rawData = rawData;
+    rawData.forEach(function (inputData, index) {
+      if (inputData.input && inputData.score) {
+        inputData.input.score = inputData.score;
+        inputData = inputData.input;
+      }
+      _this[index] = new Input(_this._config, inputData);
+    });
+    this.length = rawData.length;
+  }
+  /**
+  * Get all inputs in app
+  * @param {Object}    options  Object with keys explained below: (optional)
+  *   @param {Number}    options.page  The page number (optional, default: 1)
+  *   @param {Number}    options.perPage  Number of images to return per page (optional, default: 20)
+  * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
+  */
+
+
+  _createClass(Inputs, [{
+    key: 'list',
+    value: function list() {
+      var _this2 = this;
+
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
+
+      var url = '' + this._config.apiEndpoint + INPUTS_PATH;
+      return wrapToken(this._config, function (headers) {
+        return new Promise(function (resolve, reject) {
+          axios.get(url, {
+            headers: headers,
+            params: {
+              'page': options.page,
+              'per_page': options.perPage
+            }
+          }).then(function (response) {
+            if (isSuccess(response)) {
+              resolve(new Inputs(_this2._config, response.data.inputs));
+            } else {
+              reject(response);
+            }
+          }, reject);
+        });
+      });
+    }
+    /**
+    * Adds an input or multiple inputs
+    * @param {object|object[]}        inputs                                Can be a single media object or an array of media objects (max of 128 inputs/call; passing > 128 will throw an exception)
+    *   @param {object|string}          inputs[].input                        If string, is given, this is assumed to be an image url
+    *     @param {string}                 inputs[].input.(url|base64)           Can be a publicly accessibly url or base64 string representing image bytes (required)
+    *     @param {string}                 inputs[].input.inputId                ID of input (optional)
+    *     @param {number[]}               inputs[].input.crop                   An array containing the percent to be cropped from top, left, bottom and right (optional)
+    *     @param {object[]}               inputs[].input.concepts               An array of concepts to attach to media object (optional)
+    *       @param {object|string}          inputs[].input.concepts[].concept     If string, is given, this is assumed to be concept id with value equals true
+    *         @param {string}                 inputs[].input.concepts[].concept.id          The concept id (required)
+    *         @param {boolean}                inputs[].input.concepts[].concept.value       Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+    * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
+    */
+
+  }, {
+    key: 'create',
+    value: function create(inputs) {
+      var _this3 = this;
+
+      if (checkType(/(String|Object)/, inputs)) {
+        inputs = [inputs];
+      }
+      var url = '' + this._config.apiEndpoint + INPUTS_PATH;
+      if (inputs.length > MAX_BATCH_SIZE) {
+        throw new Error('Number of inputs exceeded maximum of ' + MAX_BATCH_SIZE);
+      }
+      return wrapToken(this._config, function (headers) {
+        var data = {
+          'inputs': inputs.map(formatInput)
+        };
+        return new Promise(function (resolve, reject) {
+          axios.post(url, data, { headers: headers }).then(function (response) {
+            if (isSuccess(response)) {
+              resolve(new Inputs(_this3._config, response.data.inputs));
+            } else {
+              reject(response);
+            }
+          }, reject);
+        });
+      });
+    }
+    /**
+    * Get input by id
+    * @param {String}    id  The input id
+    * @return {Promise(input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
+    */
+
+  }, {
+    key: 'get',
+    value: function get(id) {
+      var _this4 = this;
+
+      var url = '' + this._config.apiEndpoint + replaceVars(INPUT_PATH, [id]);
+      return wrapToken(this._config, function (headers) {
+        return new Promise(function (resolve, reject) {
+          axios.get(url, { headers: headers }).then(function (response) {
+            if (isSuccess(response)) {
+              resolve(new Input(_this4._config, response.data.input));
+            } else {
+              reject(response);
+            }
+          }, reject);
+        });
+      });
+    }
+    /**
+    * Delete an input or a list of inputs by id or all inputs if no id is passed
+    * @param {String}    id           The id of input to delete (optional)
+    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+    */
+
+  }, {
+    key: 'delete',
+    value: function _delete() {
+      var _this5 = this;
+
+      var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      var val = void 0;
+      if (id === null) {
+        (function () {
+          var url = '' + _this5._config.apiEndpoint + replaceVars(INPUT_PATH, [id]);
+          val = wrapToken(_this5._config, function (headers) {
+            return axios.delete(url, { headers: headers });
+          });
+        })();
+      } else if (Array.isArray(id)) {
+        val = this._update('delete_inputs', id);
+      } else {
+        (function () {
+          var url = '' + _this5._config.apiEndpoint + INPUTS_PATH;
+          val = wrapToken(_this5._config, function (headers) {
+            return axios.delete(url, { headers: headers });
+          });
+        })();
+      }
+      return val;
+    }
+    /**
+    * Merge concepts to inputs in bulk
+    * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
+    *   @param {object}           inputs[].input
+    *     @param {string}           inputs[].input.id        The id of the input to update
+    *     @param {string}           inputs[].input.concepts  Object with keys explained below:
+    *       @param {object}           inputs[].input.concepts[].concept
+    *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
+    *         @param {boolean}          inputs[].input.concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+    * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
+    */
+
+  }, {
+    key: 'mergeConcepts',
+    value: function mergeConcepts(inputs) {
+      return this._update('merge_concepts', inputs);
+    }
+    /**
+    * Delete concepts to inputs in bulk
+    * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
+    *   @param {object}           inputs[].input
+    *     @param {string}           inputs[].input.id        The id of the input to update
+    *     @param {string}           inputs[].input.concepts  Object with keys explained below:
+    *       @param {object}           inputs[].input.concepts[].concept
+    *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
+    *         @param {boolean}          inputs[].input.concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+    * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
+    */
+
+  }, {
+    key: 'deleteConcepts',
+    value: function deleteConcepts(inputs) {
+      return this._update('delete_concepts', inputs);
+    }
+  }, {
+    key: '_update',
+    value: function _update(action, inputs) {
+      var _this6 = this;
+
+      var url = '' + this._config.apiEndpoint + INPUTS_PATH;
+      if (checkType(/Object/, inputs)) {
+        inputs = [inputs];
+      }
+      if (inputs.length > MAX_BATCH_SIZE) {
+        throw new Error('Number of inputs exceeded maximum of ' + MAX_BATCH_SIZE);
+      }
+      var data = {
+        action: action,
+        'inputs': inputs.map(function (input) {
+          return formatInput(input, false);
+        })
+      };
+      return wrapToken(this._config, function (headers) {
+        return new Promise(function (resolve, reject) {
+          axios.patch(url, data, { headers: headers }).then(function (response) {
+            if (isSuccess(response)) {
+              resolve(new Inputs(_this6._config, response.data.inputs));
+            } else {
+              reject(response);
+            }
+          }, reject);
+        });
+      });
+    }
+    /**
+    * Search for inputs or outputs based on concepts or images
+    *   @param {object[]}               queries          List of all predictions to match with
+    *     @param {object}                 queries[].concept            An object with the following keys:
+    *       @param {string}                 queries[].concept.type        Search over 'input' or 'output' (default: 'output')
+    *       @param {string}                 queries[].concept.name        The concept name
+    *       @param {boolean}                queries[].concept.value       Indicates whether or not the term should match with the prediction returned (default: true)
+    *     @param {object}                 queries[].image              An image object that contains the following keys:
+    *       @param {string}                 queries[].image.type          Search over 'input' or 'output' (default: 'output')
+    *       @param {string}                 queries[].image.(base64|url)  Can be a publicly accessibly url or base64 string representing image bytes (required)
+    *       @param {number[]}               queries[].image.crop          An array containing the percent to be cropped from top, left, bottom and right (optional)
+    * @param {Object}                   options       Object with keys explained below: (optional)
+    *    @param {Number}                  options.page          The page number (optional, default: 1)
+    *    @param {Number}                  options.perPage       Number of images to return per page (optional, default: 20)
+    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+    */
+
+  }, {
+    key: 'search',
+    value: function search() {
+      var _this7 = this;
+
+      var ands = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { page: 1, perPage: 20 };
+
+      var url = '' + this._config.apiEndpoint + SEARCH_PATH;
+      var data = {
+        'query': {
+          'ands': []
+        },
+        'pagination': {
+          'page': options.page,
+          'per_page': options.perPage
+        }
+      };
+
+      if (!Array.isArray(ands)) {
+        ands = [ands];
+      }
+      if (ands.length > 0) {
+        data['query']['ands'] = ands.map(function (andQuery) {
+          return andQuery.name ? formatConceptsSearch(andQuery) : formatImagesSearch(andQuery);
+        });
+      }
+      return wrapToken(this._config, function (headers) {
+        return new Promise(function (resolve, reject) {
+          axios.post(url, data, { headers: headers }).then(function (response) {
+            if (isSuccess(response)) {
+              resolve(new Inputs(_this7._config, response.data.hits));
+            } else {
+              reject(response);
+            }
+          }, reject);
+        });
+      });
+    }
+    /**
+    * Get inputs status (number of uploaded, in process or failed inputs)
+    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+    */
+
+  }, {
+    key: 'getStatus',
+    value: function getStatus() {
+      var url = '' + this._config.apiEndpoint + INPUTS_STATUS_PATH;
+      return wrapToken(this._config, function (headers) {
+        return new Promise(function (resolve, reject) {
+          axios.get(url, { headers: headers }).then(function (response) {
+            if (isSuccess(response)) {
+              resolve(response.data);
+            } else {
+              reject(response);
+            }
+          }, reject);
+        });
+      });
+    }
+  }]);
+
+  return Inputs;
+}();
+
+;
+
+module.exports = Inputs;
