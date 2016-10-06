@@ -1,5 +1,5 @@
 var fs = require('fs');
-var Clarifai = require('./../index');
+var Clarifai = require('./../src/index');
 var Models = require('./../src/Models');
 var Inputs = require('./../src/Inputs');
 var imageBytes = require('./image-bytes');
