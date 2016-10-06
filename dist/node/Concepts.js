@@ -131,7 +131,7 @@ var Concepts = function () {
         return new Promise(function (resolve, reject) {
           axios.post(url, data, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
-              resolve(new Concept(_this4._config, response.data.concepts));
+              resolve(new Concepts(_this4._config, response.data.concepts));
             } else {
               reject(response);
             }

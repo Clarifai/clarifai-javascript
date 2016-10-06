@@ -1,7 +1,7 @@
 /**
  * Clarifai JavaScript SDK v2.0.9
  *
- * Last updated: Wed Oct 05 2016 22:23:28 GMT-0400 (EDT)
+ * Last updated: Thu Oct 06 2016 17:30:49 GMT-0400 (EDT)
  *
  * Visit https://developer.clarifai.com
  *
@@ -2456,7 +2456,7 @@ var Concepts = function () {
         return new Promise(function (resolve, reject) {
           axios.post(url, data, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
-              resolve(new Concept(_this4._config, response.data.concepts));
+              resolve(new Concepts(_this4._config, response.data.concepts));
             } else {
               reject(response);
             }
