@@ -245,7 +245,7 @@ function publish() {
   var headers = {
     'Cache-Control': 'max-age=21600, no-transform, public'
   };
-  return gulp.src(['./../dist/browser/**', './../docs/*'])
+  return gulp.src(['./../dist/browser/**', './../docs/**'])
     .pipe(rename(function (path) {
         path.dirname = '/js/' + path.dirname;
     }))

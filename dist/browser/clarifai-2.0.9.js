@@ -1,7 +1,7 @@
 /**
  * Clarifai JavaScript SDK v2.0.9
  *
- * Last updated: Fri Oct 07 2016 14:31:03 GMT-0400 (EDT)
+ * Last updated: Fri Oct 07 2016 14:35:52 GMT-0400 (EDT)
  *
  * Visit https://developer.clarifai.com
  *
