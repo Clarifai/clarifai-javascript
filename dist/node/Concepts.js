@@ -34,7 +34,7 @@ var Concepts = function () {
   function Concepts(_config) {
     var _this = this;
 
-    var rawData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    var rawData = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
 
     _classCallCheck(this, Concepts);
 
@@ -59,7 +59,7 @@ var Concepts = function () {
     value: function list() {
       var _this2 = this;
 
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
+      var options = arguments.length <= 0 || arguments[0] === undefined ? { page: 1, perPage: 20 } : arguments[0];
 
       var url = '' + this._config.apiEndpoint + CONCEPTS_PATH;
       return wrapToken(this._config, function (headers) {
@@ -118,7 +118,7 @@ var Concepts = function () {
     value: function create() {
       var _this4 = this;
 
-      var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+      var concepts = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
 
       if (checkType(/(Object|String)/, concepts)) {
         concepts = [concepts];

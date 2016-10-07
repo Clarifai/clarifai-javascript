@@ -7,7 +7,7 @@ module.exports = {
     return SUCCESS_CODES.indexOf(response.status) > -1;
   },
   deleteEmpty: function deleteEmpty(obj) {
-    var strict = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    var strict = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
     Object.keys(obj).forEach(function (key) {
       if (obj[key] === null || obj[key] === undefined || strict === true && (obj[key] === '' || obj[key].length === 0 || Object.keys(obj[key]).length === 0)) {

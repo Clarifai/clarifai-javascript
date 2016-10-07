@@ -1,7 +1,7 @@
 /**
  * Clarifai JavaScript SDK v2.0.9
  *
- * Last updated: Thu Oct 06 2016 17:30:49 GMT-0400 (EDT)
+ * Last updated: Fri Oct 07 2016 14:31:03 GMT-0400 (EDT)
  *
  * Visit https://developer.clarifai.com
  *
@@ -2214,7 +2214,7 @@ var App = function () {
     value: function _init(clientId, clientSecret) {
       var _this = this;
 
-      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
       this._config = {
         'apiEndpoint': options.apiEndpoint || process && process.env && process.env.API_ENDPOINT || 'https://api.clarifai.com',
@@ -2359,7 +2359,7 @@ var Concepts = function () {
   function Concepts(_config) {
     var _this = this;
 
-    var rawData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    var rawData = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
 
     _classCallCheck(this, Concepts);
 
@@ -2384,7 +2384,7 @@ var Concepts = function () {
     value: function list() {
       var _this2 = this;
 
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
+      var options = arguments.length <= 0 || arguments[0] === undefined ? { page: 1, perPage: 20 } : arguments[0];
 
       var url = '' + this._config.apiEndpoint + CONCEPTS_PATH;
       return wrapToken(this._config, function (headers) {
@@ -2443,7 +2443,7 @@ var Concepts = function () {
     value: function create() {
       var _this4 = this;
 
-      var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+      var concepts = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
 
       if (checkType(/(Object|String)/, concepts)) {
         concepts = [concepts];
@@ -2663,7 +2663,7 @@ var Inputs = function () {
   function Inputs(_config) {
     var _this = this;
 
-    var rawData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    var rawData = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
 
     _classCallCheck(this, Inputs);
 
@@ -2692,7 +2692,7 @@ var Inputs = function () {
     value: function list() {
       var _this2 = this;
 
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
+      var options = arguments.length <= 0 || arguments[0] === undefined ? { page: 1, perPage: 20 } : arguments[0];
 
       var url = '' + this._config.apiEndpoint + INPUTS_PATH;
       return wrapToken(this._config, function (headers) {
@@ -2789,7 +2789,7 @@ var Inputs = function () {
     value: function _delete() {
       var _this5 = this;
 
-      var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var id = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
 
       var val = void 0;
       if (id === null) {
@@ -2897,8 +2897,8 @@ var Inputs = function () {
     value: function search() {
       var _this7 = this;
 
-      var ands = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { page: 1, perPage: 20 };
+      var ands = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+      var options = arguments.length <= 1 || arguments[1] === undefined ? { page: 1, perPage: 20 } : arguments[1];
 
       var url = '' + this._config.apiEndpoint + SEARCH_PATH;
       var data = {
@@ -3043,7 +3043,7 @@ var Model = function () {
   }, {
     key: 'mergeConcepts',
     value: function mergeConcepts() {
-      var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+      var concepts = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
 
       return this._update('merge_concepts', concepts);
     }
@@ -3056,7 +3056,7 @@ var Model = function () {
   }, {
     key: 'deleteConcepts',
     value: function deleteConcepts() {
-      var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+      var concepts = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
 
       return this._update('delete_concepts', concepts);
     }
@@ -3176,7 +3176,7 @@ var Model = function () {
   }, {
     key: 'getVersions',
     value: function getVersions() {
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
+      var options = arguments.length <= 0 || arguments[0] === undefined ? { page: 1, perPage: 20 } : arguments[0];
 
       var url = '' + this._config.apiEndpoint + replaceVars(MODEL_VERSIONS_PATH, [this.id]);
       return wrapToken(this._config, function (headers) {
@@ -3217,7 +3217,7 @@ var Model = function () {
   }, {
     key: 'getInputs',
     value: function getInputs() {
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
+      var options = arguments.length <= 0 || arguments[0] === undefined ? { page: 1, perPage: 20 } : arguments[0];
 
       var url = '' + this._config.apiEndpoint + (this.versionId ? replaceVars(MODEL_VERSION_INPUTS_PATH, [this.id, this.versionId]) : replaceVars(MODEL_INPUTS_PATH, [this.id]));
       return wrapToken(this._config, function (headers) {
@@ -3279,7 +3279,7 @@ var Models = function () {
   function Models(_config) {
     var _this = this;
 
-    var rawData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    var rawData = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
 
     _classCallCheck(this, Models);
 
@@ -3372,7 +3372,7 @@ var Models = function () {
     value: function train(model) {
       var _this4 = this;
 
-      var sync = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      var sync = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
       return new Promise(function (resolve, reject) {
         _this4.initModel(model).then(function (model) {
@@ -3393,7 +3393,7 @@ var Models = function () {
     value: function list() {
       var _this5 = this;
 
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
+      var options = arguments.length <= 0 || arguments[0] === undefined ? { page: 1, perPage: 20 } : arguments[0];
 
       var url = '' + this._config.apiEndpoint + MODELS_PATH;
       return wrapToken(this._config, function (headers) {
@@ -3428,8 +3428,8 @@ var Models = function () {
     value: function create(name) {
       var _this6 = this;
 
-      var conceptsData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var conceptsData = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
       var concepts = conceptsData instanceof Concepts ? conceptsData.toObject('id') : conceptsData.map(function (concept) {
         var val = concept;
@@ -3528,7 +3528,7 @@ var Models = function () {
     value: function search(name) {
       var _this8 = this;
 
-      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var type = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
 
       var url = '' + this._config.apiEndpoint + MODEL_SEARCH_PATH;
       return wrapToken(this._config, function (headers) {
@@ -3586,7 +3586,7 @@ module.exports = {
   },
   // var replacement must be given in order
   replaceVars: function replaceVars(path) {
-    var vars = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    var vars = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
 
     var newPath = path;
     vars.forEach(function (val, index) {
@@ -3626,7 +3626,7 @@ module.exports = {
     return SUCCESS_CODES.indexOf(response.status) > -1;
   },
   deleteEmpty: function deleteEmpty(obj) {
-    var strict = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    var strict = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
     Object.keys(obj).forEach(function (key) {
       if (obj[key] === null || obj[key] === undefined || strict === true && (obj[key] === '' || obj[key].length === 0 || Object.keys(obj[key]).length === 0)) {

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>App.js - Documentation</title>
+    <title>App - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,125 +28,393 @@
 
 <div id="main">
     
-    <h1 class="page-title">App.js</h1>
+    <h1 class="page-title">App</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>let axios = require('axios');
-let es6Promise = require('es6-promise');
-let {Promise} = es6Promise;
-let Models = require('./Models');
-let Inputs = require('./Inputs');
-let Concepts = require('./Concepts');
-let constants = require('./constants');
-let {API} = constants;
-let {TOKEN_PATH} = API;
+        <h2>
+        App
+        </h2>
+        
+            <div class="class-description">top-level class that allows access to models, inputs and concepts</div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="App"><span class="type-signature"></span>new App<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
 
 
-/**
-* top-level class that allows access to models, inputs and concepts
-* @class
-*/
-class App {
-  constructor(clientId, clientSecret, options) {
-    this._validate(clientId, clientSecret, options);
-    this._init(clientId, clientSecret, options);
-  }
-  /**
-  * Gets a token from the API using client credentials
-  * @return {Promise(token, error)} A Promise that is fulfilled with the token string or rejected with an error
-  */
-  getToken() {
-    return this._config.token();
-  }
-  /**
-  * Sets the token to use for the API
-  * @param {String}         _token    The token you are setting
-  * @return {Boolean}                 true if token has valid fields, false if not
-  */
-  setToken(_token) {
-    let token = _token;
-    if (typeof _token === 'string') {
-      token = {
-        'access_token': _token,
-        'expires_in': 176400
-      };
-    }
-    if (token.access_token &amp;&amp; token.expires_in) {
-      this._config['_token'] = token;
-      return true;
-    }
-    return false;
-  }
-  _validate(clientId, clientSecret, options) {
-    if (clientId === undefined || clientSecret === undefined) {
-      throw new Error('Client ID and client secret is required');
-    }
-  }
-  _init(clientId, clientSecret, options={}) {
-    this._config = {
-      'apiEndpoint': options.apiEndpoint ||
-        (process &amp;&amp; process.env &amp;&amp; process.env.API_ENDPOINT) ||
-        'https://api.clarifai.com',
-      'clientId': clientId,
-      'clientSecret': clientSecret,
-      '_token': null,
-      token: ()=> {
-        return new Promise((resolve, reject)=> {
-          let now = new Date().getTime();
-          if (this._config._token !== null &amp;&amp; this._config._token.expireTime > now) {
-            resolve(this._config._token);
-          } else {
-            this._getToken(resolve, reject);
-          }
-        });
-      }
-    };
-    this.models = new Models(this._config);
-    this.inputs = new Inputs(this._config);
-    this.concepts = new Concepts(this._config);
-  }
-  _getToken(resolve, reject) {
-    this._requestToken().then(
-      (response)=> {
-        if (response.status === 200) {
-          let token = response.data;
-          let now = new Date().getTime();
-          token.expireTime = now + (token.expires_in * 1000);
-          this.setToken(token);
-          resolve(token);
-        } else {
-          reject(response);
-        }
-      },
-      reject
-    );
-  }
-  _requestToken() {
-    let url = `${this._config['apiEndpoint']}${TOKEN_PATH}`;
-    let clientId = this._config['clientId'];
-    let clientSecret = this._config['clientSecret'];
-    return axios({
-      'url': url,
-      'method': 'POST',
-      'auth': {
-        'username': clientId,
-        'password': clientSecret
-      }
-    });
-  }
-};
 
-module.exports = App;
-</code></pre>
-        </article>
-    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="App.js.html">App.js</a>, <a href="App.js.html#line16">line 16</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="getToken"><span class="type-signature"></span>getToken<span class="signature">()</span><span class="type-signature"> &rarr; {Promise(token, error)}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Gets a token from the API using client credentials
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="App.js.html">App.js</a>, <a href="App.js.html#line25">line 25</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A Promise that is fulfilled with the token string or rejected with an error
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise(token, error)</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="setToken"><span class="type-signature"></span>setToken<span class="signature">(_token)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Sets the token to use for the API
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>_token</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The token you are setting</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="App.js.html">App.js</a>, <a href="App.js.html#line33">line 33</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    true if token has valid fields, false if not
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -156,7 +424,7 @@ module.exports = App;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a> on Wed Oct 05 2016 12:33:14 GMT-0400 (EDT) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a> on Fri Oct 07 2016 14:31:54 GMT-0400 (EDT) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

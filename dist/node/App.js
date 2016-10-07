@@ -72,7 +72,7 @@ var App = function () {
     value: function _init(clientId, clientSecret) {
       var _this = this;
 
-      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
       this._config = {
         'apiEndpoint': options.apiEndpoint || process && process.env && process.env.API_ENDPOINT || 'https://api.clarifai.com',

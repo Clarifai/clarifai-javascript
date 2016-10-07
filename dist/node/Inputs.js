@@ -39,7 +39,7 @@ var Inputs = function () {
   function Inputs(_config) {
     var _this = this;
 
-    var rawData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    var rawData = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
 
     _classCallCheck(this, Inputs);
 
@@ -68,7 +68,7 @@ var Inputs = function () {
     value: function list() {
       var _this2 = this;
 
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
+      var options = arguments.length <= 0 || arguments[0] === undefined ? { page: 1, perPage: 20 } : arguments[0];
 
       var url = '' + this._config.apiEndpoint + INPUTS_PATH;
       return wrapToken(this._config, function (headers) {
@@ -165,7 +165,7 @@ var Inputs = function () {
     value: function _delete() {
       var _this5 = this;
 
-      var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var id = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
 
       var val = void 0;
       if (id === null) {
@@ -273,8 +273,8 @@ var Inputs = function () {
     value: function search() {
       var _this7 = this;
 
-      var ands = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { page: 1, perPage: 20 };
+      var ands = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+      var options = arguments.length <= 1 || arguments[1] === undefined ? { page: 1, perPage: 20 } : arguments[1];
 
       var url = '' + this._config.apiEndpoint + SEARCH_PATH;
       var data = {
