@@ -1,7 +1,7 @@
 /**
- * Clarifai JavaScript SDK v2.0.9
+ * Clarifai JavaScript SDK v2.0.10
  *
- * Last updated: Tue Oct 25 2016 12:36:05 GMT-0400 (EDT)
+ * Last updated: Tue Oct 25 2016 12:47:45 GMT-0400 (EDT)
  *
  * Visit https://developer.clarifai.com
  *
@@ -2141,7 +2141,7 @@ process.chdir = function (dir) {
 },{}],21:[function(require,module,exports){
 module.exports={
   "name": "clarifai",
-  "version": "2.0.9",
+  "version": "2.0.10",
   "description": "Official Clarifai Javascript SDK",
   "main": "dist/node/index.js",
   "repository": "https://github.com/Clarifai/clarifai-javascript",
