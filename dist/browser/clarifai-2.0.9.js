@@ -1,7 +1,7 @@
 /**
  * Clarifai JavaScript SDK v2.0.9
  *
- * Last updated: Fri Oct 07 2016 14:35:52 GMT-0400 (EDT)
+ * Last updated: Tue Oct 25 2016 12:36:05 GMT-0400 (EDT)
  *
  * Visit https://developer.clarifai.com
  *
@@ -2139,6 +2139,55 @@ process.chdir = function (dir) {
 };
 
 },{}],21:[function(require,module,exports){
+module.exports={
+  "name": "clarifai",
+  "version": "2.0.9",
+  "description": "Official Clarifai Javascript SDK",
+  "main": "dist/node/index.js",
+  "repository": "https://github.com/Clarifai/clarifai-javascript",
+  "author": "Clarifai Inc.",
+  "license": "Apache-2.0",
+  "scripts": {
+    "jsdoc": "jsdoc src/* -t node_modules/minami -d docs/$npm_package_version"
+  },
+  "dependencies": {
+    "axios": "0.11.1",
+    "es6-promise": "3.1.2",
+    "form-data": "0.2.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^6.1.2",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-register": "^6.14.0",
+    "babelify": "^7.3.0",
+    "del": "2.0.2",
+    "envify": "3.4.0",
+    "git-branch": "0.3.0",
+    "gulp": "3.9.0",
+    "gulp-awspublish": "3.0.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-browserify": "0.5.1",
+    "gulp-concat": "2.6.0",
+    "gulp-data": "1.2.1",
+    "gulp-eslint": "2.0.0",
+    "gulp-if": "2.0.0",
+    "gulp-imagemin": "2.3.0",
+    "gulp-insert": "0.5.0",
+    "gulp-jasmine": "^2.2.1",
+    "gulp-newer": "0.5.1",
+    "gulp-notify": "2.2.0",
+    "gulp-rename": "1.2.2",
+    "gulp-replace-task": "0.11.0",
+    "gulp-uglify": "1.4.1",
+    "gulp-util": "3.0.6",
+    "jsdoc": "^3.4.1",
+    "minami": "^1.1.1",
+    "require-dir": "0.3.0",
+    "serve-static": "1.10.0"
+  }
+}
+
+},{}],22:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -2214,7 +2263,7 @@ var App = function () {
     value: function _init(clientId, clientSecret) {
       var _this = this;
 
-      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
       this._config = {
         'apiEndpoint': options.apiEndpoint || process && process.env && process.env.API_ENDPOINT || 'https://api.clarifai.com',
@@ -2278,7 +2327,7 @@ var App = function () {
 module.exports = App;
 
 }).call(this,require("1YiZ5S"))
-},{"./Concepts":23,"./Inputs":25,"./Models":27,"./constants":28,"1YiZ5S":20,"axios":1,"es6-promise":19}],22:[function(require,module,exports){
+},{"./Concepts":24,"./Inputs":26,"./Models":28,"./constants":29,"1YiZ5S":20,"axios":1,"es6-promise":19}],23:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2321,7 +2370,7 @@ var Concept = function () {
 
 module.exports = Concept;
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2358,7 +2407,7 @@ var Concepts = function () {
   function Concepts(_config) {
     var _this = this;
 
-    var rawData = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+    var rawData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
     _classCallCheck(this, Concepts);
 
@@ -2383,7 +2432,7 @@ var Concepts = function () {
     value: function list() {
       var _this2 = this;
 
-      var options = arguments.length <= 0 || arguments[0] === undefined ? { page: 1, perPage: 20 } : arguments[0];
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
 
       var url = '' + this._config.apiEndpoint + CONCEPTS_PATH;
       return wrapToken(this._config, function (headers) {
@@ -2442,7 +2491,7 @@ var Concepts = function () {
     value: function create() {
       var _this4 = this;
 
-      var concepts = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+      var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
       if (checkType(/(Object|String)/, concepts)) {
         concepts = [concepts];
@@ -2521,7 +2570,7 @@ var Concepts = function () {
 
 module.exports = Concepts;
 
-},{"./Concept":22,"./constants":28,"./helpers":30,"./utils":31,"axios":1}],24:[function(require,module,exports){
+},{"./Concept":23,"./constants":29,"./helpers":31,"./utils":32,"axios":1}],25:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2620,7 +2669,7 @@ var Input = function () {
 
 module.exports = Input;
 
-},{"./constants":28,"axios":1}],25:[function(require,module,exports){
+},{"./constants":29,"axios":1}],26:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2662,7 +2711,7 @@ var Inputs = function () {
   function Inputs(_config) {
     var _this = this;
 
-    var rawData = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+    var rawData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
     _classCallCheck(this, Inputs);
 
@@ -2691,7 +2740,7 @@ var Inputs = function () {
     value: function list() {
       var _this2 = this;
 
-      var options = arguments.length <= 0 || arguments[0] === undefined ? { page: 1, perPage: 20 } : arguments[0];
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
 
       var url = '' + this._config.apiEndpoint + INPUTS_PATH;
       return wrapToken(this._config, function (headers) {
@@ -2788,7 +2837,7 @@ var Inputs = function () {
     value: function _delete() {
       var _this5 = this;
 
-      var id = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       var val = void 0;
       if (id === null) {
@@ -2896,8 +2945,8 @@ var Inputs = function () {
     value: function search() {
       var _this7 = this;
 
-      var ands = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
-      var options = arguments.length <= 1 || arguments[1] === undefined ? { page: 1, perPage: 20 } : arguments[1];
+      var ands = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { page: 1, perPage: 20 };
 
       var url = '' + this._config.apiEndpoint + SEARCH_PATH;
       var data = {
@@ -2960,7 +3009,7 @@ var Inputs = function () {
 
 module.exports = Inputs;
 
-},{"./Input":24,"./constants":28,"./helpers":30,"./utils":31,"axios":1}],26:[function(require,module,exports){
+},{"./Input":25,"./constants":29,"./helpers":31,"./utils":32,"axios":1}],27:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3042,7 +3091,7 @@ var Model = function () {
   }, {
     key: 'mergeConcepts',
     value: function mergeConcepts() {
-      var concepts = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+      var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
       return this._update('merge_concepts', concepts);
     }
@@ -3055,7 +3104,7 @@ var Model = function () {
   }, {
     key: 'deleteConcepts',
     value: function deleteConcepts() {
-      var concepts = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+      var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
       return this._update('delete_concepts', concepts);
     }
@@ -3175,7 +3224,7 @@ var Model = function () {
   }, {
     key: 'getVersions',
     value: function getVersions() {
-      var options = arguments.length <= 0 || arguments[0] === undefined ? { page: 1, perPage: 20 } : arguments[0];
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
 
       var url = '' + this._config.apiEndpoint + replaceVars(MODEL_VERSIONS_PATH, [this.id]);
       return wrapToken(this._config, function (headers) {
@@ -3216,7 +3265,7 @@ var Model = function () {
   }, {
     key: 'getInputs',
     value: function getInputs() {
-      var options = arguments.length <= 0 || arguments[0] === undefined ? { page: 1, perPage: 20 } : arguments[0];
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
 
       var url = '' + this._config.apiEndpoint + (this.versionId ? replaceVars(MODEL_VERSION_INPUTS_PATH, [this.id, this.versionId]) : replaceVars(MODEL_INPUTS_PATH, [this.id]));
       return wrapToken(this._config, function (headers) {
@@ -3235,7 +3284,7 @@ var Model = function () {
 
 module.exports = Model;
 
-},{"./Concepts":23,"./constants":28,"./helpers":30,"./utils":31,"axios":1}],27:[function(require,module,exports){
+},{"./Concepts":24,"./constants":29,"./helpers":31,"./utils":32,"axios":1}],28:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3278,7 +3327,7 @@ var Models = function () {
   function Models(_config) {
     var _this = this;
 
-    var rawData = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+    var rawData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
     _classCallCheck(this, Models);
 
@@ -3371,7 +3420,7 @@ var Models = function () {
     value: function train(model) {
       var _this4 = this;
 
-      var sync = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+      var sync = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
       return new Promise(function (resolve, reject) {
         _this4.initModel(model).then(function (model) {
@@ -3392,7 +3441,7 @@ var Models = function () {
     value: function list() {
       var _this5 = this;
 
-      var options = arguments.length <= 0 || arguments[0] === undefined ? { page: 1, perPage: 20 } : arguments[0];
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
 
       var url = '' + this._config.apiEndpoint + MODELS_PATH;
       return wrapToken(this._config, function (headers) {
@@ -3427,8 +3476,8 @@ var Models = function () {
     value: function create(name) {
       var _this6 = this;
 
-      var conceptsData = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
-      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+      var conceptsData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
       var concepts = conceptsData instanceof Concepts ? conceptsData.toObject('id') : conceptsData.map(function (concept) {
         var val = concept;
@@ -3527,7 +3576,7 @@ var Models = function () {
     value: function search(name) {
       var _this8 = this;
 
-      var type = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
       var url = '' + this._config.apiEndpoint + MODEL_SEARCH_PATH;
       return wrapToken(this._config, function (headers) {
@@ -3557,7 +3606,7 @@ var Models = function () {
 
 module.exports = Models;
 
-},{"./Concepts":23,"./Model":26,"./constants":28,"./helpers":30,"./utils":31,"axios":1,"es6-promise":19}],28:[function(require,module,exports){
+},{"./Concepts":24,"./Model":27,"./constants":29,"./helpers":31,"./utils":32,"axios":1,"es6-promise":19}],29:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -3585,7 +3634,7 @@ module.exports = {
   },
   // var replacement must be given in order
   replaceVars: function replaceVars(path) {
-    var vars = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+    var vars = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
     var newPath = path;
     vars.forEach(function (val, index) {
@@ -3596,7 +3645,7 @@ module.exports = {
   URL_REGEX: /^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i
 };
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -3615,7 +3664,7 @@ module.exports = global.Clarifai = {
 };
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./App":21}],30:[function(require,module,exports){
+},{"./App":22}],31:[function(require,module,exports){
 'use strict';
 
 var SUCCESS_CODES = [200, 201];
@@ -3625,7 +3674,7 @@ module.exports = {
     return SUCCESS_CODES.indexOf(response.status) > -1;
   },
   deleteEmpty: function deleteEmpty(obj) {
-    var strict = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var strict = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
     Object.keys(obj).forEach(function (key) {
       if (obj[key] === null || obj[key] === undefined || strict === true && (obj[key] === '' || obj[key].length === 0 || Object.keys(obj[key]).length === 0)) {
@@ -3641,7 +3690,7 @@ module.exports = {
   }
 };
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 'use strict';
 
 var _require = require('es6-promise');
@@ -3656,13 +3705,18 @@ var _require3 = require('./helpers');
 
 var checkType = _require3.checkType;
 
+var _require4 = require('./../package.json');
+
+var VERSION = _require4.version;
+
 
 module.exports = {
   wrapToken: function wrapToken(_config, requestFn) {
     return new Promise(function (resolve, reject) {
       _config.token().then(function (token) {
         var headers = {
-          'Authorization': 'Bearer ' + token['access_token']
+          'Authorization': 'Bearer ' + token['access_token'],
+          'X-Clarifai-Client': 'js:' + VERSION
         };
         requestFn(headers).then(resolve, reject);
       }, reject);
@@ -3761,4 +3815,4 @@ module.exports = {
   }
 };
 
-},{"./constants":28,"./helpers":30,"es6-promise":19}]},{},[29])
+},{"./../package.json":21,"./constants":29,"./helpers":31,"es6-promise":19}]},{},[30])

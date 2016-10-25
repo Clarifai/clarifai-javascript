@@ -25,7 +25,7 @@ module.exports = {
   },
   // var replacement must be given in order
   replaceVars: function replaceVars(path) {
-    var vars = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+    var vars = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
     var newPath = path;
     vars.forEach(function (val, index) {
