@@ -1,13 +1,15 @@
 let {Promise} = require('es6-promise');
 let {URL_REGEX} = require('./constants');
 let {checkType} = require('./helpers');
+var VERSION = require('./../package.json').version;
 
 module.exports = {
   wrapToken: (_config, requestFn)=> {
     return new Promise((resolve, reject)=> {
       _config.token().then((token)=> {
         let headers = {
-          'Authorization': `Bearer ${token['access_token']}`
+          'Authorization': `Bearer ${token['access_token']}`,
+	  'X-Clarifai-Client': `js:${VERSION}`
         };
         requestFn(headers).then(resolve, reject);
       }, reject);
