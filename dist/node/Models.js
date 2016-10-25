@@ -40,7 +40,7 @@ var Models = function () {
   function Models(_config) {
     var _this = this;
 
-    var rawData = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+    var rawData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
     _classCallCheck(this, Models);
 
@@ -133,7 +133,7 @@ var Models = function () {
     value: function train(model) {
       var _this4 = this;
 
-      var sync = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+      var sync = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
       return new Promise(function (resolve, reject) {
         _this4.initModel(model).then(function (model) {
@@ -154,7 +154,7 @@ var Models = function () {
     value: function list() {
       var _this5 = this;
 
-      var options = arguments.length <= 0 || arguments[0] === undefined ? { page: 1, perPage: 20 } : arguments[0];
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
 
       var url = '' + this._config.apiEndpoint + MODELS_PATH;
       return wrapToken(this._config, function (headers) {
@@ -189,8 +189,8 @@ var Models = function () {
     value: function create(name) {
       var _this6 = this;
 
-      var conceptsData = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
-      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+      var conceptsData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
       var concepts = conceptsData instanceof Concepts ? conceptsData.toObject('id') : conceptsData.map(function (concept) {
         var val = concept;
@@ -289,7 +289,7 @@ var Models = function () {
     value: function search(name) {
       var _this8 = this;
 
-      var type = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
       var url = '' + this._config.apiEndpoint + MODEL_SEARCH_PATH;
       return wrapToken(this._config, function (headers) {

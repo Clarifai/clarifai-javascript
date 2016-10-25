@@ -79,7 +79,7 @@ var Model = function () {
   }, {
     key: 'mergeConcepts',
     value: function mergeConcepts() {
-      var concepts = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+      var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
       return this._update('merge_concepts', concepts);
     }
@@ -92,7 +92,7 @@ var Model = function () {
   }, {
     key: 'deleteConcepts',
     value: function deleteConcepts() {
-      var concepts = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+      var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
       return this._update('delete_concepts', concepts);
     }
@@ -212,7 +212,7 @@ var Model = function () {
   }, {
     key: 'getVersions',
     value: function getVersions() {
-      var options = arguments.length <= 0 || arguments[0] === undefined ? { page: 1, perPage: 20 } : arguments[0];
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
 
       var url = '' + this._config.apiEndpoint + replaceVars(MODEL_VERSIONS_PATH, [this.id]);
       return wrapToken(this._config, function (headers) {
@@ -253,7 +253,7 @@ var Model = function () {
   }, {
     key: 'getInputs',
     value: function getInputs() {
-      var options = arguments.length <= 0 || arguments[0] === undefined ? { page: 1, perPage: 20 } : arguments[0];
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
 
       var url = '' + this._config.apiEndpoint + (this.versionId ? replaceVars(MODEL_VERSION_INPUTS_PATH, [this.id, this.versionId]) : replaceVars(MODEL_INPUTS_PATH, [this.id]));
       return wrapToken(this._config, function (headers) {

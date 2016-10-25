@@ -12,13 +12,18 @@ var _require3 = require('./helpers');
 
 var checkType = _require3.checkType;
 
+var _require4 = require('./../package.json');
+
+var VERSION = _require4.version;
+
 
 module.exports = {
   wrapToken: function wrapToken(_config, requestFn) {
     return new Promise(function (resolve, reject) {
       _config.token().then(function (token) {
         var headers = {
-          'Authorization': 'Bearer ' + token['access_token']
+          'Authorization': 'Bearer ' + token['access_token'],
+          'X-Clarifai-Client': 'js:' + VERSION
         };
         requestFn(headers).then(resolve, reject);
       }, reject);
