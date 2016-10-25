@@ -1,6 +1,6 @@
 let axios = require('axios');
 let {API, replaceVars} = require('./constants');
-let {INPUT_PATCH_PATH} = API;
+let {INPUTS_PATH} = API;
 
 /**
 * class representing an input
@@ -45,10 +45,15 @@ class Input {
     return this._update('delete_concepts', concepts);
   }
   _update(concepts) {
-    let url = `${this._config.apiEndpoint}${replaceVars(INPUT_PATCH_PATH, [this.id])}`;
+    let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
     let data = {
       action,
-      concepts
+      inputs: [
+        {
+          id: this.id,
+          data: { concepts }
+        }
+      ]
     };
     return wrapToken(this._config, (headers)=> {
       return new Promise((resolve, reject)=> {
