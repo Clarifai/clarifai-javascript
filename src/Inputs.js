@@ -108,25 +108,34 @@ class Inputs {
   }
   /**
   * Delete an input or a list of inputs by id or all inputs if no id is passed
-  * @param {String}    id           The id of input to delete (optional)
+  * @param {string|string[]}    id           The id of input to delete (optional)
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   delete(id=null) {
     let val;
-    if (id === null) {
+    // delete an input
+    if (checkType(/String/, id)) {
       let url = `${this._config.apiEndpoint}${replaceVars(INPUT_PATH, [id])}`;
       val = wrapToken(this._config, (headers)=> {
         return axios.delete(url, {headers});
       });
-    } else if (Array.isArray(id)) {
-      val = this._update('delete_inputs', id);
     } else {
-      let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
-      val = wrapToken(this._config, (headers)=> {
-        return axios.delete(url, {headers});
-      });
+      val = this._deleteInputs(id);
     }
     return val;
+  }
+  _deleteInputs(id=null) {
+    let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
+    return wrapToken(this._config, (headers)=> {
+      let data = id === null? {'delete_all': true}:
+        {'ids': id};
+      return axios({
+        url,
+        method: 'delete',
+        headers,
+        data
+      });
+    });
   }
   /**
   * Merge concepts to inputs in bulk

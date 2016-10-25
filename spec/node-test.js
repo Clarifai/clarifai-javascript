@@ -7,6 +7,7 @@ var imageBytes = require('./image-bytes');
 var sampleImage = 'https://samples.clarifai.com/metro-north.jpg';
 var sampleImage2 = 'https://samples.clarifai.com/wedding.jpg';
 var sampleImage3 = 'https://samples.clarifai.com/cookies.jpeg';
+var inputsIDs = [];
 var app;
 
 describe('Clarifai JS SDK', function() {
@@ -65,6 +66,7 @@ describe('Clarifai JS SDK', function() {
 
   describe('Inputs', function() {
       var inputId;
+
       it('Adds an input', function(done) {
         app.inputs.create([
           {
@@ -196,6 +198,9 @@ describe('Clarifai JS SDK', function() {
             expect(input.id).toBeDefined();
             expect(input.createdAt).toBeDefined();
             expect(input.toObject().data).toBeDefined();
+            inputs.rawData.forEach(function(input) {
+              inputsIDs.push(input.id);
+            });
             done();
           },
           errorHandler.bind(done)
@@ -437,6 +442,34 @@ describe('Clarifai JS SDK', function() {
         },
         errorHandler.bind(done)
       )
+    });
+  });
+
+  describe('Delete Resources', function() {
+    it('Allows you to delete inputs partially', function(done) {
+      app.inputs.delete(inputsIDs.slice(0, 1)).then(
+        function(response) {
+          var data = response.data;
+          expect(data.status).toBeDefined();
+          expect(data.status.code).toBe(10000);
+          expect(data.status.description).toBe('Ok');
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Allows you to delete all inputs', function(done) {
+      app.inputs.delete().then(
+        function(response) {
+          var data = response.data;
+          expect(data.status).toBeDefined();
+          expect(data.status.code).toBe(10000);
+          expect(data.status.description).toBe('Ok');
+          done();
+        },
+        errorHandler.bind(done)
+      );
     });
   });
 });

@@ -1,5 +1,5 @@
 let axios = require('axios');
-let {API, replaceVars} = require('./constants');
+let {API} = require('./constants');
 let {INPUTS_PATH} = API;
 
 /**
