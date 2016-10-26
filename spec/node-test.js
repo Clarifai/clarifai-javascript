@@ -8,6 +8,7 @@ var sampleImage = 'https://samples.clarifai.com/metro-north.jpg';
 var sampleImage2 = 'https://samples.clarifai.com/wedding.jpg';
 var sampleImage3 = 'https://samples.clarifai.com/cookies.jpeg';
 var inputsIDs = [];
+var conceptsIds;
 var app;
 
 describe('Clarifai JS SDK', function() {
@@ -64,6 +65,28 @@ describe('Clarifai JS SDK', function() {
     });
   });
 
+  describe('Concepts', function() {
+    conceptsIds = [
+      'porsche' + Date.now(),
+      'rolls royce' + Date.now(),
+      'lamborghini' + Date.now()
+    ];
+
+    it('creates concepts given a list of strings', function(done) {
+      app.concepts.create(conceptsIds).then(
+        function(concepts) {
+          expect(concepts).toBeDefined();
+          expect(concepts.length).toBe(3);
+          expect(concepts[0].id).toBe(conceptsIds[0]);
+          expect(concepts[1].id).toBe(conceptsIds[1]);
+          expect(concepts[2].id).toBe(conceptsIds[2]);
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+  });
+
   describe('Inputs', function() {
       var inputId;
 
@@ -88,7 +111,7 @@ describe('Clarifai JS SDK', function() {
         );
       });
 
-      it('Adds an input with tags', function(done) {
+      it('Adds an input with concepts', function(done) {
         app.inputs.create([
           {
             url: "https://samples.clarifai.com/metro-north.jpg",
@@ -142,7 +165,7 @@ describe('Clarifai JS SDK', function() {
         );
       });
 
-      it('Bulk adds inputs with tags', function(done) {
+      it('Bulk adds inputs with concepts', function(done) {
         app.inputs.create([
           {
             url: "http://i.imgur.com/HEoT5xR.png",
@@ -384,6 +407,49 @@ describe('Clarifai JS SDK', function() {
           expect(output.created_at).toBeDefined();
           expect(output.data).toBeDefined();
           done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Update model name and config', function(done) {
+      app.models.update({
+        id: testModel.id,
+        name: 'Super Cars',
+        conceptsMutuallyExclusive: true,
+        closedEnvironment: true
+      }).then(
+        function(models) {
+          expect(models).toBeDefined();
+          expect(models[0]).toBeDefined();
+          expect(models[0].id).toBe(testModel.id);
+          expect(models[0].name).toBe('Super Cars');
+          expect(models[0].outputInfo.output_config.concepts_mutually_exclusive).toBe(true);
+          expect(models[0].outputInfo.output_config.closed_environment).toBe(true);
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Update model concepts', function(done) {
+      app.models.update({
+        id: testModel.id,
+        concepts: conceptsIds
+      }).then(
+        function(models) {
+          models[0].getOutputInfo().then(
+            function(model) {
+              expect(model.outputInfo).toBeDefined();
+              expect(model.outputInfo.data.concepts).toBeDefined();
+              expect(model.outputInfo.data.concepts.length).toBe(conceptsIds.length);
+              expect(model.outputInfo.data.concepts[0].id).toBe(conceptsIds[0]);
+              expect(model.outputInfo.data.concepts[1].id).toBe(conceptsIds[1]);
+              expect(model.outputInfo.data.concepts[2].id).toBe(conceptsIds[2]);
+              done();
+            },
+            errorHandler.bind(done)
+          );
         },
         errorHandler.bind(done)
       );
