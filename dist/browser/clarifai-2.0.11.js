@@ -1,7 +1,7 @@
 /**
- * Clarifai JavaScript SDK v2.0.10
+ * Clarifai JavaScript SDK v2.0.11
  *
- * Last updated: Tue Oct 25 2016 12:47:45 GMT-0400 (EDT)
+ * Last updated: Tue Oct 25 2016 21:52:39 GMT-0400 (EDT)
  *
  * Visit https://developer.clarifai.com
  *
@@ -180,7 +180,7 @@ module.exports = function xhrAdapter(resolve, reject, config) {
 };
 
 }).call(this,require("1YiZ5S"))
-},{"../helpers/settle":15,"./../helpers/btoa":8,"./../helpers/buildURL":9,"./../helpers/cookies":11,"./../helpers/isURLSameOrigin":13,"./../helpers/parseHeaders":14,"./../helpers/transformData":17,"./../utils":18,"1YiZ5S":20}],3:[function(require,module,exports){
+},{"../helpers/settle":15,"./../helpers/btoa":8,"./../helpers/buildURL":9,"./../helpers/cookies":11,"./../helpers/isURLSameOrigin":13,"./../helpers/parseHeaders":14,"./../helpers/transformData":17,"./../utils":18,"1YiZ5S":21}],3:[function(require,module,exports){
 'use strict';
 
 var defaults = require('./defaults');
@@ -394,7 +394,7 @@ module.exports = function dispatchRequest(config) {
 
 
 }).call(this,require("1YiZ5S"))
-},{"../adapters/http":2,"../adapters/xhr":2,"1YiZ5S":20}],6:[function(require,module,exports){
+},{"../adapters/http":2,"../adapters/xhr":2,"1YiZ5S":21}],6:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -2073,7 +2073,9 @@ module.exports = {
 
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"1YiZ5S":20}],20:[function(require,module,exports){
+},{"1YiZ5S":21}],20:[function(require,module,exports){
+
+},{}],21:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -2137,55 +2139,6 @@ process.cwd = function () { return '/' };
 process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
-
-},{}],21:[function(require,module,exports){
-module.exports={
-  "name": "clarifai",
-  "version": "2.0.10",
-  "description": "Official Clarifai Javascript SDK",
-  "main": "dist/node/index.js",
-  "repository": "https://github.com/Clarifai/clarifai-javascript",
-  "author": "Clarifai Inc.",
-  "license": "Apache-2.0",
-  "scripts": {
-    "jsdoc": "jsdoc src/* -t node_modules/minami -d docs/$npm_package_version"
-  },
-  "dependencies": {
-    "axios": "0.11.1",
-    "es6-promise": "3.1.2",
-    "form-data": "0.2.0"
-  },
-  "devDependencies": {
-    "babel-eslint": "^6.1.2",
-    "babel-preset-es2015": "^6.14.0",
-    "babel-register": "^6.14.0",
-    "babelify": "^7.3.0",
-    "del": "2.0.2",
-    "envify": "3.4.0",
-    "git-branch": "0.3.0",
-    "gulp": "3.9.0",
-    "gulp-awspublish": "3.0.1",
-    "gulp-babel": "^6.1.2",
-    "gulp-browserify": "0.5.1",
-    "gulp-concat": "2.6.0",
-    "gulp-data": "1.2.1",
-    "gulp-eslint": "2.0.0",
-    "gulp-if": "2.0.0",
-    "gulp-imagemin": "2.3.0",
-    "gulp-insert": "0.5.0",
-    "gulp-jasmine": "^2.2.1",
-    "gulp-newer": "0.5.1",
-    "gulp-notify": "2.2.0",
-    "gulp-rename": "1.2.2",
-    "gulp-replace-task": "0.11.0",
-    "gulp-uglify": "1.4.1",
-    "gulp-util": "3.0.6",
-    "jsdoc": "^3.4.1",
-    "minami": "^1.1.1",
-    "require-dir": "0.3.0",
-    "serve-static": "1.10.0"
-  }
-}
 
 },{}],22:[function(require,module,exports){
 (function (process){
@@ -2327,7 +2280,7 @@ var App = function () {
 module.exports = App;
 
 }).call(this,require("1YiZ5S"))
-},{"./Concepts":24,"./Inputs":26,"./Models":28,"./constants":29,"1YiZ5S":20,"axios":1,"es6-promise":19}],23:[function(require,module,exports){
+},{"./Concepts":24,"./Inputs":26,"./Models":28,"./constants":29,"1YiZ5S":21,"axios":1,"es6-promise":19}],23:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3693,6 +3646,8 @@ module.exports = {
 },{}],32:[function(require,module,exports){
 'use strict';
 
+var fs = require('fs');
+
 var _require = require('es6-promise');
 
 var Promise = _require.Promise;
@@ -3705,10 +3660,14 @@ var _require3 = require('./helpers');
 
 var checkType = _require3.checkType;
 
-var _require4 = require('./../package.json');
-
-var VERSION = _require4.version;
-
+var path = void 0;
+try {
+  fs.accessSync('../package.json', fs.F_OK);
+  path = '../package.json';
+} catch (e) {
+  path = '../../package.json';
+}
+var VERSION = require(path).version;
 
 module.exports = {
   wrapToken: function wrapToken(_config, requestFn) {
@@ -3815,4 +3774,4 @@ module.exports = {
   }
 };
 
-},{"./../package.json":21,"./constants":29,"./helpers":31,"es6-promise":19}]},{},[30])
+},{"./constants":29,"./helpers":31,"es6-promise":19,"fs":20}]},{},[30])
