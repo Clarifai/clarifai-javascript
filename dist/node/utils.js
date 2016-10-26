@@ -1,5 +1,7 @@
 'use strict';
 
+var fs = require('fs');
+
 var _require = require('es6-promise');
 
 var Promise = _require.Promise;
@@ -12,10 +14,14 @@ var _require3 = require('./helpers');
 
 var checkType = _require3.checkType;
 
-var _require4 = require('./../package.json');
-
-var VERSION = _require4.version;
-
+var path = void 0;
+try {
+  fs.accessSync('../package.json', fs.F_OK);
+  path = '../package.json';
+} catch (e) {
+  path = '../../package.json';
+}
+var VERSION = require(path).version;
 
 module.exports = {
   wrapToken: function wrapToken(_config, requestFn) {
