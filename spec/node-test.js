@@ -10,6 +10,7 @@ var sampleImage3 = 'https://samples.clarifai.com/cookies.jpeg';
 var inputsIDs = [];
 var conceptsIds;
 var app;
+var ferrariId = 'ferrari' + Date.now();
 
 describe('Clarifai JS SDK', function() {
   beforeAll(function() {
@@ -69,14 +70,15 @@ describe('Clarifai JS SDK', function() {
     conceptsIds = [
       'porsche' + Date.now(),
       'rolls royce' + Date.now(),
-      'lamborghini' + Date.now()
+      'lamborghini' + Date.now(),
+      ferrariId
     ];
 
     it('creates concepts given a list of strings', function(done) {
       app.concepts.create(conceptsIds).then(
         function(concepts) {
           expect(concepts).toBeDefined();
-          expect(concepts.length).toBe(3);
+          expect(concepts.length).toBe(conceptsIds.length);
           expect(concepts[0].id).toBe(conceptsIds[0]);
           expect(concepts[1].id).toBe(conceptsIds[1]);
           expect(concepts[2].id).toBe(conceptsIds[2]);
@@ -172,7 +174,7 @@ describe('Clarifai JS SDK', function() {
             allowDuplicateUrl: true,
             concepts: [
               {
-                id: "ferrari",
+                id: ferrariId,
                 value: true
               },
               {
@@ -185,7 +187,7 @@ describe('Clarifai JS SDK', function() {
             allowDuplicateUrl: true,
             concepts: [
               {
-                id: "ferrari",
+                id: ferrariId,
                 value: true
               },
               {
@@ -290,7 +292,7 @@ describe('Clarifai JS SDK', function() {
     it('Creates a new model', function(done) {
       app.models.create('vroom-vroom', [
         {
-          'id': 'ferrari'
+          'id': ferrariId
         }
       ]).then(
         function(model) {
@@ -497,7 +499,7 @@ describe('Clarifai JS SDK', function() {
           'url': 'https://samples.clarifai.com/metro-north.jpg'
         },
         {
-          'name': 'ferrari'
+          'name': ferrariId
         }
       ]);
       val.then(
