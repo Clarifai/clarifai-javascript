@@ -10,7 +10,11 @@ var sampleImage3 = 'https://samples.clarifai.com/cookies.jpeg';
 var inputsIDs = [];
 var conceptsIds;
 var app;
+var beerId = 'beer' + Date.now();
 var ferrariId = 'ferrari' + Date.now();
+var d = Date.now();
+var inputId1 = 'foobar' + d;
+var inputId2 = 'foobaz' + d;
 
 describe('Clarifai JS SDK', function() {
   beforeAll(function() {
@@ -71,6 +75,7 @@ describe('Clarifai JS SDK', function() {
       'porsche' + Date.now(),
       'rolls royce' + Date.now(),
       'lamborghini' + Date.now(),
+      beerId,
       ferrariId
     ];
 
@@ -137,6 +142,37 @@ describe('Clarifai JS SDK', function() {
             expect(inputs[0].createdAt).toBeDefined();
             expect(inputs[0].id).toBeDefined();
             expect(inputs[0].toObject().data).toBeDefined();
+            done();
+          },
+          errorHandler.bind(done)
+        );
+      });
+
+      it('Adds input with metadata', function(done) {
+        app.inputs.create([
+          {
+            id: inputId1,
+            url: "https://s3.amazonaws.com/samples.clarifai.com/beer.jpeg",
+            allowDuplicateUrl: true,
+            concepts: [{ id: beerId }],
+            metadata: { foo: 'bar' }
+          },
+          {
+            id: inputId2,
+            url: "https://s3.amazonaws.com/samples.clarifai.com/beer.jpeg",
+            allowDuplicateUrl: true,
+            concepts: [{ id: beerId }],
+            metadata: { foo: 'baz' }
+          }
+        ]).then(
+          function(inputs) {
+            expect(inputs).toBeDefined();
+            expect(inputs instanceof Inputs).toBe(true);
+            expect(inputs.length).toBe(2);
+            expect(inputs[0].id).toBe(inputId1);
+            expect(inputs[1].id).toBe(inputId2);
+            expect(inputs[0].toObject().data.metadata.foo).toBe('bar');
+            expect(inputs[1].toObject().data.metadata.foo).toBe('baz');
             done();
           },
           errorHandler.bind(done)
@@ -494,18 +530,36 @@ describe('Clarifai JS SDK', function() {
     });
 
     it('Filter by images and concepts', function(done) {
-      var val = app.inputs.search([
+      app.inputs.search([
         {
           'url': 'https://samples.clarifai.com/metro-north.jpg'
         },
         {
           'name': ferrariId
         }
-      ]);
-      val.then(
+      ]).then(
         function(inputs) {
           expect(inputs instanceof Inputs).toBe(true);
           expect(inputs[0].score).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      )
+    });
+
+    it('Filter with metadata', function(done) {
+      app.inputs.search([
+        {
+          'url': "https://s3.amazonaws.com/samples.clarifai.com/beer.jpeg",
+          'metadata': {
+            'foo': 'bar'
+          }
+        }
+      ]).then(
+        function(inputs) {
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs[0].score).toBeDefined();
+          expect(inputs[0].id).toBe(inputId1);
           done();
         },
         errorHandler.bind(done)

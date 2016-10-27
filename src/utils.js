@@ -56,6 +56,9 @@ module.exports = {
     if (input['concepts']) {
       formatted['data']['concepts'] = input['concepts'];
     }
+    if (input['metadata']) {
+      formatted['data']['metadata'] = input['metadata'];
+    }
     if (includeImage !== false) {
       formatted.data['image'] = {
         'url': input['url'],
@@ -88,7 +91,7 @@ module.exports = {
     };
   },
   formatImagesSearch: (image)=> {
-    let imageQuery;
+    let imageQuery, formatted;
     if (typeof image === 'string') {
       imageQuery = {
         'url': image
@@ -108,10 +111,27 @@ module.exports = {
         }
       }
     };
-    return image.type === 'input'?
-      input: {
-        'output': input
-      };
+
+    if (image.type !== 'input') {
+      input = {'output': input};
+    }
+
+    if (image.metadata !== undefined) {
+      formatted = [
+        input,
+        {
+          'input': {
+            'data': {
+              'metadata': image.metadata
+            }
+          }
+        }
+      ];
+    } else {
+      formatted = input;
+    }
+
+    return formatted;
   },
   formatConcept: (concept)=> {
     let formatted = concept;
