@@ -23,6 +23,28 @@ module.exports = {
       }, reject);
     });
   },
+  formatModel: (data)=> {
+    let formatted = {};
+    formatted.id = data.id;
+    if (data.name) {
+      formatted.name = data.name;
+    }
+    formatted['output_info'] = {};
+    if (data.conceptsMutuallyExclusive !== undefined) {
+      formatted['output_info']['output_config'] = formatted['output_info']['output_config'] || {};
+      formatted['output_info']['output_config']['concepts_mutually_exclusive'] = !!data.conceptsMutuallyExclusive;
+    }
+    if (data.closedEnvironment !== undefined) {
+      formatted['output_info']['output_config'] = formatted['output_info']['output_config'] || {};
+      formatted['output_info']['output_config']['closed_environment'] = !!data.closedEnvironment;
+    }
+    if (data.concepts) {
+      formatted['output_info']['data'] = {
+        'concepts': data.concepts.map(module.exports.formatConcept)
+      };
+    }
+    return formatted;
+  },
   formatInput: (data, includeImage)=> {
     let input = checkType(/String/, data)?
       { 'url': data }:
@@ -33,6 +55,9 @@ module.exports = {
     };
     if (input['concepts']) {
       formatted['data']['concepts'] = input['concepts'];
+    }
+    if (input['metadata']) {
+      formatted['data']['metadata'] = input['metadata'];
     }
     if (includeImage !== false) {
       formatted.data['image'] = {
@@ -66,7 +91,7 @@ module.exports = {
     };
   },
   formatImagesSearch: (image)=> {
-    let imageQuery;
+    let imageQuery, formatted;
     if (typeof image === 'string') {
       imageQuery = {
         'url': image
@@ -86,17 +111,33 @@ module.exports = {
         }
       }
     };
-    return image.type === 'input'?
-      input: {
-        'output': input
-      };
+
+    if (image.type !== 'input') {
+      input = {'output': input};
+    }
+
+    if (image.metadata !== undefined) {
+      formatted = [
+        input,
+        {
+          'input': {
+            'data': {
+              'metadata': image.metadata
+            }
+          }
+        }
+      ];
+    } else {
+      formatted = input;
+    }
+
+    return formatted;
   },
   formatConcept: (concept)=> {
     let formatted = concept;
     if (checkType(/String/, concept)) {
       formatted = {
-        id: concept,
-        name: concept
+        id: concept
       };
     }
     return formatted;

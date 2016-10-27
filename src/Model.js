@@ -70,16 +70,12 @@ class Model {
     let concepts = conceptsData[0] instanceof Concepts?
       conceptsData.toObject('id'):
       conceptsData;
-    let params = {
+    let data = {
       'concepts': concepts,
       'action': action
     };
     return wrapToken(this._config, (headers)=> {
-      let data = {
-        headers,
-        params
-      };
-      return axios.patch(url, data);
+      return axios.patch(url, data, {headers});
     });
   }
   /**

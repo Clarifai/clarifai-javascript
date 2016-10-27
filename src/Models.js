@@ -4,7 +4,7 @@ let Model = require('./Model');
 let Concepts = require('./Concepts');
 let {API, replaceVars} = require('./constants');
 let {isSuccess, checkType} = require('./helpers');
-let {wrapToken} = require('./utils');
+let {wrapToken, formatModel} = require('./utils');
 let {MODELS_PATH, MODEL_PATH, MODEL_SEARCH_PATH, MODEL_VERSION_PATH} = API;
 
 /**
@@ -110,7 +110,7 @@ class Models {
           headers
         }).then((response)=> {
           if (isSuccess(response)) {
-            resolve(new Models(this._config, response.models));
+            resolve(new Models(this._config, response.data.models));
           } else {
             reject(response);
           }
@@ -120,16 +120,16 @@ class Models {
   }
   /**
    * Create a model
-   * @param {string|object}           model                                    If string, it is assumed to be the model name. Otherwise, if object is given, it can have any of the following keys:
-   *   @param {string}                  model.id                                 Model id
-   *   @param {string}                  model.name                               Model name
-   * @param {object[]|Concepts[]}     conceptsData                             List of objects with ids or an instance of Concepts object
-   * @param {Object}                  options                                  Object with keys explained below:
-   *   @param {Boolean}                 options.conceptsMutuallyExclusive        Optional
-   *   @param {Boolean}                 options.closedEnvironment                Optional
+   * @param {string|object}                  model                                  If string, it is assumed to be the model id. Otherwise, if object is given, it can have any of the following keys:
+   *   @param {string}                         model.id                               Model id
+   *   @param {string}                         model.name                             Model name
+   * @param {object[]|string[]|Concepts[]}   conceptsData                           List of objects with ids, concept id strings or an instance of Concepts object
+   * @param {Object}                         options                                Object with keys explained below:
+   *   @param {boolean}                        options.conceptsMutuallyExclusive      Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
+   *   @param {boolean}                        options.closedEnvironment              Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
    * @return {Promise(model, error)} A Promise that is fulfilled with an instance of Model or rejected with an error
    */
-  create(name, conceptsData=[], options={}) {
+  create(model, conceptsData=[], options={}) {
     let concepts = conceptsData instanceof Concepts?
       conceptsData.toObject('id'):
       conceptsData.map((concept)=> {
@@ -139,29 +139,28 @@ class Models {
         }
         return val;
       });
+    let modelObj = model;
+    if (checkType(/String/, model)) {
+      modelObj = {id: model, name: model};
+    }
+    if (modelObj.id === undefined) {
+      throw new Error('Model ID is required');
+    }
     let url = `${this._config.apiEndpoint}${MODELS_PATH}`;
-    let data = {
-      'model': {
-        'name': name,
-        'output_info': {
-          'data': {
-            concepts
-          },
-          'output_config': {
-            'concepts_mutually_exclusive': !!options.conceptsMutuallyExclusive,
-            'closed_environment': !!options.closedEnvironment
-          }
-        }
+    let data = {model: modelObj};
+    data['model']['output_info'] = {
+      'data': {
+        concepts
+      },
+      'output_config': {
+        'concepts_mutually_exclusive': !!options.conceptsMutuallyExclusive,
+        'closed_environment': !!options.closedEnvironment
       }
     };
+
     return wrapToken(this._config, (headers)=> {
       return new Promise((resolve, reject)=> {
-        axios({
-          'method': 'post',
-          'url': url,
-          'data': data,
-          'headers': headers
-        }).then((response)=> {
+        axios.post(url, data, {headers}).then((response)=> {
           if (isSuccess(response)) {
             resolve(new Model(this._config, response.data.model));
           } else {
@@ -183,6 +182,39 @@ class Models {
         axios.get(url, {headers}).then((response)=> {
           if (isSuccess(response)) {
             resolve(new Model(this._config, response.data.model));
+          } else {
+            reject(response);
+          }
+        }, reject);
+      });
+    });
+  }
+  /**
+  * Update a model's or a list of models' output config or concepts
+  * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
+  *   @param {string}               id                                    The id of the model to apply changes to (Required)
+  *   @param {string}               name                                  The new name of the model to update with
+  *   @param {boolean}              conceptsMutuallyExclusive      Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
+  *   @param {boolean}              closedEnvironment              Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
+  *   @param {object[]}             concepts                              An array of concept objects or string
+  *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
+  *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
+  */
+  update(obj) {
+    let url = `${this._config.apiEndpoint}${MODELS_PATH}`;
+    let models = obj;
+    if (checkType(/Object/, obj)) {
+      models = [obj];
+    }
+    let data = {
+      models: models.map(formatModel)
+    };
+
+    return wrapToken(this._config, (headers)=> {
+      return new Promise((resolve, reject)=> {
+        axios.patch(url, data, {headers}).then((response)=> {
+          if (isSuccess(response)) {
+            resolve(new Models(this._config, response.data.models));
           } else {
             reject(response);
           }

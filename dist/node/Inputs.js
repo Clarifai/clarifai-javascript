@@ -94,12 +94,14 @@ var Inputs = function () {
     * @param {object|object[]}        inputs                                Can be a single media object or an array of media objects (max of 128 inputs/call; passing > 128 will throw an exception)
     *   @param {object|string}          inputs[].input                        If string, is given, this is assumed to be an image url
     *     @param {string}                 inputs[].input.(url|base64)           Can be a publicly accessibly url or base64 string representing image bytes (required)
-    *     @param {string}                 inputs[].input.inputId                ID of input (optional)
+    *     @param {string}                 inputs[].input.id                     ID of input (optional)
     *     @param {number[]}               inputs[].input.crop                   An array containing the percent to be cropped from top, left, bottom and right (optional)
     *     @param {object[]}               inputs[].input.concepts               An array of concepts to attach to media object (optional)
     *       @param {object|string}          inputs[].input.concepts[].concept     If string, is given, this is assumed to be concept id with value equals true
     *         @param {string}                 inputs[].input.concepts[].concept.id          The concept id (required)
     *         @param {boolean}                inputs[].input.concepts[].concept.value       Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+    *     @param {object[]}               inputs[].input.metadata               Object with key values to attach to the input (optional)
+    *       @param {string}                 inputs[].input.concepts[].<key>       <key> can be any string with any <value>
     * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
     */
 
@@ -156,7 +158,7 @@ var Inputs = function () {
     }
     /**
     * Delete an input or a list of inputs by id or all inputs if no id is passed
-    * @param {String}    id           The id of input to delete (optional)
+    * @param {string|string[]}    id           The id of input to delete (optional)
     * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
     */
 
@@ -168,24 +170,34 @@ var Inputs = function () {
       var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       var val = void 0;
-      if (id === null) {
+      // delete an input
+      if (checkType(/String/, id)) {
         (function () {
           var url = '' + _this5._config.apiEndpoint + replaceVars(INPUT_PATH, [id]);
           val = wrapToken(_this5._config, function (headers) {
             return axios.delete(url, { headers: headers });
           });
         })();
-      } else if (Array.isArray(id)) {
-        val = this._update('delete_inputs', id);
       } else {
-        (function () {
-          var url = '' + _this5._config.apiEndpoint + INPUTS_PATH;
-          val = wrapToken(_this5._config, function (headers) {
-            return axios.delete(url, { headers: headers });
-          });
-        })();
+        val = this._deleteInputs(id);
       }
       return val;
+    }
+  }, {
+    key: '_deleteInputs',
+    value: function _deleteInputs() {
+      var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      var url = '' + this._config.apiEndpoint + INPUTS_PATH;
+      return wrapToken(this._config, function (headers) {
+        var data = id === null ? { 'delete_all': true } : { 'ids': id };
+        return axios({
+          url: url,
+          method: 'delete',
+          headers: headers,
+          data: data
+        });
+      });
     }
     /**
     * Merge concepts to inputs in bulk
@@ -262,6 +274,7 @@ var Inputs = function () {
     *       @param {string}                 queries[].image.type          Search over 'input' or 'output' (default: 'output')
     *       @param {string}                 queries[].image.(base64|url)  Can be a publicly accessibly url or base64 string representing image bytes (required)
     *       @param {number[]}               queries[].image.crop          An array containing the percent to be cropped from top, left, bottom and right (optional)
+    *       @param {object}                 queries[].input.metadata      An object with <key> and <value> specified by user to refine search with (optional)
     * @param {Object}                   options       Object with keys explained below: (optional)
     *    @param {Number}                  options.page          The page number (optional, default: 1)
     *    @param {Number}                  options.perPage       Number of images to return per page (optional, default: 20)
@@ -276,6 +289,7 @@ var Inputs = function () {
       var ands = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { page: 1, perPage: 20 };
 
+      var formattedAnds = [];
       var url = '' + this._config.apiEndpoint + SEARCH_PATH;
       var data = {
         'query': {
@@ -291,9 +305,11 @@ var Inputs = function () {
         ands = [ands];
       }
       if (ands.length > 0) {
-        data['query']['ands'] = ands.map(function (andQuery) {
-          return andQuery.name ? formatConceptsSearch(andQuery) : formatImagesSearch(andQuery);
+        ands.forEach(function (andQuery) {
+          var el = andQuery.name ? formatConceptsSearch(andQuery) : formatImagesSearch(andQuery);
+          formattedAnds = formattedAnds.concat(el);
         });
+        data['query']['ands'] = formattedAnds;
       }
       return wrapToken(this._config, function (headers) {
         return new Promise(function (resolve, reject) {
