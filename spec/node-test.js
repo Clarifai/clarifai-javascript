@@ -210,11 +210,11 @@ describe('Clarifai JS SDK', function() {
             allowDuplicateUrl: true,
             concepts: [
               {
-                id: ferrariId,
-                value: true
+                id: ferrariId
               },
               {
-                id: "outdoors"
+                id: "outdoors",
+                value: false
               }
             ]
           },
@@ -223,8 +223,7 @@ describe('Clarifai JS SDK', function() {
             allowDuplicateUrl: true,
             concepts: [
               {
-                id: ferrariId,
-                value: true
+                id: ferrariId
               },
               {
                 id: "outdoors",
@@ -324,9 +323,10 @@ describe('Clarifai JS SDK', function() {
     var testModel;
     var generalModel;
     var generalModelId;
+    var testModelId = 'vroom-vroom' + Date.now();
 
     it('Creates a new model', function(done) {
-      app.models.create('vroom-vroom', [
+      app.models.create(testModelId, [
         {
           'id': ferrariId
         }
@@ -344,6 +344,13 @@ describe('Clarifai JS SDK', function() {
         },
         errorHandler.bind(done)
       );
+    });
+
+    it('Throws an error if no model id is given', function(done) {
+      expect(function(){
+        app.models.create({name: 'asdf'}, [{'id': ferrariId}]);
+      }).toThrow(new Error('Model ID is required'));
+      done();
     });
 
 
@@ -379,15 +386,13 @@ describe('Clarifai JS SDK', function() {
     });
 
     it('Searches for a model', function(done) {
-      app.models.search('vroom-vroom').then(
+      app.models.search(testModelId).then(
         function(models) {
           expect(models).toBeDefined();
           var model = models[0];
           expect(model).toBeDefined();
-          expect(model.name).toBe('vroom-vroom');
+          expect(model.name).toBe(testModelId);
           expect(model.id).toBeDefined();
-          generalModelId = model.id;
-          generalModel = model;
           expect(model.createdAt).toBeDefined();
           expect(model.appId).toBeDefined();
           expect(model.outputInfo).toBeDefined();
@@ -398,8 +403,8 @@ describe('Clarifai JS SDK', function() {
       );
     });
 
-    it('Call predict on models collection giving a model id', function(done) {
-      app.models.predict(generalModelId, [
+    it('Call predict on models collection given a model id', function(done) {
+      app.models.predict(Clarifai.GENERAL_MODEL, [
         {
           'url': 'http://www.ramtrucks.com/assets/towing_guide/images/before_you_buy/truck.png'
         },
@@ -425,29 +430,31 @@ describe('Clarifai JS SDK', function() {
     });
 
     it('Attaches model outputs', function(done) {
-      generalModel.predict([
-        {
-          'url': 'http://www.ramtrucks.com/assets/towing_guide/images/before_you_buy/truck.png'
-        },
-        {
-          'url': 'http://www.planwallpaper.com/static/images/ferrari-9.jpg'
-        }
-      ]).then(
-        function(response) {
-          expect(response.data.outputs).toBeDefined();
-          var outputs = response.data.outputs;
-          expect(outputs.length).toBe(2);
-          var output = outputs[0];
-          expect(output.id).toBeDefined();
-          expect(output.status).toBeDefined();
-          expect(output.input).toBeDefined();
-          expect(output.model).toBeDefined();
-          expect(output.created_at).toBeDefined();
-          expect(output.data).toBeDefined();
-          done();
-        },
-        errorHandler.bind(done)
-      );
+      app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
+        generalModel.predict([
+          {
+            'url': 'http://www.ramtrucks.com/assets/towing_guide/images/before_you_buy/truck.png'
+          },
+          {
+            'url': 'http://www.planwallpaper.com/static/images/ferrari-9.jpg'
+          }
+        ]).then(
+          function(response) {
+            expect(response.data.outputs).toBeDefined();
+            var outputs = response.data.outputs;
+            expect(outputs.length).toBe(2);
+            var output = outputs[0];
+            expect(output.id).toBeDefined();
+            expect(output.status).toBeDefined();
+            expect(output.input).toBeDefined();
+            expect(output.model).toBeDefined();
+            expect(output.created_at).toBeDefined();
+            expect(output.data).toBeDefined();
+            done();
+          },
+          errorHandler.bind(done)
+        )
+      });
     });
 
     it('Update model name and config', function(done) {
