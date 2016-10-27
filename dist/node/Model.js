@@ -104,16 +104,12 @@ var Model = function () {
       }
       var url = '' + this._config.apiEndpoint + replaceVars(MODEL_PATCH_PATH, [this.id]);
       var concepts = conceptsData[0] instanceof Concepts ? conceptsData.toObject('id') : conceptsData;
-      var params = {
+      var data = {
         'concepts': concepts,
         'action': action
       };
       return wrapToken(this._config, function (headers) {
-        var data = {
-          headers: headers,
-          params: params
-        };
-        return axios.patch(url, data);
+        return axios.patch(url, data, { headers: headers });
       });
     }
     /**

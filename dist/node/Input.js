@@ -9,8 +9,7 @@ var axios = require('axios');
 var _require = require('./constants');
 
 var API = _require.API;
-var replaceVars = _require.replaceVars;
-var INPUT_PATCH_PATH = API.INPUT_PATCH_PATH;
+var INPUTS_PATH = API.INPUTS_PATH;
 
 /**
 * class representing an input
@@ -70,10 +69,13 @@ var Input = function () {
   }, {
     key: '_update',
     value: function _update(concepts) {
-      var url = '' + this._config.apiEndpoint + replaceVars(INPUT_PATCH_PATH, [this.id]);
+      var url = '' + this._config.apiEndpoint + INPUTS_PATH;
       var data = {
         action: action,
-        concepts: concepts
+        inputs: [{
+          id: this.id,
+          data: { concepts: concepts }
+        }]
       };
       return wrapToken(this._config, function (headers) {
         return new Promise(function (resolve, reject) {

@@ -26,6 +26,7 @@ var checkType = _require3.checkType;
 var _require4 = require('./utils');
 
 var wrapToken = _require4.wrapToken;
+var formatModel = _require4.formatModel;
 var MODELS_PATH = API.MODELS_PATH;
 var MODEL_PATH = API.MODEL_PATH;
 var MODEL_SEARCH_PATH = API.MODEL_SEARCH_PATH;
@@ -164,7 +165,7 @@ var Models = function () {
             headers: headers
           }).then(function (response) {
             if (isSuccess(response)) {
-              resolve(new Models(_this5._config, response.models));
+              resolve(new Models(_this5._config, response.data.models));
             } else {
               reject(response);
             }
@@ -174,19 +175,19 @@ var Models = function () {
     }
     /**
      * Create a model
-     * @param {string|object}           model                                    If string, it is assumed to be the model name. Otherwise, if object is given, it can have any of the following keys:
-     *   @param {string}                  model.id                                 Model id
-     *   @param {string}                  model.name                               Model name
-     * @param {object[]|Concepts[]}     conceptsData                             List of objects with ids or an instance of Concepts object
-     * @param {Object}                  options                                  Object with keys explained below:
-     *   @param {Boolean}                 options.conceptsMutuallyExclusive        Optional
-     *   @param {Boolean}                 options.closedEnvironment                Optional
+     * @param {string|object}                  model                                  If string, it is assumed to be the model id. Otherwise, if object is given, it can have any of the following keys:
+     *   @param {string}                         model.id                               Model id
+     *   @param {string}                         model.name                             Model name
+     * @param {object[]|string[]|Concepts[]}   conceptsData                           List of objects with ids, concept id strings or an instance of Concepts object
+     * @param {Object}                         options                                Object with keys explained below:
+     *   @param {boolean}                        options.conceptsMutuallyExclusive      Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
+     *   @param {boolean}                        options.closedEnvironment              Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
      * @return {Promise(model, error)} A Promise that is fulfilled with an instance of Model or rejected with an error
      */
 
   }, {
     key: 'create',
-    value: function create(name) {
+    value: function create(model) {
       var _this6 = this;
 
       var conceptsData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
@@ -199,29 +200,28 @@ var Models = function () {
         }
         return val;
       });
+      var modelObj = model;
+      if (checkType(/String/, model)) {
+        modelObj = { id: model, name: model };
+      }
+      if (modelObj.id === undefined) {
+        throw new Error('Model ID is required');
+      }
       var url = '' + this._config.apiEndpoint + MODELS_PATH;
-      var data = {
-        'model': {
-          'name': name,
-          'output_info': {
-            'data': {
-              concepts: concepts
-            },
-            'output_config': {
-              'concepts_mutually_exclusive': !!options.conceptsMutuallyExclusive,
-              'closed_environment': !!options.closedEnvironment
-            }
-          }
+      var data = { model: modelObj };
+      data['model']['output_info'] = {
+        'data': {
+          concepts: concepts
+        },
+        'output_config': {
+          'concepts_mutually_exclusive': !!options.conceptsMutuallyExclusive,
+          'closed_environment': !!options.closedEnvironment
         }
       };
+
       return wrapToken(this._config, function (headers) {
         return new Promise(function (resolve, reject) {
-          axios({
-            'method': 'post',
-            'url': url,
-            'data': data,
-            'headers': headers
-          }).then(function (response) {
+          axios.post(url, data, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
               resolve(new Model(_this6._config, response.data.model));
             } else {
@@ -248,6 +248,44 @@ var Models = function () {
           axios.get(url, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
               resolve(new Model(_this7._config, response.data.model));
+            } else {
+              reject(response);
+            }
+          }, reject);
+        });
+      });
+    }
+    /**
+    * Update a model's or a list of models' output config or concepts
+    * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
+    *   @param {string}               id                                    The id of the model to apply changes to (Required)
+    *   @param {string}               name                                  The new name of the model to update with
+    *   @param {boolean}              conceptsMutuallyExclusive      Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
+    *   @param {boolean}              closedEnvironment              Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
+    *   @param {object[]}             concepts                              An array of concept objects or string
+    *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
+    *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
+    */
+
+  }, {
+    key: 'update',
+    value: function update(obj) {
+      var _this8 = this;
+
+      var url = '' + this._config.apiEndpoint + MODELS_PATH;
+      var models = obj;
+      if (checkType(/Object/, obj)) {
+        models = [obj];
+      }
+      var data = {
+        models: models.map(formatModel)
+      };
+
+      return wrapToken(this._config, function (headers) {
+        return new Promise(function (resolve, reject) {
+          axios.patch(url, data, { headers: headers }).then(function (response) {
+            if (isSuccess(response)) {
+              resolve(new Models(_this8._config, response.data.models));
             } else {
               reject(response);
             }
@@ -287,7 +325,7 @@ var Models = function () {
   }, {
     key: 'search',
     value: function search(name) {
-      var _this8 = this;
+      var _this9 = this;
 
       var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
@@ -302,7 +340,7 @@ var Models = function () {
         return new Promise(function (resolve, reject) {
           axios.post(url, params, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
-              resolve(new Models(_this8._config, response.data.models));
+              resolve(new Models(_this9._config, response.data.models));
             } else {
               reject(response);
             }

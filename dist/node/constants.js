@@ -20,7 +20,6 @@ module.exports = {
     INPUTS_PATH: '/v2/inputs',
     INPUT_PATH: '/v2/inputs/$0',
     INPUTS_STATUS_PATH: '/v2/inputs/status',
-    INPUT_PATCH_PATH: '/v2/inputs/$0/data/concepts',
     SEARCH_PATH: '/v2/searches'
   },
   // var replacement must be given in order

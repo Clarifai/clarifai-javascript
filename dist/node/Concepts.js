@@ -107,8 +107,8 @@ var Concepts = function () {
     /**
     * Add a list of concepts given an id and name
     * @param {object|object[]}   concepts       Can be a single media object or an array of media objects
-    *   @param  {object}           concepts[].concept
-    *     @param  {object}           concepts[].concept.id      The new concept's id
+    *   @param  {object|string}    concepts[].concept         If string, this is assumed to be the concept id. Otherwise, an object with the following attributes
+    *     @param  {object}           concepts[].concept.id      The new concept's id (Required)
     *     @param  {object}           concepts[].concept.name    The new concept's name
     * @return {Promise(Concept, error)}             A Promise that is fulfilled with a Concept instance or rejected with an error
     */
