@@ -5,3 +5,4 @@ aws.json
 npm-debug.log
 .awspublish*
 out/*
+docs/*

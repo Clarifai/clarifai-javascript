@@ -91,7 +91,8 @@ module.exports = {
     };
   },
   formatImagesSearch: (image)=> {
-    let imageQuery, formatted;
+    let imageQuery;
+    let formatted = [];
     if (typeof image === 'string') {
       imageQuery = {
         'url': image
@@ -104,31 +105,28 @@ module.exports = {
       };
     }
 
-    let input = {
-      'input': {
-        'data': {
-          'image': imageQuery
+    if (imageQuery.url || imageQuery.baseQuery) {
+      let input = {
+        'input': {
+          'data': {
+            'image': imageQuery
+          }
         }
+      };
+      if (image.type !== 'input') {
+        input = {'output': input};
       }
-    };
-
-    if (image.type !== 'input') {
-      input = {'output': input};
+      formatted.push(input);
     }
 
     if (image.metadata !== undefined) {
-      formatted = [
-        input,
-        {
-          'input': {
-            'data': {
-              'metadata': image.metadata
-            }
+      formatted.push({
+        'input': {
+          'data': {
+            'metadata': image.metadata
           }
         }
-      ];
-    } else {
-      formatted = input;
+      });
     }
 
     return formatted;

@@ -1,7 +1,7 @@
 /**
- * Clarifai JavaScript SDK v2.0.12
+ * Clarifai JavaScript SDK v2.0.13
  *
- * Last updated: Thu Oct 27 2016 11:33:23 GMT-0400 (EDT)
+ * Last updated: Fri Oct 28 2016 15:03:42 GMT-0400 (EDT)
  *
  * Visit https://developer.clarifai.com
  *
@@ -2723,11 +2723,11 @@ var Inputs = function () {
     *     @param {string}                 inputs[].input.(url|base64)           Can be a publicly accessibly url or base64 string representing image bytes (required)
     *     @param {string}                 inputs[].input.id                     ID of input (optional)
     *     @param {number[]}               inputs[].input.crop                   An array containing the percent to be cropped from top, left, bottom and right (optional)
+    *     @param {object[]}               inputs[].input.metadata               Object with key values to attach to the input (optional)
     *     @param {object[]}               inputs[].input.concepts               An array of concepts to attach to media object (optional)
     *       @param {object|string}          inputs[].input.concepts[].concept     If string, is given, this is assumed to be concept id with value equals true
     *         @param {string}                 inputs[].input.concepts[].concept.id          The concept id (required)
     *         @param {boolean}                inputs[].input.concepts[].concept.value       Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
-    *     @param {object[]}               inputs[].input.metadata               Object with key values to attach to the input (optional)
     *       @param {string}                 inputs[].input.concepts[].<key>       <key> can be any string with any <value>
     * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
     */
@@ -2901,7 +2901,7 @@ var Inputs = function () {
     *       @param {string}                 queries[].image.type          Search over 'input' or 'output' (default: 'output')
     *       @param {string}                 queries[].image.(base64|url)  Can be a publicly accessibly url or base64 string representing image bytes (required)
     *       @param {number[]}               queries[].image.crop          An array containing the percent to be cropped from top, left, bottom and right (optional)
-    *       @param {object}                 queries[].input.metadata      An object with <key> and <value> specified by user to refine search with (optional)
+    *       @param {object}                 queries[].image.metadata      An object with <key> and <value> specified by user to refine search with (optional)
     * @param {Object}                   options       Object with keys explained below: (optional)
     *    @param {Number}                  options.page          The page number (optional, default: 1)
     *    @param {Number}                  options.perPage       Number of images to return per page (optional, default: 20)
@@ -3798,8 +3798,8 @@ module.exports = {
     };
   },
   formatImagesSearch: function formatImagesSearch(image) {
-    var imageQuery = void 0,
-        formatted = void 0;
+    var imageQuery = void 0;
+    var formatted = [];
     if (typeof image === 'string') {
       imageQuery = {
         'url': image
@@ -3812,28 +3812,28 @@ module.exports = {
       };
     }
 
-    var input = {
-      'input': {
-        'data': {
-          'image': imageQuery
+    if (imageQuery.url || imageQuery.baseQuery) {
+      var input = {
+        'input': {
+          'data': {
+            'image': imageQuery
+          }
         }
+      };
+      if (image.type !== 'input') {
+        input = { 'output': input };
       }
-    };
-
-    if (image.type !== 'input') {
-      input = { 'output': input };
+      formatted.push(input);
     }
 
     if (image.metadata !== undefined) {
-      formatted = [input, {
+      formatted.push({
         'input': {
           'data': {
             'metadata': image.metadata
           }
         }
-      }];
-    } else {
-      formatted = input;
+      });
     }
 
     return formatted;

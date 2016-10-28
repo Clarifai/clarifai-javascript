@@ -155,14 +155,14 @@ describe('Clarifai JS SDK', function() {
             url: "https://s3.amazonaws.com/samples.clarifai.com/beer.jpeg",
             allowDuplicateUrl: true,
             concepts: [{ id: beerId }],
-            metadata: { foo: 'bar' }
+            metadata: { foo: 'bar', baz: 'blah' }
           },
           {
             id: inputId2,
             url: "https://s3.amazonaws.com/samples.clarifai.com/beer.jpeg",
             allowDuplicateUrl: true,
             concepts: [{ id: beerId }],
-            metadata: { foo: 'baz' }
+            metadata: { foo: 'baz', baz: 'blah' }
           }
         ]).then(
           function(inputs) {
@@ -554,7 +554,22 @@ describe('Clarifai JS SDK', function() {
       )
     });
 
-    it('Filter with metadata', function(done) {
+    it('Filter with metadata only', function(done) {
+      app.inputs.search([{
+        'metadata': {
+          'baz': 'blah'
+        }
+      }]).then(
+        function(inputs) {
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs.length).toBe(2);
+          done();
+        },
+        errorHandler.bind(done)
+      )
+    });
+
+    it('Filter with metadata and image url', function(done) {
       app.inputs.search([
         {
           'url': "https://s3.amazonaws.com/samples.clarifai.com/beer.jpeg",
