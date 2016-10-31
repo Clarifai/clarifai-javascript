@@ -1,15 +1,7 @@
-let fs = require('fs');
 let {Promise} = require('es6-promise');
 let {URL_REGEX} = require('./constants');
 let {checkType} = require('./helpers');
-let path;
-try {
-  fs.accessSync('../package.json', fs.F_OK);
-  path = '../package.json';
-} catch (e) {
-  path = '../../package.json';
-}
-const VERSION = require(path).version;
+let {version: VERSION} = require('./../package.json');
 
 module.exports = {
   wrapToken: (_config, requestFn)=> {

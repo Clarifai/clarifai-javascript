@@ -40,6 +40,7 @@ function watchFiles() {
 gulp.task('cleanbuild', function() {
   return del([
     './../dist/**',
+    './../sdk/**',
     ], {'force': true});
 });
 
@@ -63,7 +64,7 @@ gulp.task('browserify', ['cleanbuild'], function() {
 
   return gulp.src('./../src/index.js')
     .pipe(browserify({
-      'insertGlobals': false,
+      'insertGlobals': true,
       'debug': false,
       'transform': ['babelify']
     }).on('error', notify.onError(function(error) {
@@ -81,12 +82,12 @@ gulp.task('browserify', ['cleanbuild'], function() {
       path.basename = 'clarifai-' + VERSION;
     }))
     .pipe(insert.prepend(BROWSER_HEADER))
-    .pipe(gulp.dest('./../dist/browser'))
+    .pipe(gulp.dest('./../sdk'))
     .pipe(uglify())
     .pipe(rename(function (path) {
       path.basename = 'clarifai-' + VERSION + '.min';
     }))
-    .pipe(gulp.dest('./../dist/browser'));
+    .pipe(gulp.dest('./../sdk'));
 });
 
 gulp.task('dist', ['browserify'], function() {
@@ -94,7 +95,7 @@ gulp.task('dist', ['browserify'], function() {
     .pipe(babel({
       presets: ['es2015']
     }))
-    .pipe(gulp.dest('./../dist/node'));
+    .pipe(gulp.dest('./../dist'));
 });
 
 var buildVars = {};
@@ -225,6 +226,7 @@ gulp.task('test', function() {
 // deploy to the S3 bucket set in aws.json
 gulp.task(
   'deploy',
+  tasks,
   publish
 );
 
@@ -244,7 +246,7 @@ function publish() {
   var headers = {
     'Cache-Control': 'max-age=21600, no-transform, public'
   };
-  return gulp.src(['./../dist/browser/**', './../docs/**'])
+  return gulp.src(['./../sdk/**', './../docs/**'])
     .pipe(rename(function (path) {
         path.dirname = '/js/' + path.dirname;
     }))
