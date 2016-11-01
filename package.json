@@ -1,8 +1,8 @@
 {
   "name": "clarifai",
-  "version": "2.0.13",
+  "version": "2.0.14",
   "description": "Official Clarifai Javascript SDK",
-  "main": "dist/node/index.js",
+  "main": "dist/index.js",
   "repository": "https://github.com/Clarifai/clarifai-javascript",
   "author": "Clarifai Inc.",
   "license": "Apache-2.0",
