@@ -1,4 +1,5 @@
 let axios = require('axios');
+let Concepts = require('./Concepts');
 let {API} = require('./constants');
 let {INPUTS_PATH} = API;
 
@@ -11,6 +12,7 @@ class Input {
     this.id = data.id;
     this.createdAt = data.created_at || data.createdAt;
     this.imageUrl = data.data.image.url;
+    this.concepts = new Concepts(_config, data.data.concepts);
     this.score = data.score;
     this._config = _config;
     this._rawData = data;
@@ -28,30 +30,51 @@ class Input {
   *   @param {object}           concepts[].concept
   *     @param {string}           concepts[].concept.id        The concept id (required)
   *     @param {boolean}          concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+  * @param {object}           metadata                      Object with key values to attach to the input (optional)
   * @return {Promise(input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
   */
-  mergeConcepts(concepts) {
-    return this._update('merge_concepts', concepts);
+  mergeConcepts(concepts, metadata) {
+    return this._update('merge', concepts, metadata);
   }
   /**
-  * Delete concept to an input
+  * Delete concept from an input
   * @param {object[]}         concepts    Object with keys explained below:
   *   @param {object}           concepts[].concept
   *     @param {string}           concepts[].concept.id        The concept id (required)
   *     @param {boolean}          concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+  * @param {object}           metadata                      Object with key values to attach to the input (optional)
   * @return {Promise(input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
   */
-  deleteConcepts(concepts) {
-    return this._update('delete_concepts', concepts);
+  deleteConcepts(concepts, metadata) {
+    return this._update('remove', concepts, metadata);
   }
-  _update(concepts) {
+  /**
+  * Overwrite inputs
+  * @param {object[]}         concepts                      Array of object with keys explained below:
+  *   @param {object}           concepts[].concept
+  *     @param {string}           concepts[].concept.id         The concept id (required)
+  *     @param {boolean}          concepts[].concept.value      Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+  * @param {object}           metadata                      Object with key values to attach to the input (optional)
+  * @return {Promise(input, error)}                         A Promise that is fulfilled with an instance of Input or rejected with an error
+  */
+  overwriteConcepts(concepts, metadata) {
+    return this._update('overwrite', concepts, metadata);
+  }
+  _update(action, concepts=[], metadata=null) {
     let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
+    let inputData = {};
+    if (concepts.length) {
+      inputData.concepts = concepts;
+    }
+    if (metadata !== null) {
+      inputData.metadata = metadata;
+    }
     let data = {
       action,
       inputs: [
         {
           id: this.id,
-          data: { concepts }
+          data: inputData
         }
       ]
     };

@@ -8,7 +8,7 @@ class Concept {
     this.name = data.name;
     this.createdAt = data.created_at || data.createdAt;
     this.appId = data.app_id || data.appId;
-    this.value = null;
+    this.value = data.value || null;
     this._config = _config;
     this._rawData = data;
   }

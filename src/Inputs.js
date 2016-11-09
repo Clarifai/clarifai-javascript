@@ -144,6 +144,7 @@ class Inputs {
   * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
   *   @param {object}           inputs[].input
   *     @param {string}           inputs[].input.id        The id of the input to update
+  *     @param {object}           inputs[].input.metadata                     Object with key values to attach to the input (optional)
   *     @param {string}           inputs[].input.concepts  Object with keys explained below:
   *       @param {object}           inputs[].input.concepts[].concept
   *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
@@ -151,21 +152,37 @@ class Inputs {
   * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
   */
   mergeConcepts(inputs) {
-    return this._update('merge_concepts', inputs);
+    return this._update('merge', inputs);
   }
   /**
   * Delete concepts to inputs in bulk
   * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
   *   @param {object}           inputs[].input
-  *     @param {string}           inputs[].input.id        The id of the input to update
-  *     @param {string}           inputs[].input.concepts  Object with keys explained below:
+  *     @param {string}           inputs[].input.id                           The id of the input to update
+  *     @param {object}           inputs[].input.metadata                     Object with key values to attach to the input (optional)
+  *     @param {string}           inputs[].input.concepts                     Object with keys explained below:
   *       @param {object}           inputs[].input.concepts[].concept
   *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
   *         @param {boolean}          inputs[].input.concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
   * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
   */
   deleteConcepts(inputs) {
-    return this._update('delete_concepts', inputs);
+    return this._update('remove', inputs);
+  }
+  /**
+  * Overwrite inputs in bulk
+  * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
+  *   @param {object}           inputs[].input
+  *     @param {string}           inputs[].input.id                           The id of the input to update
+  *     @param {object}           inputs[].input.metadata                     Object with key values to attach to the input (optional)
+  *     @param {string}           inputs[].input.concepts                     Object with keys explained below:
+  *       @param {object}           inputs[].input.concepts[].concept
+  *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
+  *         @param {boolean}          inputs[].input.concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+  * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
+  */
+  overwriteConcepts(inputs) {
+    return this._update('overwrite', inputs);
   }
   _update(action, inputs) {
     let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;

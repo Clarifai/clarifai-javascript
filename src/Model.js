@@ -1,12 +1,11 @@
 let axios = require('axios');
-let Concepts = require('./Concepts');
 let {isSuccess, checkType} = require('./helpers');
 let {API, replaceVars} = require('./constants');
 let {wrapToken, formatImagePredict} = require('./utils');
 let {
   MODEL_VERSIONS_PATH,
   MODEL_VERSION_PATH,
-  MODEL_PATCH_PATH,
+  MODELS_PATH,
   PREDICT_PATH,
   VERSION_PREDICT_PATH,
   MODEL_INPUTS_PATH,
@@ -47,12 +46,12 @@ class Model {
     return this._rawData;
   }
   /**
-  * Merge concepts from a model
+  * Merge concepts to a model
   * @param {object[]}      concepts    List of concept objects with id
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   mergeConcepts(concepts=[]) {
-    return this._update('merge_concepts', concepts);
+    return this._update({action: 'merge', concepts});
   }
   /**
   * Remove concepts from a model
@@ -60,22 +59,45 @@ class Model {
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   deleteConcepts(concepts=[]) {
-    return this._update('delete_concepts', concepts);
+    return this._update({action: 'remove', concepts});
   }
-  _update(action, conceptsData) {
-    if (!Array.isArray(conceptsData)) {
-      conceptsData = [conceptsData];
+  /**
+  * Overwrite concepts in a model
+  * @param {object[]}      concepts    List of concept objects with id
+  * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  deleteConcepts(concepts=[]) {
+    return this._update({action: 'overwrite', concepts});
+  }
+  /**
+  * Update a model's output config or concepts
+  * @param {object}               model                                 An object with any of the following attrs:
+  *   @param {string}               name                                  The new name of the model to update with
+  *   @param {boolean}              conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
+  *   @param {boolean}              closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
+  *   @param {object[]}             concepts                              An array of concept objects or string
+  *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
+  *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
+  *   @param {object[]}             action                                The action to perform on the given concepts. Possible values are 'merge', 'remove', or 'overwrite'. Default: 'merge'
+  */
+  update(obj) {
+    let url = `${this._config.apiEndpoint}${MODELS_PATH}`;
+    let modelData = [obj];
+    let data = {models: modelData.map(formatModel)};
+    if (data.concepts) {
+      data['action'] = obj.action || 'merge';
     }
-    let url = `${this._config.apiEndpoint}${replaceVars(MODEL_PATCH_PATH, [this.id])}`;
-    let concepts = conceptsData[0] instanceof Concepts?
-      conceptsData.toObject('id'):
-      conceptsData;
-    let data = {
-      'concepts': concepts,
-      'action': action
-    };
+
     return wrapToken(this._config, (headers)=> {
-      return axios.patch(url, data, {headers});
+      return new Promise((resolve, reject)=> {
+        axios.patch(url, data, {headers}).then((response)=> {
+          if (isSuccess(response)) {
+            resolve(new Model(this._config, response.data.models[0]));
+          } else {
+            reject(response);
+          }
+        }, reject);
+      });
     });
   }
   /**

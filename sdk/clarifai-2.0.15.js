@@ -1,7 +1,7 @@
 /**
- * Clarifai JavaScript SDK v2.0.14
+ * Clarifai JavaScript SDK v2.0.15
  *
- * Last updated: Mon Oct 31 2016 22:43:53 GMT-0400 (EDT)
+ * Last updated: Wed Nov 09 2016 18:57:27 GMT-0500 (EST)
  *
  * Visit https://developer.clarifai.com
  *
@@ -3504,7 +3504,7 @@ process.chdir = function (dir) {
 },{"1YiZ5S":23,"buffer":20}],24:[function(require,module,exports){
 module.exports={
   "name": "clarifai",
-  "version": "2.0.14",
+  "version": "2.0.15",
   "description": "Official Clarifai Javascript SDK",
   "main": "dist/index.js",
   "repository": "https://github.com/Clarifai/clarifai-javascript",
@@ -3710,7 +3710,7 @@ var Concept = function () {
     this.name = data.name;
     this.createdAt = data.created_at || data.createdAt;
     this.appId = data.app_id || data.appId;
-    this.value = null;
+    this.value = data.value || null;
     this._config = _config;
     this._rawData = data;
   }
@@ -3946,6 +3946,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var axios = require('axios');
+var Concepts = require('./Concepts');
 
 var _require = require('./constants');
 
@@ -3964,6 +3965,7 @@ var Input = function () {
     this.id = data.id;
     this.createdAt = data.created_at || data.createdAt;
     this.imageUrl = data.data.image.url;
+    this.concepts = new Concepts(_config, data.data.concepts);
     this.score = data.score;
     this._config = _config;
     this._rawData = data;
@@ -3985,37 +3987,64 @@ var Input = function () {
     *   @param {object}           concepts[].concept
     *     @param {string}           concepts[].concept.id        The concept id (required)
     *     @param {boolean}          concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+    * @param {object}           metadata                      Object with key values to attach to the input (optional)
     * @return {Promise(input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
     */
 
   }, {
     key: 'mergeConcepts',
-    value: function mergeConcepts(concepts) {
-      return this._update('merge_concepts', concepts);
+    value: function mergeConcepts(concepts, metadata) {
+      return this._update('merge', concepts, metadata);
     }
     /**
-    * Delete concept to an input
+    * Delete concept from an input
     * @param {object[]}         concepts    Object with keys explained below:
     *   @param {object}           concepts[].concept
     *     @param {string}           concepts[].concept.id        The concept id (required)
     *     @param {boolean}          concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+    * @param {object}           metadata                      Object with key values to attach to the input (optional)
     * @return {Promise(input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
     */
 
   }, {
     key: 'deleteConcepts',
-    value: function deleteConcepts(concepts) {
-      return this._update('delete_concepts', concepts);
+    value: function deleteConcepts(concepts, metadata) {
+      return this._update('remove', concepts, metadata);
+    }
+    /**
+    * Overwrite inputs
+    * @param {object[]}         concepts                      Array of object with keys explained below:
+    *   @param {object}           concepts[].concept
+    *     @param {string}           concepts[].concept.id         The concept id (required)
+    *     @param {boolean}          concepts[].concept.value      Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+    * @param {object}           metadata                      Object with key values to attach to the input (optional)
+    * @return {Promise(input, error)}                         A Promise that is fulfilled with an instance of Input or rejected with an error
+    */
+
+  }, {
+    key: 'overwriteConcepts',
+    value: function overwriteConcepts(concepts, metadata) {
+      return this._update('overwrite', concepts, metadata);
     }
   }, {
     key: '_update',
-    value: function _update(concepts) {
+    value: function _update(action) {
+      var concepts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+      var metadata = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
       var url = '' + this._config.apiEndpoint + INPUTS_PATH;
+      var inputData = {};
+      if (concepts.length) {
+        inputData.concepts = concepts;
+      }
+      if (metadata !== null) {
+        inputData.metadata = metadata;
+      }
       var data = {
         action: action,
         inputs: [{
           id: this.id,
-          data: { concepts: concepts }
+          data: inputData
         }]
       };
       return wrapToken(this._config, function (headers) {
@@ -4040,7 +4069,7 @@ var Input = function () {
 module.exports = Input;
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/Input.js","/")
-},{"./constants":32,"1YiZ5S":23,"axios":1,"buffer":20}],29:[function(require,module,exports){
+},{"./Concepts":27,"./constants":32,"1YiZ5S":23,"axios":1,"buffer":20}],29:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 'use strict';
 
@@ -4248,6 +4277,7 @@ var Inputs = function () {
     * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
     *   @param {object}           inputs[].input
     *     @param {string}           inputs[].input.id        The id of the input to update
+    *     @param {object}           inputs[].input.metadata                     Object with key values to attach to the input (optional)
     *     @param {string}           inputs[].input.concepts  Object with keys explained below:
     *       @param {object}           inputs[].input.concepts[].concept
     *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
@@ -4258,14 +4288,15 @@ var Inputs = function () {
   }, {
     key: 'mergeConcepts',
     value: function mergeConcepts(inputs) {
-      return this._update('merge_concepts', inputs);
+      return this._update('merge', inputs);
     }
     /**
     * Delete concepts to inputs in bulk
     * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
     *   @param {object}           inputs[].input
-    *     @param {string}           inputs[].input.id        The id of the input to update
-    *     @param {string}           inputs[].input.concepts  Object with keys explained below:
+    *     @param {string}           inputs[].input.id                           The id of the input to update
+    *     @param {object}           inputs[].input.metadata                     Object with key values to attach to the input (optional)
+    *     @param {string}           inputs[].input.concepts                     Object with keys explained below:
     *       @param {object}           inputs[].input.concepts[].concept
     *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
     *         @param {boolean}          inputs[].input.concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
@@ -4275,7 +4306,25 @@ var Inputs = function () {
   }, {
     key: 'deleteConcepts',
     value: function deleteConcepts(inputs) {
-      return this._update('delete_concepts', inputs);
+      return this._update('remove', inputs);
+    }
+    /**
+    * Overwrite inputs in bulk
+    * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
+    *   @param {object}           inputs[].input
+    *     @param {string}           inputs[].input.id                           The id of the input to update
+    *     @param {object}           inputs[].input.metadata                     Object with key values to attach to the input (optional)
+    *     @param {string}           inputs[].input.concepts                     Object with keys explained below:
+    *       @param {object}           inputs[].input.concepts[].concept
+    *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
+    *         @param {boolean}          inputs[].input.concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+    * @return {Promise(inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
+    */
+
+  }, {
+    key: 'overwriteConcepts',
+    value: function overwriteConcepts(inputs) {
+      return this._update('overwrite', inputs);
     }
   }, {
     key: '_update',
@@ -4407,7 +4456,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var axios = require('axios');
-var Concepts = require('./Concepts');
 
 var _require = require('./helpers');
 
@@ -4425,7 +4473,7 @@ var wrapToken = _require3.wrapToken;
 var formatImagePredict = _require3.formatImagePredict;
 var MODEL_VERSIONS_PATH = API.MODEL_VERSIONS_PATH;
 var MODEL_VERSION_PATH = API.MODEL_VERSION_PATH;
-var MODEL_PATCH_PATH = API.MODEL_PATCH_PATH;
+var MODELS_PATH = API.MODELS_PATH;
 var PREDICT_PATH = API.PREDICT_PATH;
 var VERSION_PREDICT_PATH = API.VERSION_PREDICT_PATH;
 var MODEL_INPUTS_PATH = API.MODEL_INPUTS_PATH;
@@ -4473,7 +4521,7 @@ var Model = function () {
       return this._rawData;
     }
     /**
-    * Merge concepts from a model
+    * Merge concepts to a model
     * @param {object[]}      concepts    List of concept objects with id
     * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
     */
@@ -4483,7 +4531,7 @@ var Model = function () {
     value: function mergeConcepts() {
       var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-      return this._update('merge_concepts', concepts);
+      return this._update({ action: 'merge', concepts: concepts });
     }
     /**
     * Remove concepts from a model
@@ -4496,22 +4544,55 @@ var Model = function () {
     value: function deleteConcepts() {
       var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-      return this._update('delete_concepts', concepts);
+      return this._update({ action: 'remove', concepts: concepts });
     }
+    /**
+    * Overwrite concepts in a model
+    * @param {object[]}      concepts    List of concept objects with id
+    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+    */
+
   }, {
-    key: '_update',
-    value: function _update(action, conceptsData) {
-      if (!Array.isArray(conceptsData)) {
-        conceptsData = [conceptsData];
+    key: 'deleteConcepts',
+    value: function deleteConcepts() {
+      var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+      return this._update({ action: 'overwrite', concepts: concepts });
+    }
+    /**
+    * Update a model's output config or concepts
+    * @param {object}               model                                 An object with any of the following attrs:
+    *   @param {string}               name                                  The new name of the model to update with
+    *   @param {boolean}              conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
+    *   @param {boolean}              closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
+    *   @param {object[]}             concepts                              An array of concept objects or string
+    *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
+    *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
+    *   @param {object[]}             action                                The action to perform on the given concepts. Possible values are 'merge', 'remove', or 'overwrite'. Default: 'merge'
+    */
+
+  }, {
+    key: 'update',
+    value: function update(obj) {
+      var _this = this;
+
+      var url = '' + this._config.apiEndpoint + MODELS_PATH;
+      var modelData = [obj];
+      var data = { models: modelData.map(formatModel) };
+      if (data.concepts) {
+        data['action'] = obj.action || 'merge';
       }
-      var url = '' + this._config.apiEndpoint + replaceVars(MODEL_PATCH_PATH, [this.id]);
-      var concepts = conceptsData[0] instanceof Concepts ? conceptsData.toObject('id') : conceptsData;
-      var data = {
-        'concepts': concepts,
-        'action': action
-      };
+
       return wrapToken(this._config, function (headers) {
-        return axios.patch(url, data, { headers: headers });
+        return new Promise(function (resolve, reject) {
+          axios.patch(url, data, { headers: headers }).then(function (response) {
+            if (isSuccess(response)) {
+              resolve(new Model(_this._config, response.data.models[0]));
+            } else {
+              reject(response);
+            }
+          }, reject);
+        });
       });
     }
     /**
@@ -4523,7 +4604,7 @@ var Model = function () {
   }, {
     key: 'train',
     value: function train(sync) {
-      var _this = this;
+      var _this2 = this;
 
       var url = '' + this._config.apiEndpoint + replaceVars(MODEL_VERSIONS_PATH, [this.id]);
       return wrapToken(this._config, function (headers) {
@@ -4531,9 +4612,9 @@ var Model = function () {
           axios.post(url, null, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
               if (sync) {
-                _this._pollTrain.bind(_this)(resolve, reject);
+                _this2._pollTrain.bind(_this2)(resolve, reject);
               } else {
-                resolve(new Model(_this._config, response.data.model));
+                resolve(new Model(_this2._config, response.data.model));
               }
             } else {
               reject(response);
@@ -4545,14 +4626,14 @@ var Model = function () {
   }, {
     key: '_pollTrain',
     value: function _pollTrain(resolve, reject) {
-      var _this2 = this;
+      var _this3 = this;
 
       clearTimeout(this.pollTimeout);
       this.getOutputInfo().then(function (model) {
         var modelStatusCode = model.modelVersion.status.code.toString();
         if (modelStatusCode === MODEL_QUEUED_FOR_TRAINING || modelStatusCode === MODEL_TRAINING) {
-          _this2.pollTimeout = setTimeout(function () {
-            return _this2._pollTrain(resolve, reject);
+          _this3.pollTimeout = setTimeout(function () {
+            return _this3._pollTrain(resolve, reject);
           }, POLLTIME);
         } else {
           resolve(model);
@@ -4629,13 +4710,13 @@ var Model = function () {
   }, {
     key: 'getOutputInfo',
     value: function getOutputInfo() {
-      var _this3 = this;
+      var _this4 = this;
 
       var url = '' + this._config.apiEndpoint + replaceVars(MODEL_OUTPUT_PATH, [this.id]);
       return wrapToken(this._config, function (headers) {
         return new Promise(function (resolve, reject) {
           axios.get(url, { headers: headers }).then(function (response) {
-            resolve(new Model(_this3._config, response.data.model));
+            resolve(new Model(_this4._config, response.data.model));
           }, reject);
         });
       });
@@ -4671,7 +4752,7 @@ var Model = function () {
 module.exports = Model;
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/Model.js","/")
-},{"./Concepts":27,"./constants":32,"./helpers":34,"./utils":35,"1YiZ5S":23,"axios":1,"buffer":20}],31:[function(require,module,exports){
+},{"./constants":32,"./helpers":34,"./utils":35,"1YiZ5S":23,"axios":1,"buffer":20}],31:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 'use strict';
 
@@ -4935,11 +5016,12 @@ var Models = function () {
     * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
     *   @param {string}               id                                    The id of the model to apply changes to (Required)
     *   @param {string}               name                                  The new name of the model to update with
-    *   @param {boolean}              conceptsMutuallyExclusive      Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
-    *   @param {boolean}              closedEnvironment              Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
+    *   @param {boolean}              conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
+    *   @param {boolean}              closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
     *   @param {object[]}             concepts                              An array of concept objects or string
     *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
     *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
+    *   @param {object[]}             action                                The action to perform on the given concepts. Possible values are 'merge', 'remove', or 'overwrite'. Default: 'merge'
     */
 
   }, {
@@ -4952,9 +5034,10 @@ var Models = function () {
       if (checkType(/Object/, obj)) {
         models = [obj];
       }
-      var data = {
-        models: models.map(formatModel)
-      };
+      var data = { models: models.map(formatModel) };
+      if (obj.concepts) {
+        data['action'] = obj.action || 'merge';
+      }
 
       return wrapToken(this._config, function (headers) {
         return new Promise(function (resolve, reject) {
@@ -4967,6 +5050,66 @@ var Models = function () {
           }, reject);
         });
       });
+    }
+    /**
+    * Update model by merging concepts
+    * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
+    *   @param {string}               id                                    The id of the model to apply changes to (Required)
+    *   @param {string}               name                                  The new name of the model to update with
+    *   @param {boolean}              conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
+    *   @param {boolean}              closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
+    *   @param {object[]}             concepts                              An array of concept objects or string
+    *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
+    *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
+    */
+
+  }, {
+    key: 'mergeConcepts',
+    value: function mergeConcepts() {
+      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      data.action = 'merge';
+      return this.update(data);
+    }
+    /**
+    * Update model by removing concepts
+    * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
+    *   @param {string}               id                                    The id of the model to apply changes to (Required)
+    *   @param {string}               name                                  The new name of the model to update with
+    *   @param {boolean}              conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
+    *   @param {boolean}              closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
+    *   @param {object[]}             concepts                              An array of concept objects or string
+    *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
+    *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
+    */
+
+  }, {
+    key: 'deleteConcepts',
+    value: function deleteConcepts() {
+      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      data.action = 'remove';
+      return this.update(data);
+    }
+    /**
+    * Update model by overwriting concepts
+    * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
+    *   @param {string}               id                                    The id of the model to apply changes to (Required)
+    *   @param {string}               name                                  The new name of the model to update with
+    *   @param {boolean}              conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
+    *   @param {boolean}              closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
+    *   @param {object[]}             concepts                              An array of concept objects or string
+    *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
+    *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
+    */
+
+  }, {
+    key: 'overwriteConcepts',
+    value: function overwriteConcepts() {
+      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      data.action = 'overwrite';
+      return this.update(data);
     }
     /**
      * Deletes all models or a model (if given id) or a model version (if given id and verion id)
@@ -5091,7 +5234,7 @@ module.exports = global.Clarifai = {
   BLUR: 'ddd9d34872ab32be9f0e3b2b98a87be2'
 };
 
-}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_aa8fbed5.js","/")
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_bfe7de0f.js","/")
 },{"./App":25,"1YiZ5S":23,"buffer":20}],34:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 'use strict';
@@ -5153,8 +5296,13 @@ module.exports = {
       }, reject);
     });
   },
-  formatModel: function formatModel(data) {
+  formatModel: function formatModel() {
+    var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
     var formatted = {};
+    if (data.id === null || data.id === undefined) {
+      throw new Error('Model id is required');
+    }
     formatted.id = data.id;
     if (data.name) {
       formatted.name = data.name;

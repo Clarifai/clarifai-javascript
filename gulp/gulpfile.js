@@ -226,7 +226,6 @@ gulp.task('test', function() {
 // deploy to the S3 bucket set in aws.json
 gulp.task(
   'deploy',
-  tasks,
   publish
 );
 
