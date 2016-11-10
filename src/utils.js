@@ -15,8 +15,11 @@ module.exports = {
       }, reject);
     });
   },
-  formatModel: (data)=> {
+  formatModel: (data={})=> {
     let formatted = {};
+    if (data.id === null || data.id === undefined) {
+      throw new Error('Model id is required');
+    }
     formatted.id = data.id;
     if (data.name) {
       formatted.name = data.name;

@@ -5,7 +5,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var axios = require('axios');
-var Concepts = require('./Concepts');
 
 var _require = require('./helpers');
 
@@ -23,7 +22,7 @@ var wrapToken = _require3.wrapToken;
 var formatImagePredict = _require3.formatImagePredict;
 var MODEL_VERSIONS_PATH = API.MODEL_VERSIONS_PATH;
 var MODEL_VERSION_PATH = API.MODEL_VERSION_PATH;
-var MODEL_PATCH_PATH = API.MODEL_PATCH_PATH;
+var MODELS_PATH = API.MODELS_PATH;
 var PREDICT_PATH = API.PREDICT_PATH;
 var VERSION_PREDICT_PATH = API.VERSION_PREDICT_PATH;
 var MODEL_INPUTS_PATH = API.MODEL_INPUTS_PATH;
@@ -71,7 +70,7 @@ var Model = function () {
       return this._rawData;
     }
     /**
-    * Merge concepts from a model
+    * Merge concepts to a model
     * @param {object[]}      concepts    List of concept objects with id
     * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
     */
@@ -81,7 +80,7 @@ var Model = function () {
     value: function mergeConcepts() {
       var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-      return this._update('merge_concepts', concepts);
+      return this._update({ action: 'merge', concepts: concepts });
     }
     /**
     * Remove concepts from a model
@@ -94,22 +93,55 @@ var Model = function () {
     value: function deleteConcepts() {
       var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-      return this._update('delete_concepts', concepts);
+      return this._update({ action: 'remove', concepts: concepts });
     }
+    /**
+    * Overwrite concepts in a model
+    * @param {object[]}      concepts    List of concept objects with id
+    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+    */
+
   }, {
-    key: '_update',
-    value: function _update(action, conceptsData) {
-      if (!Array.isArray(conceptsData)) {
-        conceptsData = [conceptsData];
+    key: 'deleteConcepts',
+    value: function deleteConcepts() {
+      var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+      return this._update({ action: 'overwrite', concepts: concepts });
+    }
+    /**
+    * Update a model's output config or concepts
+    * @param {object}               model                                 An object with any of the following attrs:
+    *   @param {string}               name                                  The new name of the model to update with
+    *   @param {boolean}              conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
+    *   @param {boolean}              closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
+    *   @param {object[]}             concepts                              An array of concept objects or string
+    *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
+    *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
+    *   @param {object[]}             action                                The action to perform on the given concepts. Possible values are 'merge', 'remove', or 'overwrite'. Default: 'merge'
+    */
+
+  }, {
+    key: 'update',
+    value: function update(obj) {
+      var _this = this;
+
+      var url = '' + this._config.apiEndpoint + MODELS_PATH;
+      var modelData = [obj];
+      var data = { models: modelData.map(formatModel) };
+      if (data.concepts) {
+        data['action'] = obj.action || 'merge';
       }
-      var url = '' + this._config.apiEndpoint + replaceVars(MODEL_PATCH_PATH, [this.id]);
-      var concepts = conceptsData[0] instanceof Concepts ? conceptsData.toObject('id') : conceptsData;
-      var data = {
-        'concepts': concepts,
-        'action': action
-      };
+
       return wrapToken(this._config, function (headers) {
-        return axios.patch(url, data, { headers: headers });
+        return new Promise(function (resolve, reject) {
+          axios.patch(url, data, { headers: headers }).then(function (response) {
+            if (isSuccess(response)) {
+              resolve(new Model(_this._config, response.data.models[0]));
+            } else {
+              reject(response);
+            }
+          }, reject);
+        });
       });
     }
     /**
@@ -121,7 +153,7 @@ var Model = function () {
   }, {
     key: 'train',
     value: function train(sync) {
-      var _this = this;
+      var _this2 = this;
 
       var url = '' + this._config.apiEndpoint + replaceVars(MODEL_VERSIONS_PATH, [this.id]);
       return wrapToken(this._config, function (headers) {
@@ -129,9 +161,9 @@ var Model = function () {
           axios.post(url, null, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
               if (sync) {
-                _this._pollTrain.bind(_this)(resolve, reject);
+                _this2._pollTrain.bind(_this2)(resolve, reject);
               } else {
-                resolve(new Model(_this._config, response.data.model));
+                resolve(new Model(_this2._config, response.data.model));
               }
             } else {
               reject(response);
@@ -143,14 +175,14 @@ var Model = function () {
   }, {
     key: '_pollTrain',
     value: function _pollTrain(resolve, reject) {
-      var _this2 = this;
+      var _this3 = this;
 
       clearTimeout(this.pollTimeout);
       this.getOutputInfo().then(function (model) {
         var modelStatusCode = model.modelVersion.status.code.toString();
         if (modelStatusCode === MODEL_QUEUED_FOR_TRAINING || modelStatusCode === MODEL_TRAINING) {
-          _this2.pollTimeout = setTimeout(function () {
-            return _this2._pollTrain(resolve, reject);
+          _this3.pollTimeout = setTimeout(function () {
+            return _this3._pollTrain(resolve, reject);
           }, POLLTIME);
         } else {
           resolve(model);
@@ -227,13 +259,13 @@ var Model = function () {
   }, {
     key: 'getOutputInfo',
     value: function getOutputInfo() {
-      var _this3 = this;
+      var _this4 = this;
 
       var url = '' + this._config.apiEndpoint + replaceVars(MODEL_OUTPUT_PATH, [this.id]);
       return wrapToken(this._config, function (headers) {
         return new Promise(function (resolve, reject) {
           axios.get(url, { headers: headers }).then(function (response) {
-            resolve(new Model(_this3._config, response.data.model));
+            resolve(new Model(_this4._config, response.data.model));
           }, reject);
         });
       });

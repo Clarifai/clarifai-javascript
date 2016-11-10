@@ -29,8 +29,13 @@ module.exports = {
       }, reject);
     });
   },
-  formatModel: function formatModel(data) {
+  formatModel: function formatModel() {
+    var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
     var formatted = {};
+    if (data.id === null || data.id === undefined) {
+      throw new Error('Model id is required');
+    }
     formatted.id = data.id;
     if (data.name) {
       formatted.name = data.name;

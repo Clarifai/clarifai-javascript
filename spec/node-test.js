@@ -294,7 +294,7 @@ describe('Clarifai JS SDK', function() {
         );
       });
 
-      it('Updates an input', function(done) {
+      it('Updates an input by merging concepts', function(done) {
         app.inputs.mergeConcepts([
           {
             id: inputId,
@@ -311,6 +311,68 @@ describe('Clarifai JS SDK', function() {
             expect(inputs[0].createdAt).toBeDefined();
             expect(inputs[0].id).toBeDefined();
             expect(inputs[0].toObject().data).toBeDefined();
+            done();
+          },
+          errorHandler.bind(done)
+        );
+      });
+
+      it('Updates an input by overwriting concepts', function(done) {
+        app.inputs.overwriteConcepts([
+          {
+            id: inputId,
+            concepts: [
+              { "id":"train", "value": false },
+              { "id":"car", "value": true },
+              { "id":"car2", "value": false },
+              { "id":"car3", "value": false }
+            ]
+          }
+        ]).then(
+          function(inputs) {
+            expect(inputs).toBeDefined();
+            expect(inputs.length).toBe(1);
+            expect(inputs instanceof Inputs).toBe(true);
+            expect(inputs[0].concepts.length).toBe(4);
+            for (var i = 0; i < inputs[0].concepts; i++) {
+              switch (inputs[0].concepts[i].name) {
+                case "train":
+                  expect(inputs[0].concepts[i].value).toBe(0);
+                  break;
+                case "car":
+                  expect(inputs[0].concepts[i].value).toBe(1);
+                  break;
+                case "car2":
+                  expect(inputs[0].concepts[i].value).toBe(0);
+                  break;
+                case "car3":
+                  expect(inputs[0].concepts[i].value).toBe(0);
+                  break;
+              }
+            }
+            done();
+          },
+          errorHandler.bind(done)
+        );
+      });
+
+      it('Updates an input by deleting concepts', function(done) {
+        app.inputs.deleteConcepts([
+          {
+            id: inputId,
+            concepts: [
+              { "id":"train" },
+              { "id":"car" },
+              { "id":"car2" },
+              { "id":"car3" }
+            ]
+          }
+        ]).then(
+          function(inputs) {
+            expect(inputs).toBeDefined();
+            expect(inputs.length).toBe(1);
+            expect(inputs instanceof Inputs).toBe(true);
+            expect(inputs[0].concepts.length).toBe(0);
             done();
           },
           errorHandler.bind(done)
@@ -488,9 +550,90 @@ describe('Clarifai JS SDK', function() {
               expect(model.outputInfo).toBeDefined();
               expect(model.outputInfo.data.concepts).toBeDefined();
               expect(model.outputInfo.data.concepts.length).toBe(conceptsIds.length);
-              expect(model.outputInfo.data.concepts[0].id).toBe(conceptsIds[0]);
-              expect(model.outputInfo.data.concepts[1].id).toBe(conceptsIds[1]);
-              expect(model.outputInfo.data.concepts[2].id).toBe(conceptsIds[2]);
+              var conceptsIdsCopy = conceptsIds.slice(0);
+              var totalFound = 0;
+              for (var i = 0; i < model.outputInfo.data.concepts.length; i++) {
+                var currConcept = model.outputInfo.data.concepts[i];
+                var pos = conceptsIdsCopy.indexOf(currConcept.id);
+                if (pos > -1) {
+                  totalFound++;
+                  conceptsIdsCopy.splice(pos, 1)
+                }
+              }
+              expect(totalFound).toBe(conceptsIds.length);
+              done();
+            },
+            errorHandler.bind(done)
+          );
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Updates model by merging concepts', function(done) {
+      var testConcepts = ['random-concept-1', 'random-concept-2'];
+      app.models.mergeConcepts({
+        id: testModel.id,
+        concepts: testConcepts
+      }).then(
+        function(models) {
+          models[0].getOutputInfo().then(
+            function(model) {
+              expect(model.outputInfo).toBeDefined();
+              expect(model.outputInfo.data.concepts.length).toBe(conceptsIds.length + testConcepts.length);
+              var conceptsCopy = Array.from(model.outputInfo.data.concepts).map(function(el) { return el.id; });
+              var totalFound = 0;
+              for (var i = 0; i < testConcepts.length; i++) {
+                var pos = conceptsCopy.indexOf(testConcepts[i]);
+                if (pos > -1) {
+                  totalFound++;
+                  conceptsCopy.splice(pos, 1);
+                }
+              }
+              expect(totalFound).toBe(2);
+              done();
+            },
+            errorHandler.bind(done)
+          );
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Updates model by overwriting concepts', function(done) {
+      var testConcepts = ['random-concept-1', 'random-concept-3', 'random-concept-4'];
+      app.models.overwriteConcepts({
+        id: testModel.id,
+        concepts: testConcepts
+      }).then(
+        function(models) {
+          models[0].getOutputInfo().then(
+            function(model) {
+              expect(model.outputInfo).toBeDefined();
+              expect(model.outputInfo.data.concepts.length).toBe(testConcepts.length);
+              done();
+            },
+            errorHandler.bind(done)
+          );
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Updates model by deleting concepts', function(done) {
+      app.models.deleteConcepts({
+        id: testModel.id,
+        concepts: [
+          'random-concept-1',
+          'random-concept-2',
+          'random-concept-3',
+          'random-concept-4'
+        ]
+      }).then(
+        function(models) {
+          models[0].getOutputInfo().then(
+            function(model) {
+              expect(model.outputInfo.data).toBeUndefined();
               done();
             },
             errorHandler.bind(done)
