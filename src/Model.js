@@ -1,6 +1,6 @@
 let axios = require('axios');
 let {isSuccess, checkType} = require('./helpers');
-let {API, replaceVars} = require('./constants');
+let {API, SYNC_TIMEOUT, replaceVars} = require('./constants');
 let {wrapToken, formatImagePredict} = require('./utils');
 let {
   MODEL_VERSIONS_PATH,
@@ -66,7 +66,7 @@ class Model {
   * @param {object[]}      concepts    List of concept objects with id
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
-  deleteConcepts(concepts=[]) {
+  overwriteConcepts(concepts=[]) {
     return this._update({action: 'overwrite', concepts});
   }
   /**
@@ -112,7 +112,8 @@ class Model {
         axios.post(url, null, {headers}).then((response)=> {
           if (isSuccess(response)) {
             if (sync) {
-              this._pollTrain.bind(this)(resolve, reject);
+              let timeStart = Date.now();
+              this._pollTrain.bind(this)(timeStart, resolve, reject);
             } else {
               resolve(new Model(this._config, response.data.model));
             }
@@ -123,12 +124,18 @@ class Model {
       });
     });
   }
-  _pollTrain(resolve, reject) {
+  _pollTrain(timeStart, resolve, reject) {
     clearTimeout(this.pollTimeout);
+    if ((Date.now() - timeStart) >= SYNC_TIMEOUT) {
+      return reject({
+        status: 'Error',
+        message: 'Sync call timed out'
+      });
+    }
     this.getOutputInfo().then((model)=> {
       let modelStatusCode = model.modelVersion.status.code.toString();
       if (modelStatusCode === MODEL_QUEUED_FOR_TRAINING || modelStatusCode === MODEL_TRAINING) {
-        this.pollTimeout = setTimeout(()=> this._pollTrain(resolve, reject), POLLTIME);
+        this.pollTimeout = setTimeout(()=> this._pollTrain(timeStart, resolve, reject), POLLTIME);
       } else {
         resolve(model);
       }

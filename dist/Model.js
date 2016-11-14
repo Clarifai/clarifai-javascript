@@ -14,6 +14,7 @@ var checkType = _require.checkType;
 var _require2 = require('./constants');
 
 var API = _require2.API;
+var SYNC_TIMEOUT = _require2.SYNC_TIMEOUT;
 var replaceVars = _require2.replaceVars;
 
 var _require3 = require('./utils');
@@ -102,8 +103,8 @@ var Model = function () {
     */
 
   }, {
-    key: 'deleteConcepts',
-    value: function deleteConcepts() {
+    key: 'overwriteConcepts',
+    value: function overwriteConcepts() {
       var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
       return this._update({ action: 'overwrite', concepts: concepts });
@@ -161,7 +162,8 @@ var Model = function () {
           axios.post(url, null, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
               if (sync) {
-                _this2._pollTrain.bind(_this2)(resolve, reject);
+                var timeStart = Date.now();
+                _this2._pollTrain.bind(_this2)(timeStart, resolve, reject);
               } else {
                 resolve(new Model(_this2._config, response.data.model));
               }
@@ -174,15 +176,21 @@ var Model = function () {
     }
   }, {
     key: '_pollTrain',
-    value: function _pollTrain(resolve, reject) {
+    value: function _pollTrain(timeStart, resolve, reject) {
       var _this3 = this;
 
       clearTimeout(this.pollTimeout);
+      if (Date.now() - timeStart >= SYNC_TIMEOUT) {
+        return reject({
+          status: 'Error',
+          message: 'Sync call timed out'
+        });
+      }
       this.getOutputInfo().then(function (model) {
         var modelStatusCode = model.modelVersion.status.code.toString();
         if (modelStatusCode === MODEL_QUEUED_FOR_TRAINING || modelStatusCode === MODEL_TRAINING) {
           _this3.pollTimeout = setTimeout(function () {
-            return _this3._pollTrain(resolve, reject);
+            return _this3._pollTrain(timeStart, resolve, reject);
           }, POLLTIME);
         } else {
           resolve(model);
