@@ -1,7 +1,7 @@
 /**
- * Clarifai JavaScript SDK v2.0.15
+ * Clarifai JavaScript SDK v2.0.16
  *
- * Last updated: Wed Nov 09 2016 18:57:27 GMT-0500 (EST)
+ * Last updated: Mon Nov 14 2016 13:00:53 GMT-0500 (EST)
  *
  * Visit https://developer.clarifai.com
  *
@@ -3504,7 +3504,7 @@ process.chdir = function (dir) {
 },{"1YiZ5S":23,"buffer":20}],24:[function(require,module,exports){
 module.exports={
   "name": "clarifai",
-  "version": "2.0.15",
+  "version": "2.0.16",
   "description": "Official Clarifai Javascript SDK",
   "main": "dist/index.js",
   "repository": "https://github.com/Clarifai/clarifai-javascript",
@@ -4465,6 +4465,7 @@ var checkType = _require.checkType;
 var _require2 = require('./constants');
 
 var API = _require2.API;
+var SYNC_TIMEOUT = _require2.SYNC_TIMEOUT;
 var replaceVars = _require2.replaceVars;
 
 var _require3 = require('./utils');
@@ -4553,8 +4554,8 @@ var Model = function () {
     */
 
   }, {
-    key: 'deleteConcepts',
-    value: function deleteConcepts() {
+    key: 'overwriteConcepts',
+    value: function overwriteConcepts() {
       var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
       return this._update({ action: 'overwrite', concepts: concepts });
@@ -4612,7 +4613,8 @@ var Model = function () {
           axios.post(url, null, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
               if (sync) {
-                _this2._pollTrain.bind(_this2)(resolve, reject);
+                var timeStart = Date.now();
+                _this2._pollTrain.bind(_this2)(timeStart, resolve, reject);
               } else {
                 resolve(new Model(_this2._config, response.data.model));
               }
@@ -4625,15 +4627,21 @@ var Model = function () {
     }
   }, {
     key: '_pollTrain',
-    value: function _pollTrain(resolve, reject) {
+    value: function _pollTrain(timeStart, resolve, reject) {
       var _this3 = this;
 
       clearTimeout(this.pollTimeout);
+      if (Date.now() - timeStart >= SYNC_TIMEOUT) {
+        return reject({
+          status: 'Error',
+          message: 'Sync call timed out'
+        });
+      }
       this.getOutputInfo().then(function (model) {
         var modelStatusCode = model.modelVersion.status.code.toString();
         if (modelStatusCode === MODEL_QUEUED_FOR_TRAINING || modelStatusCode === MODEL_TRAINING) {
           _this3.pollTimeout = setTimeout(function () {
-            return _this3._pollTrain(resolve, reject);
+            return _this3._pollTrain(timeStart, resolve, reject);
           }, POLLTIME);
         } else {
           resolve(model);
@@ -5212,7 +5220,8 @@ module.exports = {
     });
     return newPath;
   },
-  URL_REGEX: /^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i
+  URL_REGEX: /^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i,
+  SYNC_TIMEOUT: 60000
 };
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/constants.js","/")
@@ -5234,7 +5243,7 @@ module.exports = global.Clarifai = {
   BLUR: 'ddd9d34872ab32be9f0e3b2b98a87be2'
 };
 
-}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_bfe7de0f.js","/")
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_bcf720f0.js","/")
 },{"./App":25,"1YiZ5S":23,"buffer":20}],34:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 'use strict';

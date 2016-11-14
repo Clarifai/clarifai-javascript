@@ -83,6 +83,10 @@ gulp.task('browserify', ['cleanbuild'], function() {
     }))
     .pipe(insert.prepend(BROWSER_HEADER))
     .pipe(gulp.dest('./../sdk'))
+    .pipe(rename(function (path) {
+      path.basename = 'clarifai-latest';
+    }))
+    .pipe(gulp.dest('./../sdk'))
     .pipe(uglify())
     .pipe(rename(function (path) {
       path.basename = 'clarifai-' + VERSION + '.min';
