@@ -7,7 +7,7 @@
   "author": "Clarifai Inc.",
   "license": "Apache-2.0",
   "scripts": {
-    "jsdoc": "jsdoc src/* -t node_modules/minami -d docs/$npm_package_version"
+    "jsdoc": "jsdoc src/* -t node_modules/minami -d docs/$npm_package_version && jsdoc src/* -t node_modules/minami -d docs/latest"
   },
   "dependencies": {
     "axios": "0.11.1",
