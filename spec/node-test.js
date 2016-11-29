@@ -4,9 +4,15 @@ var Models = require('./../src/Models');
 var Inputs = require('./../src/Inputs');
 var imageBytes = require('./image-bytes');
 
-var sampleImage = 'https://samples.clarifai.com/metro-north.jpg';
-var sampleImage2 = 'https://samples.clarifai.com/wedding.jpg';
-var sampleImage3 = 'https://samples.clarifai.com/cookies.jpeg';
+var sampleImage  = 'https://s3.amazonaws.com/samples.clarifai.com/metro-north.jpg';
+var sampleImage2 = 'https://s3.amazonaws.com/samples.clarifai.com/wedding.jpg';
+var sampleImage3 = 'https://s3.amazonaws.com/samples.clarifai.com/cookies.jpeg';
+var sampleImage4 = 'https://s3.amazonaws.com/samples.clarifai.com/beer.jpeg';
+var sampleImage5 = 'https://s3.amazonaws.com/samples.clarifai.com/dog.tiff';
+var sampleImage6 = 'https://s3.amazonaws.com/samples.clarifai.com/red-car-1.png';
+var sampleImage7 = 'https://s3.amazonaws.com/samples.clarifai.com/red-car-2.jpeg';
+var sampleImage8 = 'https://s3.amazonaws.com/samples.clarifai.com/red-truck.png';
+var sampleImage9 = 'https://s3.amazonaws.com/samples.clarifai.com/black-car.jpg';
 var inputsIDs = [];
 var conceptsIds;
 var app;
@@ -100,7 +106,7 @@ describe('Clarifai JS SDK', function() {
       it('Adds an input', function(done) {
         app.inputs.create([
           {
-            url: "https://samples.clarifai.com/metro-north.jpg",
+            url: sampleImage,
             allowDuplicateUrl: true
           }
         ]).then(
@@ -121,7 +127,7 @@ describe('Clarifai JS SDK', function() {
       it('Adds an input with concepts', function(done) {
         app.inputs.create([
           {
-            url: "https://samples.clarifai.com/metro-north.jpg",
+            url: sampleImage,
             allowDuplicateUrl: true,
             concepts: [
               {
@@ -152,14 +158,14 @@ describe('Clarifai JS SDK', function() {
         app.inputs.create([
           {
             id: inputId1,
-            url: "https://s3.amazonaws.com/samples.clarifai.com/beer.jpeg",
+            url: sampleImage4,
             allowDuplicateUrl: true,
             concepts: [{ id: beerId }],
             metadata: { foo: 'bar', baz: 'blah' }
           },
           {
             id: inputId2,
-            url: "https://s3.amazonaws.com/samples.clarifai.com/beer.jpeg",
+            url: sampleImage4,
             allowDuplicateUrl: true,
             concepts: [{ id: beerId }],
             metadata: { foo: 'baz', baz: 'blah' }
@@ -182,11 +188,11 @@ describe('Clarifai JS SDK', function() {
       it('Bulk adds inputs', function(done) {
         app.inputs.create([
           {
-            url: "https://samples.clarifai.com/metro-north.jpg",
+            url: sampleImage,
             allowDuplicateUrl: true
           },
           {
-            url: "https://samples.clarifai.com/dog.tiff",
+            url: sampleImage5,
             allowDuplicateUrl: true
           }
         ]).then(
@@ -206,7 +212,7 @@ describe('Clarifai JS SDK', function() {
       it('Bulk adds inputs with concepts', function(done) {
         app.inputs.create([
           {
-            url: "http://i.imgur.com/HEoT5xR.png",
+            url: sampleImage6,
             allowDuplicateUrl: true,
             concepts: [
               {
@@ -219,7 +225,7 @@ describe('Clarifai JS SDK', function() {
             ]
           },
           {
-            url: "http://i.imgur.com/It5JRaj.jpg",
+            url: sampleImage7,
             allowDuplicateUrl: true,
             concepts: [
               {
@@ -468,10 +474,10 @@ describe('Clarifai JS SDK', function() {
     it('Call predict on models collection given a model id', function(done) {
       app.models.predict(Clarifai.GENERAL_MODEL, [
         {
-          'url': 'http://www.ramtrucks.com/assets/towing_guide/images/before_you_buy/truck.png'
+          'url': sampleImage8
         },
         {
-          'url': 'http://www.planwallpaper.com/static/images/ferrari-9.jpg'
+          'url': sampleImage9
         }
       ]).then(
         function(response) {
@@ -495,10 +501,10 @@ describe('Clarifai JS SDK', function() {
       app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
         generalModel.predict([
           {
-            'url': 'http://www.ramtrucks.com/assets/towing_guide/images/before_you_buy/truck.png'
+            'url': sampleImage8
           },
           {
-            'url': 'http://www.planwallpaper.com/static/images/ferrari-9.jpg'
+            'url': sampleImage9
           }
         ]).then(
           function(response) {
@@ -649,7 +655,7 @@ describe('Clarifai JS SDK', function() {
     it('Filter by images/inputs only', function(done) {
       app.inputs.search([
         {
-          'url': 'https://samples.clarifai.com/metro-north.jpg'
+          'url': sampleImage
         }
       ]).then(
         function(inputs) {
@@ -664,10 +670,10 @@ describe('Clarifai JS SDK', function() {
     it('Filter by concepts/inputs only', function(done) {
       app.inputs.search([
         {
-          'url': 'https://samples.clarifai.com/metro-north.jpg'
+          'url': sampleImage
         },
         {
-          "url": "https://samples.clarifai.com/dog.tiff",
+          "url": sampleImage5,
         }
       ]).then(
         function(inputs) {
@@ -682,7 +688,7 @@ describe('Clarifai JS SDK', function() {
     it('Filter by images and concepts', function(done) {
       app.inputs.search([
         {
-          'url': 'https://samples.clarifai.com/metro-north.jpg'
+          'url': sampleImage
         },
         {
           'name': ferrariId
@@ -715,7 +721,7 @@ describe('Clarifai JS SDK', function() {
     it('Filter with metadata and image url', function(done) {
       app.inputs.search([
         {
-          'url': "https://s3.amazonaws.com/samples.clarifai.com/beer.jpeg",
+          'url': sampleImage4,
           'metadata': {
             'foo': 'bar'
           }
@@ -749,6 +755,19 @@ describe('Clarifai JS SDK', function() {
 
     it('Allows you to delete all inputs', function(done) {
       app.inputs.delete().then(
+        function(response) {
+          var data = response.data;
+          expect(data.status).toBeDefined();
+          expect(data.status.code).toBe(10000);
+          expect(data.status.description).toBe('Ok');
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Allows you to delete all models', function(done) {
+      app.models.delete(null, null).then(
         function(response) {
           var data = response.data;
           expect(data.status).toBeDefined();
