@@ -421,22 +421,6 @@ describe('Clarifai JS SDK', function() {
       done();
     });
 
-
-    it('Creates a new model version', function(done) {
-      testModel.train().then(
-        function(model) {
-          expect(model).toBeDefined();
-          expect(model.modelVersion).toBeDefined();
-          expect(model.toObject()).toBeDefined();
-          var version = model.modelVersion;
-          expect(version.id).toBeDefined();
-          expect(version.created_at).toBeDefined();
-          done();
-        },
-        errorHandler.bind(done)
-      );
-    });
-
     it('Creates a new model version and returns after it has finished', function(done) {
       testModel.train(true).then(
         function(model) {
