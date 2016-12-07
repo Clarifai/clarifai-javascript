@@ -11,5 +11,6 @@ module.exports = global.Clarifai = {
   WEDDINGS_MODEL: 'c386b7a870114f4a87477c0824499348',
   COLOR_MODEL: 'eeed0b6733a644cea07cf4c60f87ebb7',
   CLUSTER_MODEL: 'cccbe437d6e54e2bb911c6aa292fb072',
+  FACE_DETECT_MODEL: 'a403429f2ddf4b49b307e318f00e528b',
   BLUR: 'ddd9d34872ab32be9f0e3b2b98a87be2'
 };
