@@ -1,7 +1,7 @@
 /**
- * Clarifai JavaScript SDK v2.0.16
+ * Clarifai JavaScript SDK v2.0.17
  *
- * Last updated: Mon Nov 14 2016 13:00:53 GMT-0500 (EST)
+ * Last updated: Tue Dec 06 2016 17:19:35 GMT-0500 (EST)
  *
  * Visit https://developer.clarifai.com
  *
@@ -3504,14 +3504,14 @@ process.chdir = function (dir) {
 },{"1YiZ5S":23,"buffer":20}],24:[function(require,module,exports){
 module.exports={
   "name": "clarifai",
-  "version": "2.0.16",
+  "version": "2.0.17",
   "description": "Official Clarifai Javascript SDK",
   "main": "dist/index.js",
   "repository": "https://github.com/Clarifai/clarifai-javascript",
   "author": "Clarifai Inc.",
   "license": "Apache-2.0",
   "scripts": {
-    "jsdoc": "jsdoc src/* -t node_modules/minami -d docs/$npm_package_version"
+    "jsdoc": "jsdoc src/* -t node_modules/minami -d docs/$npm_package_version && jsdoc src/* -t node_modules/minami -d docs/latest"
   },
   "dependencies": {
     "axios": "0.11.1",
@@ -5240,10 +5240,11 @@ module.exports = global.Clarifai = {
   WEDDINGS_MODEL: 'c386b7a870114f4a87477c0824499348',
   COLOR_MODEL: 'eeed0b6733a644cea07cf4c60f87ebb7',
   CLUSTER_MODEL: 'cccbe437d6e54e2bb911c6aa292fb072',
+  FACE_DETECT_MODEL: 'a403429f2ddf4b49b307e318f00e528b',
   BLUR: 'ddd9d34872ab32be9f0e3b2b98a87be2'
 };
 
-}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_bcf720f0.js","/")
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_dae6be34.js","/")
 },{"./App":25,"1YiZ5S":23,"buffer":20}],34:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 'use strict';
