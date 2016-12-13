@@ -208,9 +208,7 @@ class Models {
       models = [obj];
     }
     let data = {models: models.map(formatModel)};
-    if (obj.concepts) {
-      data['action'] = obj.action || 'merge';
-    }
+    data['action'] = obj.action || 'merge';
 
     return wrapToken(this._config, (headers)=> {
       return new Promise((resolve, reject)=> {
@@ -270,23 +268,49 @@ class Models {
     return this.update(data);
   }
   /**
-   * Deletes all models or a model (if given id) or a model version (if given id and verion id)
-   * @param {String}     id          The model's id
-   * @param {String}     versionId   The model's version id
+   * Deletes all models (if no ids and versionId given) or a model (if given id) or a model version (if given id and verion id)
+   * @param {String|String[]}      ids         Can be a single string or an array of strings representing the model ids
+   * @param {String}                versionId   The model's version id
    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
    */
-  delete(id, versionId) {
-    let url;
-    if (id) {
-      url = `${this._config.apiEndpoint}${replaceVars(MODEL_PATH, [id])}`;
-    } else if (versionId) {
-      url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSION_PATH, [id, versionId])}`;
+  delete(ids, versionId=null) {
+    let request, url, data;
+    let id = ids;
+
+    if (checkType(/String/, ids) || (checkType(/Array/, ids) && ids.length === 1 )) {
+      if (versionId) {
+        url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSION_PATH, [id, versionId])}`;
+      } else {
+        url = `${this._config.apiEndpoint}${replaceVars(MODEL_PATH, [id])}`;
+      }
+      request = wrapToken(this._config, (headers)=> {
+        return axios.delete(url, {headers});
+      });
     } else {
-      url = `${this._config.apiEndpoint}${MODELS_PATH}`;
+      if (!ids && !versionId) {
+        url = `${this._config.apiEndpoint}${MODELS_PATH}`;
+        data = {'delete_all': true};
+      } else if (!versionId && ids.length > 1) {
+        url = `${this._config.apiEndpoint}${MODELS_PATH}`;
+        data = {ids};
+      } else {
+        throw new Error(`Wrong arguments passed. You can only delete all
+models (provide no arguments), delete select
+models (provide list of ids), delete a single
+model (providing a single id) or delete a model
+version (provide a single id and version id)`);
+      }
+      request = wrapToken(this._config, (headers)=> {
+        return axios({
+          method: 'delete',
+          url,
+          data,
+          headers
+        });
+      });
     }
-    return wrapToken(this._config, (headers)=> {
-      return axios.delete(url, {headers});
-    });
+
+    return request;
   }
   /**
    * Search for models by name or type
