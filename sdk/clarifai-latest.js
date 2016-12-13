@@ -1,7 +1,7 @@
 /**
- * Clarifai JavaScript SDK v2.0.17
+ * Clarifai JavaScript SDK v2.0.18
  *
- * Last updated: Tue Dec 06 2016 17:19:35 GMT-0500 (EST)
+ * Last updated: Tue Dec 13 2016 14:44:50 GMT-0500 (EST)
  *
  * Visit https://developer.clarifai.com
  *
@@ -3504,7 +3504,7 @@ process.chdir = function (dir) {
 },{"1YiZ5S":23,"buffer":20}],24:[function(require,module,exports){
 module.exports={
   "name": "clarifai",
-  "version": "2.0.17",
+  "version": "2.0.18",
   "description": "Official Clarifai Javascript SDK",
   "main": "dist/index.js",
   "repository": "https://github.com/Clarifai/clarifai-javascript",
@@ -5043,9 +5043,7 @@ var Models = function () {
         models = [obj];
       }
       var data = { models: models.map(formatModel) };
-      if (obj.concepts) {
-        data['action'] = obj.action || 'merge';
-      }
+      data['action'] = obj.action || 'merge';
 
       return wrapToken(this._config, function (headers) {
         return new Promise(function (resolve, reject) {
@@ -5120,26 +5118,52 @@ var Models = function () {
       return this.update(data);
     }
     /**
-     * Deletes all models or a model (if given id) or a model version (if given id and verion id)
-     * @param {String}     id          The model's id
-     * @param {String}     versionId   The model's version id
+     * Deletes all models (if no ids and versionId given) or a model (if given id) or a model version (if given id and verion id)
+     * @param {String|String[]}      ids         Can be a single string or an array of strings representing the model ids
+     * @param {String}                versionId   The model's version id
      * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
      */
 
   }, {
     key: 'delete',
-    value: function _delete(id, versionId) {
-      var url = void 0;
-      if (id) {
-        url = '' + this._config.apiEndpoint + replaceVars(MODEL_PATH, [id]);
-      } else if (versionId) {
-        url = '' + this._config.apiEndpoint + replaceVars(MODEL_VERSION_PATH, [id, versionId]);
+    value: function _delete(ids) {
+      var versionId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+      var request = void 0,
+          url = void 0,
+          data = void 0;
+      var id = ids;
+
+      if (checkType(/String/, ids) || checkType(/Array/, ids) && ids.length === 1) {
+        if (versionId) {
+          url = '' + this._config.apiEndpoint + replaceVars(MODEL_VERSION_PATH, [id, versionId]);
+        } else {
+          url = '' + this._config.apiEndpoint + replaceVars(MODEL_PATH, [id]);
+        }
+        request = wrapToken(this._config, function (headers) {
+          return axios.delete(url, { headers: headers });
+        });
       } else {
-        url = '' + this._config.apiEndpoint + MODELS_PATH;
+        if (!ids && !versionId) {
+          url = '' + this._config.apiEndpoint + MODELS_PATH;
+          data = { 'delete_all': true };
+        } else if (!versionId && ids.length > 1) {
+          url = '' + this._config.apiEndpoint + MODELS_PATH;
+          data = { ids: ids };
+        } else {
+          throw new Error('Wrong arguments passed. You can only delete all\nmodels (provide no arguments), delete select\nmodels (provide list of ids), delete a single\nmodel (providing a single id) or delete a model\nversion (provide a single id and version id)');
+        }
+        request = wrapToken(this._config, function (headers) {
+          return axios({
+            method: 'delete',
+            url: url,
+            data: data,
+            headers: headers
+          });
+        });
       }
-      return wrapToken(this._config, function (headers) {
-        return axios.delete(url, { headers: headers });
-      });
+
+      return request;
     }
     /**
      * Search for models by name or type
@@ -5244,7 +5268,7 @@ module.exports = global.Clarifai = {
   BLUR: 'ddd9d34872ab32be9f0e3b2b98a87be2'
 };
 
-}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_dae6be34.js","/")
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_7ff55915.js","/")
 },{"./App":25,"1YiZ5S":23,"buffer":20}],34:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 'use strict';

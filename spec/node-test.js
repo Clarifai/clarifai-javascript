@@ -21,6 +21,8 @@ var ferrariId = 'ferrari' + Date.now();
 var d = Date.now();
 var inputId1 = 'foobar' + d;
 var inputId2 = 'foobaz' + d;
+var testModelId;
+var testModelVersionId;
 
 describe('Clarifai JS SDK', function() {
   beforeAll(function() {
@@ -391,7 +393,7 @@ describe('Clarifai JS SDK', function() {
     var testModel;
     var generalModel;
     var generalModelId;
-    var testModelId = 'vroom-vroom' + Date.now();
+    testModelId = 'vroom-vroom' + Date.now();
 
     it('Creates a new model', function(done) {
       app.models.create(testModelId, [
@@ -449,6 +451,7 @@ describe('Clarifai JS SDK', function() {
           expect(model.appId).toBeDefined();
           expect(model.outputInfo).toBeDefined();
           expect(model.modelVersion).toBeDefined();
+          testModelVersionId = model.modelVersion.id;
           done();
         },
         errorHandler.bind(done)
@@ -724,7 +727,7 @@ describe('Clarifai JS SDK', function() {
   });
 
   describe('Delete Resources', function() {
-    it('Allows you to delete inputs partially', function(done) {
+    it('Allows you to delete select inputs', function(done) {
       app.inputs.delete(inputsIDs.slice(0, 1)).then(
         function(response) {
           var data = response.data;
@@ -750,8 +753,96 @@ describe('Clarifai JS SDK', function() {
       );
     });
 
+    it('Throws an error if model delete arguments list is incorrect', function(done) {
+      expect(function(){
+        app.models.delete(['model-1', 'model-2'], 'version-1');
+      }).toThrow();
+      done();
+    });
+
+    it('Allows you to delete a single model version', function(done) {
+      app.models.delete(testModelId, testModelVersionId).then(
+        function(response) {
+          var data = response.data;
+          expect(data.status).toBeDefined();
+          expect(data.status.code).toBe(10000);
+          expect(data.status.description).toBe('Ok');
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Allows you to delete a list of models', function(done) {
+      var modelIds = [
+        'abc' + Date.now(),
+        'def' + Date.now(),
+        'ghi' + Date.now(),
+        'jkl' + Date.now()
+      ];
+      var completed = 0;
+      var totalToDelete = 4;
+
+      modelIds.forEach(function(modelId) {
+        app.models.create(modelId).then(
+          function(response) {
+            completed++;
+            if (completed === totalToDelete) {
+              app.models.delete(modelIds).then(
+                function(response) {
+                  var data = response.data;
+                  expect(data.status).toBeDefined();
+                  expect(data.status.code).toBe(10000);
+                  expect(data.status.description).toBe('Ok');
+                  done();
+                },
+                errorHandler.bind(done)
+              );
+            }
+          },
+          errorHandler.bind(done)
+        );
+      });
+    });
+
+    it('Allows you to delete a single model', function(done) {
+      var modelId = 'abc' + Date.now();
+      app.models.create(modelId).then(
+        function(response) {
+          app.models.delete(modelId).then(
+            function(response) {
+              expect(response.data.status).toBeDefined();
+              expect(response.data.status.code).toBe(10000);
+              expect(response.data.status.description).toBe('Ok');
+              done();
+            },
+            errorHandler.bind(done)
+          );
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Allows you to delete a single model with id given in array', function(done) {
+      var modelId = 'abc' + Date.now();
+      app.models.create(modelId).then(
+        function(response) {
+          app.models.delete([modelId]).then(
+            function(response) {
+              expect(response.data.status).toBeDefined();
+              expect(response.data.status.code).toBe(10000);
+              expect(response.data.status.description).toBe('Ok');
+              done();
+            },
+            errorHandler.bind(done)
+          );
+        },
+        errorHandler.bind(done)
+      );
+    });
+
     it('Allows you to delete all models', function(done) {
-      app.models.delete(null, null).then(
+      app.models.delete().then(
         function(response) {
           var data = response.data;
           expect(data.status).toBeDefined();
@@ -773,6 +864,7 @@ function responseHandler(response) {
 function errorHandler(err) {
   expect(err.status).toBe(true);
   expect(err.data).toBe(true);
+  log(obj);
   this();
 };
 
