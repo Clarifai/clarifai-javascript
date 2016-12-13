@@ -296,6 +296,7 @@ describe('Clarifai JS SDK', function() {
             expect(counts.processed).toBeDefined();
             expect(counts.to_process).toBeDefined();
             expect(counts.errors).toBeDefined();
+            expect(counts.errors).toBe(0);
             done();
           },
           errorHandler.bind(done)
