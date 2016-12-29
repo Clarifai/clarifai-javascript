@@ -35,7 +35,8 @@ class App {
     if (typeof _token === 'string') {
       token = {
         'access_token': _token,
-        'expires_in': 176400
+        'expires_in': 176400,
+        'expireTime': new Date().getTime() + 176400 * 1000
       };
     }
     if (token.access_token && token.expires_in) {
