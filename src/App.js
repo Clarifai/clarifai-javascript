@@ -8,6 +8,7 @@ let constants = require('./constants');
 let {API} = constants;
 let {TOKEN_PATH} = API;
 
+const EXPIRES_IN = 176400;
 
 /**
 * top-level class that allows access to models, inputs and concepts
@@ -35,8 +36,8 @@ class App {
     if (typeof _token === 'string') {
       token = {
         'access_token': _token,
-        'expires_in': 176400,
-        'expireTime': new Date().getTime() + 176400 * 1000
+        'expires_in': EXPIRES_IN,
+        'expireTime': new Date().getTime() + EXPIRES_IN * 1000
       };
     }
     if (token.access_token && token.expires_in) {
