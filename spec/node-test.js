@@ -13,6 +13,7 @@ var sampleImage6 = 'https://s3.amazonaws.com/samples.clarifai.com/red-car-1.png'
 var sampleImage7 = 'https://s3.amazonaws.com/samples.clarifai.com/red-car-2.jpeg';
 var sampleImage8 = 'https://s3.amazonaws.com/samples.clarifai.com/red-truck.png';
 var sampleImage9 = 'https://s3.amazonaws.com/samples.clarifai.com/black-car.jpg';
+var lastCount;
 var inputsIDs = [];
 var conceptsIds;
 var app;
@@ -181,7 +182,21 @@ describe('Clarifai JS SDK', function() {
             expect(inputs[1].id).toBe(inputId2);
             expect(inputs[0].toObject().data.metadata.foo).toBe('bar');
             expect(inputs[1].toObject().data.metadata.foo).toBe('baz');
-            done();
+            pollStatus(function(interval) {
+              app.inputs.getStatus().then(
+                function(data) {
+                  if (data['counts']['to_process'] == 0) {
+                    clearInterval(interval);
+                    if (data['errors'] > 0) {
+                      throw new Error('Error processing inputs', data);
+                    } else {
+                      done();
+                    }
+                  }
+                },
+                errorHandler.bind(done)
+              );
+            });
           },
           errorHandler.bind(done)
         );
@@ -205,7 +220,21 @@ describe('Clarifai JS SDK', function() {
             expect(inputs[0].createdAt).toBeDefined();
             expect(inputs[0].id).toBeDefined();
             expect(inputs[0].toObject().data).toBeDefined();
-            done();
+            pollStatus(function(interval) {
+              app.inputs.getStatus().then(
+                function(data) {
+                  if (data['counts']['to_process'] == 0) {
+                    clearInterval(interval);
+                    if (data['errors'] > 0) {
+                      throw new Error('Error processing inputs', data);
+                    } else {
+                      done();
+                    }
+                  }
+                },
+                errorHandler.bind(done)
+              );
+            });
           },
           errorHandler.bind(done)
         );
@@ -247,7 +276,22 @@ describe('Clarifai JS SDK', function() {
             expect(inputs[0].createdAt).toBeDefined();
             expect(inputs[0].id).toBeDefined();
             expect(inputs[0].toObject().data).toBeDefined();
-            done();
+            pollStatus(function(interval) {
+              app.inputs.getStatus().then(
+                function(data) {
+                  lastCount = data['counts']['processed'];
+                  if (data['counts']['to_process'] == 0) {
+                    clearInterval(interval);
+                    if (data['errors'] > 0) {
+                      throw new Error('Error processing inputs', data);
+                    } else {
+                      done();
+                    }
+                  }
+                },
+                errorHandler.bind(done)
+              );
+            });
           },
           errorHandler.bind(done)
         );
@@ -735,7 +779,18 @@ describe('Clarifai JS SDK', function() {
           expect(data.status).toBeDefined();
           expect(data.status.code).toBe(10000);
           expect(data.status.description).toBe('Ok');
-          done();
+          pollStatus(function(interval) {
+            app.inputs.getStatus().then(
+              function(data) {
+                console.log('[INPUTS STATUS]', data);
+                if (data['counts']['processed'] == lastCount - 1) {
+                  clearInterval(interval);
+                  done();
+                }
+              },
+              errorHandler.bind(done)
+            );
+          });
         },
         errorHandler.bind(done)
       );
@@ -856,6 +911,13 @@ describe('Clarifai JS SDK', function() {
     });
   });
 });
+
+
+function pollStatus(fn) {
+  var getStatus = setInterval(function() {
+    fn(getStatus)
+  }, 100);
+}
 
 function responseHandler(response) {
   expect(true).toBe(true);
