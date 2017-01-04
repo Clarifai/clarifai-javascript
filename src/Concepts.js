@@ -117,20 +117,6 @@ class Concepts {
       });
     });
   }
-  toObjects(...keys) {
-    return Array.prototype.map.call(this, (concept, i)=> {
-      let val;
-      if (keys.length > 0) {
-        val = {};
-        keys.forEach((k)=> {
-          val[k] = concept[k];
-        });
-      } else {
-        val = concept.toObject();
-      }
-      return val;
-    });
-  }
 };
 
 module.exports = Concepts;

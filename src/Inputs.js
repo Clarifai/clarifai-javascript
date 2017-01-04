@@ -12,7 +12,6 @@ const MAX_BATCH_SIZE = 128;
 */
 class Inputs {
   constructor(_config, rawData=[]) {
-    this._config = _config;
     this.rawData = rawData;
     rawData.forEach((inputData, index)=> {
       if (inputData.input && inputData.score) {
@@ -22,6 +21,7 @@ class Inputs {
       this[index] = new Input(this._config, inputData);
     });
     this.length = rawData.length;
+    this._config = _config;
   }
   /**
   * Get all inputs in app

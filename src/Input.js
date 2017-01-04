@@ -14,15 +14,8 @@ class Input {
     this.imageUrl = data.data.image.url;
     this.concepts = new Concepts(_config, data.data.concepts);
     this.score = data.score;
+    this.rawData = data;
     this._config = _config;
-    this._rawData = data;
-  }
-  /**
-  * Returns a javascript object with the raw data attributes (from API)
-  * @return {object} An object that contains data about input from api
-  */
-  toObject() {
-    return this._rawData;
   }
   /**
   * Merge concepts to an input

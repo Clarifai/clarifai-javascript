@@ -23,7 +23,6 @@ const POLLTIME = 2000;
 class Model {
   constructor(_config, data) {
     this._config = _config;
-    this.data = data;
     this.name = data.name;
     this.id = data.id;
     this.createdAt = data.created_at || data.createdAt;
@@ -36,14 +35,7 @@ class Model {
       this.modelVersion = data.model_version || data.modelVersion || data.version;
       this.versionId = (this.modelVersion || {}).id;
     }
-    this._rawData = data;
-  }
-  /**
-  * Returns a javascript object with the raw data attributes (from API)
-  * @return {object} An object that contains data about model from api
-  */
-  toObject() {
-    return this._rawData;
+    this.rawData = data;
   }
   /**
   * Merge concepts to a model
