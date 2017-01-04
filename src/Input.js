@@ -24,7 +24,7 @@ class Input {
   *     @param {string}           concepts[].concept.id        The concept id (required)
   *     @param {boolean}          concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
   * @param {object}           metadata                      Object with key values to attach to the input (optional)
-  * @return {Promise(input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
+  * @return {Promise(Input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
   */
   mergeConcepts(concepts, metadata) {
     return this._update('merge', concepts, metadata);
@@ -36,7 +36,7 @@ class Input {
   *     @param {string}           concepts[].concept.id        The concept id (required)
   *     @param {boolean}          concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
   * @param {object}           metadata                      Object with key values to attach to the input (optional)
-  * @return {Promise(input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
+  * @return {Promise(Input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
   */
   deleteConcepts(concepts, metadata) {
     return this._update('remove', concepts, metadata);
@@ -48,7 +48,7 @@ class Input {
   *     @param {string}           concepts[].concept.id         The concept id (required)
   *     @param {boolean}          concepts[].concept.value      Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
   * @param {object}           metadata                      Object with key values to attach to the input (optional)
-  * @return {Promise(input, error)}                         A Promise that is fulfilled with an instance of Input or rejected with an error
+  * @return {Promise(Input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
   */
   overwriteConcepts(concepts, metadata) {
     return this._update('overwrite', concepts, metadata);

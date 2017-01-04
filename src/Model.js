@@ -40,26 +40,26 @@ class Model {
   /**
   * Merge concepts to a model
   * @param {object[]}      concepts    List of concept objects with id
-  * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
   */
   mergeConcepts(concepts=[]) {
-    return this._update({action: 'merge', concepts});
+    return this.update({action: 'merge', concepts});
   }
   /**
   * Remove concepts from a model
   * @param {object[]}      concepts    List of concept objects with id
-  * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
   */
   deleteConcepts(concepts=[]) {
-    return this._update({action: 'remove', concepts});
+    return this.update({action: 'remove', concepts});
   }
   /**
   * Overwrite concepts in a model
   * @param {object[]}      concepts    List of concept objects with id
-  * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
   */
   overwriteConcepts(concepts=[]) {
-    return this._update({action: 'overwrite', concepts});
+    return this.update({action: 'overwrite', concepts});
   }
   /**
   * Update a model's output config or concepts
@@ -71,6 +71,7 @@ class Model {
   *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
   *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
   *   @param {object[]}             action                                The action to perform on the given concepts. Possible values are 'merge', 'remove', or 'overwrite'. Default: 'merge'
+  * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
   */
   update(obj) {
     let url = `${this._config.apiEndpoint}${MODELS_PATH}`;
@@ -95,7 +96,7 @@ class Model {
   /**
   * Create a new model version
   * @param {boolean}       sync     If true, this returns after model has completely trained. If false, this immediately returns default api response.
-  * @return {Promise(model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
+  * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
   */
   train(sync) {
     let url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSIONS_PATH, [this.id])}`;
@@ -139,7 +140,8 @@ class Model {
   * Returns model ouputs according to inputs
   * @param {object[]|object|string}       inputs    An array of objects/object/string pointing to an image resource. A string can either be a url or base64 image bytes. Object keys explained below:
   *    @param {object}                      inputs[].image     Object with keys explained below:
-  *       @param {string}                     inputs[].image.(url|base64)  Can be a publicly accessibly url or base64 string representing image bytes (required)
+  *       @param {string}                     inputs[].image.(url|base64)   Can be a publicly accessibly url or base64 string representing image bytes (required)
+  *       @param {number[]}                   inputs[].image.crop           An array containing the percent to be cropped from top, left, bottom and right (optional)
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
   predict(inputs) {
@@ -153,7 +155,11 @@ class Model {
       let params = {
         'inputs': inputs.map(formatImagePredict)
       };
-      return axios.post(url, params, {headers});
+      return new Promise((resolve, reject)=> {
+        axios.post(url, params, {headers}).then((response)=> {
+          resolve(response.data);
+        }, reject);
+      });
     });
   }
   /**
@@ -185,12 +191,16 @@ class Model {
         headers,
         params: {'per_page': options.perPage, 'page': options.page},
       };
-      return axios.get(url, data);
+      return new Promise((resolve, reject)=> {
+        axios.get(url, data).then((response)=> {
+          resolve(response.data);
+        }, reject);
+      });
     });
   }
   /**
   * Returns all the model's output info
-  * @return {Promise(Model, error)} A Promise that is fulfilled with the API response or rejected with an error
+  * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
   */
   getOutputInfo() {
     let url = `${this._config.apiEndpoint}${replaceVars(MODEL_OUTPUT_PATH, [this.id])}`;
@@ -214,9 +224,13 @@ class Model {
       replaceVars(MODEL_VERSION_INPUTS_PATH, [this.id, this.versionId]):
       replaceVars(MODEL_INPUTS_PATH, [this.id])}`;
     return wrapToken(this._config, (headers)=> {
-      return axios.get(url, {
-        params: {'per_page': options.perPage, 'page': options.page},
-        headers
+      return new Promise((resolve, reject)=> {
+        axios.get(url, {
+          params: {'per_page': options.perPage, 'page': options.page},
+          headers
+        }).then((response)=> {
+          resolve(response.data);
+        }, reject);
       });
     });
   }

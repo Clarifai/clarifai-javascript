@@ -21,13 +21,13 @@ class Models {
     this.length = rawData.length;
   }
   /**
-  * Returns a Model instance given model id or name without calling the backend
+  * Returns a Model instance given model id or name. It will call search if name is given.
   * @param {string|object}    model       If string, it is assumed to be model id. Otherwise, if object is given, it can have any of the following keys:
   *   @param {string}           model.id          Model id
   *   @param {string}           model.name        Model name
   *   @param {string}           model.version     Model version
   *   @param {string}           model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
-  * @return {Model}       An instance of Model with the given id/name
+  * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
   */
   initModel(model) {
     let data = {};
@@ -45,7 +45,7 @@ class Models {
       fn = (resolve, reject) => {
         this.search(data.name, data.type).then((models)=> {
           if (data.version) {
-            resolve(models.filter((model)=> model.modelVersion.id === data.version));
+            resolve(models.rawData.filter((model)=> model.modelVersion.id === data.version));
           } else {
             resolve(models[0]);
           }
@@ -83,7 +83,7 @@ class Models {
    *   @param {string}                   model.version     Model version
    *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
    * @param {boolean}                  sync        If true, this returns after model has completely trained. If false, this immediately returns default api response.
-   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+   * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
    */
   train(model, sync=false) {
     return new Promise((resolve, reject)=> {
@@ -99,7 +99,7 @@ class Models {
    * @param {Object}     options     Object with keys explained below: (optional)
    *   @param {Number}     options.page        The page number (optional, default: 1)
    *   @param {Number}     options.perPage     Number of images to return per page (optional, default: 20)
-   * @return {Promise(models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
+   * @return {Promise(Models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
    */
   list(options={page: 1, perPage: 20}) {
     let url = `${this._config.apiEndpoint}${MODELS_PATH}`;
@@ -127,7 +127,7 @@ class Models {
    * @param {Object}                         options                                Object with keys explained below:
    *   @param {boolean}                        options.conceptsMutuallyExclusive      Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
    *   @param {boolean}                        options.closedEnvironment              Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
-   * @return {Promise(model, error)} A Promise that is fulfilled with an instance of Model or rejected with an error
+   * @return {Promise(Model, error)} A Promise that is fulfilled with an instance of Model or rejected with an error
    */
   create(model, conceptsData=[], options={}) {
     let concepts = conceptsData instanceof Concepts?
@@ -173,7 +173,7 @@ class Models {
   /**
    * Returns a model specified by ID
    * @param {String}     id          The model's id
-   * @return {Promise(model, error)} A Promise that is fulfilled with an instance of Model or rejected with an error
+   * @return {Promise(Model, error)} A Promise that is fulfilled with an instance of Model or rejected with an error
    */
   get(id) {
     let url = `${this._config.apiEndpoint}${replaceVars(MODEL_PATH, [id])}`;
@@ -200,6 +200,7 @@ class Models {
   *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
   *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
   *   @param {object[]}             action                                The action to perform on the given concepts. Possible values are 'merge', 'remove', or 'overwrite'. Default: 'merge'
+  * @return {Promise(Models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
   */
   update(obj) {
     let url = `${this._config.apiEndpoint}${MODELS_PATH}`;
