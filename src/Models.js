@@ -3,7 +3,7 @@ let {Promise} = require('es6-promise');
 let Model = require('./Model');
 let Concepts = require('./Concepts');
 let {API, replaceVars} = require('./constants');
-let {isSuccess, checkType} = require('./helpers');
+let {isSuccess, checkType, clone} = require('./helpers');
 let {wrapToken, formatModel} = require('./utils');
 let {MODELS_PATH, MODEL_PATH, MODEL_SEARCH_PATH, MODEL_VERSION_PATH} = API;
 
@@ -334,7 +334,13 @@ class Models {
         url = `${this._config.apiEndpoint}${replaceVars(MODEL_PATH, [id])}`;
       }
       request = wrapToken(this._config, (headers)=> {
-        return axios.delete(url, {headers});
+        return new Promise((resolve, reject)=> {
+          axios.delete(url, {headers}).then((response)=> {
+            let data = clone(response.data);
+            data.rawData = clone(response.data);
+            resolve(data);
+          }, reject);
+        });
       });
     } else {
       if (!ids && !versionId) {
@@ -351,11 +357,17 @@ model (providing a single id) or delete a model
 version (provide a single id and version id)`);
       }
       request = wrapToken(this._config, (headers)=> {
-        return axios({
-          method: 'delete',
-          url,
-          data,
-          headers
+        return new Promise((resolve, reject)=> {
+          axios({
+            method: 'delete',
+            url,
+            data,
+            headers
+          }).then((response)=> {
+            let data = clone(response.data);
+            data.rawData = clone(response.data);
+            resolve(data);
+          }, reject);
         });
       });
     }

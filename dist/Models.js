@@ -22,6 +22,7 @@ var _require3 = require('./helpers');
 
 var isSuccess = _require3.isSuccess;
 var checkType = _require3.checkType;
+var clone = _require3.clone;
 
 var _require4 = require('./utils');
 
@@ -438,7 +439,13 @@ var Models = function () {
           url = '' + this._config.apiEndpoint + replaceVars(MODEL_PATH, [id]);
         }
         request = wrapToken(this._config, function (headers) {
-          return axios.delete(url, { headers: headers });
+          return new Promise(function (resolve, reject) {
+            axios.delete(url, { headers: headers }).then(function (response) {
+              var data = clone(response.data);
+              data.rawData = clone(response.data);
+              resolve(data);
+            }, reject);
+          });
         });
       } else {
         if (!ids && !versionId) {
@@ -451,11 +458,17 @@ var Models = function () {
           throw new Error('Wrong arguments passed. You can only delete all\nmodels (provide no arguments), delete select\nmodels (provide list of ids), delete a single\nmodel (providing a single id) or delete a model\nversion (provide a single id and version id)');
         }
         request = wrapToken(this._config, function (headers) {
-          return axios({
-            method: 'delete',
-            url: url,
-            data: data,
-            headers: headers
+          return new Promise(function (resolve, reject) {
+            axios({
+              method: 'delete',
+              url: url,
+              data: data,
+              headers: headers
+            }).then(function (response) {
+              var data = clone(response.data);
+              data.rawData = clone(response.data);
+              resolve(data);
+            }, reject);
           });
         });
       }

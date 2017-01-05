@@ -1,7 +1,7 @@
 /**
  * Clarifai JavaScript SDK v2.1.0-dev
  *
- * Last updated: Thu Jan 05 2017 15:03:53 GMT-0500 (EST)
+ * Last updated: Thu Jan 05 2017 17:10:25 GMT-0500 (EST)
  *
  * Visit https://developer.clarifai.com
  *
@@ -4760,6 +4760,7 @@ var _require3 = require('./helpers');
 
 var isSuccess = _require3.isSuccess;
 var checkType = _require3.checkType;
+var clone = _require3.clone;
 
 var _require4 = require('./utils');
 
@@ -5176,7 +5177,13 @@ var Models = function () {
           url = '' + this._config.apiEndpoint + replaceVars(MODEL_PATH, [id]);
         }
         request = wrapToken(this._config, function (headers) {
-          return axios.delete(url, { headers: headers });
+          return new Promise(function (resolve, reject) {
+            axios.delete(url, { headers: headers }).then(function (response) {
+              var data = clone(response.data);
+              data.rawData = clone(response.data);
+              resolve(data);
+            }, reject);
+          });
         });
       } else {
         if (!ids && !versionId) {
@@ -5189,11 +5196,17 @@ var Models = function () {
           throw new Error('Wrong arguments passed. You can only delete all\nmodels (provide no arguments), delete select\nmodels (provide list of ids), delete a single\nmodel (providing a single id) or delete a model\nversion (provide a single id and version id)');
         }
         request = wrapToken(this._config, function (headers) {
-          return axios({
-            method: 'delete',
-            url: url,
-            data: data,
-            headers: headers
+          return new Promise(function (resolve, reject) {
+            axios({
+              method: 'delete',
+              url: url,
+              data: data,
+              headers: headers
+            }).then(function (response) {
+              var data = clone(response.data);
+              data.rawData = clone(response.data);
+              resolve(data);
+            }, reject);
           });
         });
       }
@@ -5275,6 +5288,9 @@ module.exports = {
 
     var newPath = path;
     vars.forEach(function (val, index) {
+      if (index === 0) {
+        val = encodeURIComponent(val);
+      }
       newPath = newPath.replace(new RegExp('\\$' + index, 'g'), val);
     });
     return newPath;
@@ -5309,7 +5325,7 @@ module.exports = global.Clarifai = {
   BLUR: 'ddd9d34872ab32be9f0e3b2b98a87be2'
 };
 
-}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_1fbdbbee.js","/")
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_f8d1d51b.js","/")
 },{"./../package.json":24,"./App":25,"1YiZ5S":23,"buffer":20}],34:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 'use strict';

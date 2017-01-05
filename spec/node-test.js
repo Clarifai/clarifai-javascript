@@ -1,6 +1,7 @@
 var fs = require('fs');
 var Clarifai = require('./../src/index');
 var Models = require('./../src/Models');
+var Model = require('./../src/Model');
 var Inputs = require('./../src/Inputs');
 
 var sampleImage  = 'https://s3.amazonaws.com/samples.clarifai.com/metro-north.jpg';
@@ -802,10 +803,9 @@ describe('Clarifai JS SDK', function() {
     it('Allows you to delete a single model version', function(done) {
       app.models.delete(testModelId, testModelVersionId).then(
         function(response) {
-          var data = response.data;
-          expect(data.status).toBeDefined();
-          expect(data.status.code).toBe(10000);
-          expect(data.status.description).toBe('Ok');
+          expect(response.status).toBeDefined();
+          expect(response.status.code).toBe(10000);
+          expect(response.status.description).toBe('Ok');
           done();
         },
         errorHandler.bind(done)
@@ -829,10 +829,9 @@ describe('Clarifai JS SDK', function() {
             if (completed === totalToDelete) {
               app.models.delete(modelIds).then(
                 function(response) {
-                  var data = response.data;
-                  expect(data.status).toBeDefined();
-                  expect(data.status.code).toBe(10000);
-                  expect(data.status.description).toBe('Ok');
+                  expect(response.status).toBeDefined();
+                  expect(response.status.code).toBe(10000);
+                  expect(response.status.description).toBe('Ok');
                   done();
                 },
                 errorHandler.bind(done)
@@ -850,9 +849,9 @@ describe('Clarifai JS SDK', function() {
         function(response) {
           app.models.delete(modelId).then(
             function(response) {
-              expect(response.data.status).toBeDefined();
-              expect(response.data.status.code).toBe(10000);
-              expect(response.data.status.description).toBe('Ok');
+              expect(response.status).toBeDefined();
+              expect(response.status.code).toBe(10000);
+              expect(response.status.description).toBe('Ok');
               done();
             },
             errorHandler.bind(done)
@@ -868,9 +867,26 @@ describe('Clarifai JS SDK', function() {
         function(response) {
           app.models.delete([modelId]).then(
             function(response) {
-              expect(response.data.status).toBeDefined();
-              expect(response.data.status.code).toBe(10000);
-              expect(response.data.status.description).toBe('Ok');
+              expect(response.status).toBeDefined();
+              expect(response.status.code).toBe(10000);
+              expect(response.status.description).toBe('Ok');
+              done();
+            },
+            errorHandler.bind(done)
+          );
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Allows you to have special chars in model id', function(done) {
+      var modelId = 'whois?' + Date.now();
+      app.models.create(modelId).then(
+        function(response) {
+          app.models.get(modelId).then(
+            function(response) {
+              expect(response instanceof Model).toBe(true);
+              expect(response.rawData.id).toBe(modelId);
               done();
             },
             errorHandler.bind(done)
@@ -883,10 +899,9 @@ describe('Clarifai JS SDK', function() {
     it('Allows you to delete all models', function(done) {
       app.models.delete().then(
         function(response) {
-          var data = response.data;
-          expect(data.status).toBeDefined();
-          expect(data.status.code).toBe(10000);
-          expect(data.status.description).toBe('Ok');
+          expect(response.status).toBeDefined();
+          expect(response.status.code).toBe(10000);
+          expect(response.status.description).toBe('Ok');
           done();
         },
         errorHandler.bind(done)
