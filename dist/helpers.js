@@ -15,6 +15,14 @@ module.exports = {
       }
     });
   },
+  clone: function clone(obj) {
+    var keys = Object.keys(obj);
+    var copy = {};
+    keys.forEach(function (k) {
+      copy[k] = obj[k];
+    });
+    return copy;
+  },
   checkType: function checkType(regex, val) {
     if (regex instanceof RegExp === false) {
       regex = new RegExp(regex);

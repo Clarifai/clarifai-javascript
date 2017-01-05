@@ -24,6 +24,9 @@ module.exports = {
   replaceVars: (path, vars=[])=> {
     let newPath = path;
     vars.forEach((val, index)=> {
+      if (index === 0) {
+        val = encodeURIComponent(val);
+      }
       newPath = newPath.replace(new RegExp(`\\$${index}`, 'g'), val);
     });
     return newPath;

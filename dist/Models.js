@@ -22,6 +22,7 @@ var _require3 = require('./helpers');
 
 var isSuccess = _require3.isSuccess;
 var checkType = _require3.checkType;
+var clone = _require3.clone;
 
 var _require4 = require('./utils');
 
@@ -53,13 +54,13 @@ var Models = function () {
     this.length = rawData.length;
   }
   /**
-  * Returns a Model instance given model id or name without calling the backend
+  * Returns a Model instance given model id or name. It will call search if name is given.
   * @param {string|object}    model       If string, it is assumed to be model id. Otherwise, if object is given, it can have any of the following keys:
   *   @param {string}           model.id          Model id
   *   @param {string}           model.name        Model name
   *   @param {string}           model.version     Model version
   *   @param {string}           model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
-  * @return {Model}       An instance of Model with the given id/name
+  * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
   */
 
 
@@ -83,7 +84,7 @@ var Models = function () {
         fn = function fn(resolve, reject) {
           _this2.search(data.name, data.type).then(function (models) {
             if (data.version) {
-              resolve(models.filter(function (model) {
+              resolve(models.rawData.filter(function (model) {
                 return model.modelVersion.id === data.version;
               }));
             } else {
@@ -126,7 +127,7 @@ var Models = function () {
      *   @param {string}                   model.version     Model version
      *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
      * @param {boolean}                  sync        If true, this returns after model has completely trained. If false, this immediately returns default api response.
-     * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+     * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
      */
 
   }, {
@@ -143,17 +144,86 @@ var Models = function () {
       });
     }
     /**
+     * Returns a version of the model specified by its id
+     * @param {string|object}            model       If string, it is assumed to be model id. Otherwise, if object is given, it can have any of the following keys:
+     *   @param {string}                   model.id          Model id
+     *   @param {string}                   model.name        Model name
+     *   @param {string}                   model.version     Model version
+     *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+     * @param {string}     versionId   The model's id
+     * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+     */
+
+  }, {
+    key: 'getVersion',
+    value: function getVersion(model, versionId) {
+      var _this5 = this;
+
+      return new Promise(function (resolve, reject) {
+        _this5.initModel(model).then(function (model) {
+          model.getVersion(versionId).then(resolve, reject).catch(reject);
+        }, reject);
+      });
+    }
+    /**
+    * Returns a list of versions of the model
+    * @param {string|object}            model       If string, it is assumed to be model id. Otherwise, if object is given, it can have any of the following keys:
+    *   @param {string}                   model.id          Model id
+    *   @param {string}                   model.name        Model name
+    *   @param {string}                   model.version     Model version
+    *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+    * @param {object}                   options     Object with keys explained below: (optional)
+    *   @param {number}                   options.page        The page number (optional, default: 1)
+    *   @param {number}                   options.perPage     Number of images to return per page (optional, default: 20)
+    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+    */
+
+  }, {
+    key: 'getVersions',
+    value: function getVersions(model) {
+      var _this6 = this;
+
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { page: 1, perPage: 20 };
+
+      return new Promise(function (resolve, reject) {
+        _this6.initModel(model).then(function (model) {
+          model.getVersions().then(resolve, reject).catch(reject);
+        }, reject);
+      });
+    }
+    /**
+    * Returns all the model's output info
+    * @param {string|object}            model       If string, it is assumed to be model id. Otherwise, if object is given, it can have any of the following keys:
+    *   @param {string}                   model.id          Model id
+    *   @param {string}                   model.name        Model name
+    *   @param {string}                   model.version     Model version
+    *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+    * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
+    */
+
+  }, {
+    key: 'getOutputInfo',
+    value: function getOutputInfo(model) {
+      var _this7 = this;
+
+      return new Promise(function (resolve, reject) {
+        _this7.initModel(model).then(function (model) {
+          model.getOutputInfo().then(resolve, reject).catch(reject);
+        }, reject);
+      });
+    }
+    /**
      * Returns all the models
      * @param {Object}     options     Object with keys explained below: (optional)
      *   @param {Number}     options.page        The page number (optional, default: 1)
      *   @param {Number}     options.perPage     Number of images to return per page (optional, default: 20)
-     * @return {Promise(models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
+     * @return {Promise(Models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
      */
 
   }, {
     key: 'list',
     value: function list() {
-      var _this5 = this;
+      var _this8 = this;
 
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { page: 1, perPage: 20 };
 
@@ -165,7 +235,7 @@ var Models = function () {
             headers: headers
           }).then(function (response) {
             if (isSuccess(response)) {
-              resolve(new Models(_this5._config, response.data.models));
+              resolve(new Models(_this8._config, response.data.models));
             } else {
               reject(response);
             }
@@ -182,13 +252,13 @@ var Models = function () {
      * @param {Object}                         options                                Object with keys explained below:
      *   @param {boolean}                        options.conceptsMutuallyExclusive      Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
      *   @param {boolean}                        options.closedEnvironment              Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
-     * @return {Promise(model, error)} A Promise that is fulfilled with an instance of Model or rejected with an error
+     * @return {Promise(Model, error)} A Promise that is fulfilled with an instance of Model or rejected with an error
      */
 
   }, {
     key: 'create',
     value: function create(model) {
-      var _this6 = this;
+      var _this9 = this;
 
       var conceptsData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -223,7 +293,7 @@ var Models = function () {
         return new Promise(function (resolve, reject) {
           axios.post(url, data, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
-              resolve(new Model(_this6._config, response.data.model));
+              resolve(new Model(_this9._config, response.data.model));
             } else {
               reject(response);
             }
@@ -234,20 +304,20 @@ var Models = function () {
     /**
      * Returns a model specified by ID
      * @param {String}     id          The model's id
-     * @return {Promise(model, error)} A Promise that is fulfilled with an instance of Model or rejected with an error
+     * @return {Promise(Model, error)} A Promise that is fulfilled with an instance of Model or rejected with an error
      */
 
   }, {
     key: 'get',
     value: function get(id) {
-      var _this7 = this;
+      var _this10 = this;
 
       var url = '' + this._config.apiEndpoint + replaceVars(MODEL_PATH, [id]);
       return wrapToken(this._config, function (headers) {
         return new Promise(function (resolve, reject) {
           axios.get(url, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
-              resolve(new Model(_this7._config, response.data.model));
+              resolve(new Model(_this10._config, response.data.model));
             } else {
               reject(response);
             }
@@ -266,12 +336,13 @@ var Models = function () {
     *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
     *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
     *   @param {object[]}             action                                The action to perform on the given concepts. Possible values are 'merge', 'remove', or 'overwrite'. Default: 'merge'
+    * @return {Promise(Models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
     */
 
   }, {
     key: 'update',
     value: function update(obj) {
-      var _this8 = this;
+      var _this11 = this;
 
       var url = '' + this._config.apiEndpoint + MODELS_PATH;
       var models = obj;
@@ -285,7 +356,7 @@ var Models = function () {
         return new Promise(function (resolve, reject) {
           axios.patch(url, data, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
-              resolve(new Models(_this8._config, response.data.models));
+              resolve(new Models(_this11._config, response.data.models));
             } else {
               reject(response);
             }
@@ -297,9 +368,6 @@ var Models = function () {
     * Update model by merging concepts
     * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
     *   @param {string}               id                                    The id of the model to apply changes to (Required)
-    *   @param {string}               name                                  The new name of the model to update with
-    *   @param {boolean}              conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
-    *   @param {boolean}              closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
     *   @param {object[]}             concepts                              An array of concept objects or string
     *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
     *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
@@ -317,9 +385,6 @@ var Models = function () {
     * Update model by removing concepts
     * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
     *   @param {string}               id                                    The id of the model to apply changes to (Required)
-    *   @param {string}               name                                  The new name of the model to update with
-    *   @param {boolean}              conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
-    *   @param {boolean}              closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
     *   @param {object[]}             concepts                              An array of concept objects or string
     *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
     *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
@@ -337,9 +402,6 @@ var Models = function () {
     * Update model by overwriting concepts
     * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
     *   @param {string}               id                                    The id of the model to apply changes to (Required)
-    *   @param {string}               name                                  The new name of the model to update with
-    *   @param {boolean}              conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
-    *   @param {boolean}              closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
     *   @param {object[]}             concepts                              An array of concept objects or string
     *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
     *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
@@ -377,7 +439,13 @@ var Models = function () {
           url = '' + this._config.apiEndpoint + replaceVars(MODEL_PATH, [id]);
         }
         request = wrapToken(this._config, function (headers) {
-          return axios.delete(url, { headers: headers });
+          return new Promise(function (resolve, reject) {
+            axios.delete(url, { headers: headers }).then(function (response) {
+              var data = clone(response.data);
+              data.rawData = clone(response.data);
+              resolve(data);
+            }, reject);
+          });
         });
       } else {
         if (!ids && !versionId) {
@@ -390,11 +458,17 @@ var Models = function () {
           throw new Error('Wrong arguments passed. You can only delete all\nmodels (provide no arguments), delete select\nmodels (provide list of ids), delete a single\nmodel (providing a single id) or delete a model\nversion (provide a single id and version id)');
         }
         request = wrapToken(this._config, function (headers) {
-          return axios({
-            method: 'delete',
-            url: url,
-            data: data,
-            headers: headers
+          return new Promise(function (resolve, reject) {
+            axios({
+              method: 'delete',
+              url: url,
+              data: data,
+              headers: headers
+            }).then(function (response) {
+              var data = clone(response.data);
+              data.rawData = clone(response.data);
+              resolve(data);
+            }, reject);
           });
         });
       }
@@ -411,7 +485,7 @@ var Models = function () {
   }, {
     key: 'search',
     value: function search(name) {
-      var _this9 = this;
+      var _this12 = this;
 
       var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
@@ -426,7 +500,7 @@ var Models = function () {
         return new Promise(function (resolve, reject) {
           axios.post(url, params, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
-              resolve(new Models(_this9._config, response.data.models));
+              resolve(new Models(_this12._config, response.data.models));
             } else {
               reject(response);
             }

@@ -26,31 +26,21 @@ var Input = function () {
     this.imageUrl = data.data.image.url;
     this.concepts = new Concepts(_config, data.data.concepts);
     this.score = data.score;
+    this.rawData = data;
     this._config = _config;
-    this._rawData = data;
   }
   /**
-  * Returns a javascript object with the raw data attributes (from API)
-  * @return {object} An object that contains data about input from api
+  * Merge concepts to an input
+  * @param {object[]}         concepts    Object with keys explained below:
+  *   @param {object}           concepts[].concept
+  *     @param {string}           concepts[].concept.id        The concept id (required)
+  *     @param {boolean}          concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+  * @param {object}           metadata                      Object with key values to attach to the input (optional)
+  * @return {Promise(Input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
   */
 
 
   _createClass(Input, [{
-    key: 'toObject',
-    value: function toObject() {
-      return this._rawData;
-    }
-    /**
-    * Merge concepts to an input
-    * @param {object[]}         concepts    Object with keys explained below:
-    *   @param {object}           concepts[].concept
-    *     @param {string}           concepts[].concept.id        The concept id (required)
-    *     @param {boolean}          concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
-    * @param {object}           metadata                      Object with key values to attach to the input (optional)
-    * @return {Promise(input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
-    */
-
-  }, {
     key: 'mergeConcepts',
     value: function mergeConcepts(concepts, metadata) {
       return this._update('merge', concepts, metadata);
@@ -62,7 +52,7 @@ var Input = function () {
     *     @param {string}           concepts[].concept.id        The concept id (required)
     *     @param {boolean}          concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
     * @param {object}           metadata                      Object with key values to attach to the input (optional)
-    * @return {Promise(input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
+    * @return {Promise(Input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
     */
 
   }, {
@@ -77,7 +67,7 @@ var Input = function () {
     *     @param {string}           concepts[].concept.id         The concept id (required)
     *     @param {boolean}          concepts[].concept.value      Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
     * @param {object}           metadata                      Object with key values to attach to the input (optional)
-    * @return {Promise(input, error)}                         A Promise that is fulfilled with an instance of Input or rejected with an error
+    * @return {Promise(Input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
     */
 
   }, {

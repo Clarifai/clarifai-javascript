@@ -70,7 +70,7 @@ class Concepts {
   *   @param  {object|string}    concepts[].concept         If string, this is assumed to be the concept id. Otherwise, an object with the following attributes
   *     @param  {object}           concepts[].concept.id      The new concept's id (Required)
   *     @param  {object}           concepts[].concept.name    The new concept's name
-  * @return {Promise(Concept, error)}             A Promise that is fulfilled with a Concept instance or rejected with an error
+  * @return {Promise(Concepts, error)}             A Promise that is fulfilled with a Concepts instance or rejected with an error
   */
   create(concepts=[]) {
     if (checkType(/(Object|String)/, concepts)) {
@@ -96,7 +96,7 @@ class Concepts {
   /**
   * Search for a concept given a name. A wildcard can be given (example: The name "bo*" will match with "boat" and "bow" given those concepts exist
   * @param  {string}   name  The name of the concept to search for
-  * @return {Promise(Models, error)} A Promise that is fulfilled with a Concepts instance or rejected with an error
+  * @return {Promise(Concepts, error)} A Promise that is fulfilled with a Concepts instance or rejected with an error
   */
   search(name) {
     let url = `${this._config.apiEndpoint}${CONCEPT_SEARCH_PATH}`;
@@ -115,20 +115,6 @@ class Concepts {
           }
         }, reject);
       });
-    });
-  }
-  toObjects(...keys) {
-    return Array.prototype.map.call(this, (concept, i)=> {
-      let val;
-      if (keys.length > 0) {
-        val = {};
-        keys.forEach((k)=> {
-          val[k] = concept[k];
-        });
-      } else {
-        val = concept.toObject();
-      }
-      return val;
     });
   }
 };

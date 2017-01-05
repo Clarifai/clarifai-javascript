@@ -28,6 +28,9 @@ module.exports = {
 
     var newPath = path;
     vars.forEach(function (val, index) {
+      if (index === 0) {
+        val = encodeURIComponent(val);
+      }
       newPath = newPath.replace(new RegExp('\\$' + index, 'g'), val);
     });
     return newPath;

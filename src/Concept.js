@@ -10,14 +10,7 @@ class Concept {
     this.appId = data.app_id || data.appId;
     this.value = data.value || null;
     this._config = _config;
-    this._rawData = data;
-  }
-  /**
-  * Returns a javascript object with the raw data attributes (from API)
-  * @return {object} An object that contains data about concept from api
-  */
-  toObject() {
-    return this._rawData;
+    this.rawData = data;
   }
 };
 

@@ -1,6 +1,8 @@
 let App = require('./App');
+let {version} = require('./../package.json');
 
 module.exports = global.Clarifai = {
+  version,
   App,
   GENERAL_MODEL: 'aaa03c23b3724a16a56b629203edc62c',
   FOOD_MODEL: 'bd367be194cf45149e75f01d59f77ba7',

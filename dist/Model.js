@@ -10,6 +10,7 @@ var _require = require('./helpers');
 
 var isSuccess = _require.isSuccess;
 var checkType = _require.checkType;
+var clone = _require.clone;
 
 var _require2 = require('./constants');
 
@@ -44,7 +45,6 @@ var Model = function () {
     _classCallCheck(this, Model);
 
     this._config = _config;
-    this.data = data;
     this.name = data.name;
     this.id = data.id;
     this.createdAt = data.created_at || data.createdAt;
@@ -57,36 +57,26 @@ var Model = function () {
       this.modelVersion = data.model_version || data.modelVersion || data.version;
       this.versionId = (this.modelVersion || {}).id;
     }
-    this._rawData = data;
+    this.rawData = data;
   }
   /**
-  * Returns a javascript object with the raw data attributes (from API)
-  * @return {object} An object that contains data about model from api
+  * Merge concepts to a model
+  * @param {object[]}      concepts    List of concept objects with id
+  * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
   */
 
 
   _createClass(Model, [{
-    key: 'toObject',
-    value: function toObject() {
-      return this._rawData;
-    }
-    /**
-    * Merge concepts to a model
-    * @param {object[]}      concepts    List of concept objects with id
-    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
-    */
-
-  }, {
     key: 'mergeConcepts',
     value: function mergeConcepts() {
       var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-      return this._update({ action: 'merge', concepts: concepts });
+      return this.update({ action: 'merge', concepts: concepts });
     }
     /**
     * Remove concepts from a model
     * @param {object[]}      concepts    List of concept objects with id
-    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+    * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
     */
 
   }, {
@@ -94,12 +84,12 @@ var Model = function () {
     value: function deleteConcepts() {
       var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-      return this._update({ action: 'remove', concepts: concepts });
+      return this.update({ action: 'remove', concepts: concepts });
     }
     /**
     * Overwrite concepts in a model
     * @param {object[]}      concepts    List of concept objects with id
-    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+    * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
     */
 
   }, {
@@ -107,7 +97,7 @@ var Model = function () {
     value: function overwriteConcepts() {
       var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-      return this._update({ action: 'overwrite', concepts: concepts });
+      return this.update({ action: 'overwrite', concepts: concepts });
     }
     /**
     * Update a model's output config or concepts
@@ -119,6 +109,7 @@ var Model = function () {
     *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
     *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
     *   @param {object[]}             action                                The action to perform on the given concepts. Possible values are 'merge', 'remove', or 'overwrite'. Default: 'merge'
+    * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
     */
 
   }, {
@@ -148,7 +139,7 @@ var Model = function () {
     /**
     * Create a new model version
     * @param {boolean}       sync     If true, this returns after model has completely trained. If false, this immediately returns default api response.
-    * @return {Promise(model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
+    * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
     */
 
   }, {
@@ -201,7 +192,8 @@ var Model = function () {
     * Returns model ouputs according to inputs
     * @param {object[]|object|string}       inputs    An array of objects/object/string pointing to an image resource. A string can either be a url or base64 image bytes. Object keys explained below:
     *    @param {object}                      inputs[].image     Object with keys explained below:
-    *       @param {string}                     inputs[].image.(url|base64)  Can be a publicly accessibly url or base64 string representing image bytes (required)
+    *       @param {string}                     inputs[].image.(url|base64)   Can be a publicly accessibly url or base64 string representing image bytes (required)
+    *       @param {number[]}                   inputs[].image.crop           An array containing the percent to be cropped from top, left, bottom and right (optional)
     * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
     */
 
@@ -216,7 +208,13 @@ var Model = function () {
         var params = {
           'inputs': inputs.map(formatImagePredict)
         };
-        return axios.post(url, params, { headers: headers });
+        return new Promise(function (resolve, reject) {
+          axios.post(url, params, { headers: headers }).then(function (response) {
+            var data = clone(response.data);
+            data.rawData = clone(response.data);
+            resolve(data);
+          }, reject);
+        });
       });
     }
     /**
@@ -232,7 +230,9 @@ var Model = function () {
       return wrapToken(this._config, function (headers) {
         return new Promise(function (resolve, reject) {
           axios.get(url, { headers: headers }).then(function (response) {
-            resolve(response.data);
+            var data = clone(response.data);
+            data.rawData = clone(response.data);
+            resolve(data);
           }, reject);
         });
       });
@@ -256,12 +256,18 @@ var Model = function () {
           headers: headers,
           params: { 'per_page': options.perPage, 'page': options.page }
         };
-        return axios.get(url, data);
+        return new Promise(function (resolve, reject) {
+          axios.get(url, data).then(function (response) {
+            var data = clone(response.data);
+            data.rawData = clone(response.data);
+            resolve(data);
+          }, reject);
+        });
       });
     }
     /**
     * Returns all the model's output info
-    * @return {Promise(Model, error)} A Promise that is fulfilled with the API response or rejected with an error
+    * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
     */
 
   }, {
@@ -293,9 +299,15 @@ var Model = function () {
 
       var url = '' + this._config.apiEndpoint + (this.versionId ? replaceVars(MODEL_VERSION_INPUTS_PATH, [this.id, this.versionId]) : replaceVars(MODEL_INPUTS_PATH, [this.id]));
       return wrapToken(this._config, function (headers) {
-        return axios.get(url, {
-          params: { 'per_page': options.perPage, 'page': options.page },
-          headers: headers
+        return new Promise(function (resolve, reject) {
+          axios.get(url, {
+            params: { 'per_page': options.perPage, 'page': options.page },
+            headers: headers
+          }).then(function (response) {
+            var data = clone(response.data);
+            data.rawData = clone(response.data);
+            resolve(data);
+          }, reject);
         });
       });
     }

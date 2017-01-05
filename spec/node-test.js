@@ -1,8 +1,8 @@
 var fs = require('fs');
 var Clarifai = require('./../src/index');
 var Models = require('./../src/Models');
+var Model = require('./../src/Model');
 var Inputs = require('./../src/Inputs');
-var imageBytes = require('./image-bytes');
 
 var sampleImage  = 'https://s3.amazonaws.com/samples.clarifai.com/metro-north.jpg';
 var sampleImage2 = 'https://s3.amazonaws.com/samples.clarifai.com/wedding.jpg';
@@ -13,6 +13,7 @@ var sampleImage6 = 'https://s3.amazonaws.com/samples.clarifai.com/red-car-1.png'
 var sampleImage7 = 'https://s3.amazonaws.com/samples.clarifai.com/red-car-2.jpeg';
 var sampleImage8 = 'https://s3.amazonaws.com/samples.clarifai.com/red-truck.png';
 var sampleImage9 = 'https://s3.amazonaws.com/samples.clarifai.com/black-car.jpg';
+var lastCount;
 var inputsIDs = [];
 var conceptsIds;
 var app;
@@ -119,7 +120,7 @@ describe('Clarifai JS SDK', function() {
             expect(inputs[0].createdAt).toBeDefined();
             expect(inputs[0].id).toBeDefined();
             inputId = inputs[0].id;
-            expect(inputs[0].toObject().data).toBeDefined();
+            expect(inputs[0].rawData).toBeDefined();
             done();
           },
           errorHandler.bind(done)
@@ -149,7 +150,7 @@ describe('Clarifai JS SDK', function() {
             expect(inputs.length).toBe(1);
             expect(inputs[0].createdAt).toBeDefined();
             expect(inputs[0].id).toBeDefined();
-            expect(inputs[0].toObject().data).toBeDefined();
+            expect(inputs[0].rawData).toBeDefined();
             done();
           },
           errorHandler.bind(done)
@@ -179,9 +180,23 @@ describe('Clarifai JS SDK', function() {
             expect(inputs.length).toBe(2);
             expect(inputs[0].id).toBe(inputId1);
             expect(inputs[1].id).toBe(inputId2);
-            expect(inputs[0].toObject().data.metadata.foo).toBe('bar');
-            expect(inputs[1].toObject().data.metadata.foo).toBe('baz');
-            done();
+            expect(inputs[0].rawData.data.metadata.foo).toBe('bar');
+            expect(inputs[1].rawData.data.metadata.foo).toBe('baz');
+            pollStatus(function(interval) {
+              app.inputs.getStatus().then(
+                function(data) {
+                  if (data['counts']['to_process'] == 0) {
+                    clearInterval(interval);
+                    if (data['errors'] > 0) {
+                      throw new Error('Error processing inputs', data);
+                    } else {
+                      done();
+                    }
+                  }
+                },
+                errorHandler.bind(done)
+              );
+            });
           },
           errorHandler.bind(done)
         );
@@ -204,8 +219,22 @@ describe('Clarifai JS SDK', function() {
             expect(inputs.length).toBe(2);
             expect(inputs[0].createdAt).toBeDefined();
             expect(inputs[0].id).toBeDefined();
-            expect(inputs[0].toObject().data).toBeDefined();
-            done();
+            expect(inputs[0].rawData).toBeDefined();
+            pollStatus(function(interval) {
+              app.inputs.getStatus().then(
+                function(data) {
+                  if (data['counts']['to_process'] == 0) {
+                    clearInterval(interval);
+                    if (data['errors'] > 0) {
+                      throw new Error('Error processing inputs', data);
+                    } else {
+                      done();
+                    }
+                  }
+                },
+                errorHandler.bind(done)
+              );
+            });
           },
           errorHandler.bind(done)
         );
@@ -246,8 +275,23 @@ describe('Clarifai JS SDK', function() {
             expect(inputs.length).toBe(2);
             expect(inputs[0].createdAt).toBeDefined();
             expect(inputs[0].id).toBeDefined();
-            expect(inputs[0].toObject().data).toBeDefined();
-            done();
+            expect(inputs[0].rawData).toBeDefined();
+            pollStatus(function(interval) {
+              app.inputs.getStatus().then(
+                function(data) {
+                  lastCount = data['counts']['processed'];
+                  if (data['counts']['to_process'] == 0) {
+                    clearInterval(interval);
+                    if (data['errors'] > 0) {
+                      throw new Error('Error processing inputs', data);
+                    } else {
+                      done();
+                    }
+                  }
+                },
+                errorHandler.bind(done)
+              );
+            });
           },
           errorHandler.bind(done)
         );
@@ -265,7 +309,7 @@ describe('Clarifai JS SDK', function() {
             var input = inputs[0];
             expect(input.id).toBeDefined();
             expect(input.createdAt).toBeDefined();
-            expect(input.toObject().data).toBeDefined();
+            expect(input.rawData).toBeDefined();
             inputs.rawData.forEach(function(input) {
               inputsIDs.push(input.id);
             });
@@ -281,7 +325,7 @@ describe('Clarifai JS SDK', function() {
             expect(input).toBeDefined();
             expect(input.id).toBe(inputId);
             expect(input.createdAt).toBeDefined();
-            expect(input.toObject().data).toBeDefined();
+            expect(input.rawData).toBeDefined();
             done();
           },
           errorHandler.bind(done)
@@ -319,7 +363,7 @@ describe('Clarifai JS SDK', function() {
             expect(inputs instanceof Inputs).toBe(true);
             expect(inputs[0].createdAt).toBeDefined();
             expect(inputs[0].id).toBeDefined();
-            expect(inputs[0].toObject().data).toBeDefined();
+            expect(inputs[0].rawData).toBeDefined();
             done();
           },
           errorHandler.bind(done)
@@ -429,7 +473,7 @@ describe('Clarifai JS SDK', function() {
         function(model) {
           expect(model).toBeDefined();
           expect(model.modelVersion).toBeDefined();
-          expect(model.toObject()).toBeDefined();
+          expect(model.rawData).toBeDefined();
           var version = model.modelVersion;
           expect(version.id).toBeDefined();
           expect(version.created_at).toBeDefined();
@@ -469,8 +513,8 @@ describe('Clarifai JS SDK', function() {
         }
       ]).then(
         function(response) {
-          expect(response.data.outputs).toBeDefined();
-          var outputs = response.data.outputs;
+          expect(response.outputs).toBeDefined();
+          var outputs = response.outputs;
           expect(outputs.length).toBe(2);
           var output = outputs[0];
           expect(output.id).toBeDefined();
@@ -496,8 +540,8 @@ describe('Clarifai JS SDK', function() {
           }
         ]).then(
           function(response) {
-            expect(response.data.outputs).toBeDefined();
-            var outputs = response.data.outputs;
+            expect(response.outputs).toBeDefined();
+            var outputs = response.outputs;
             expect(outputs.length).toBe(2);
             var output = outputs[0];
             expect(output.id).toBeDefined();
@@ -642,13 +686,10 @@ describe('Clarifai JS SDK', function() {
   describe('Search', function() {
     it('Filter by images/inputs only', function(done) {
       app.inputs.search([
-        {
-          'url': sampleImage
-        }
+        { 'input': { 'url': sampleImage } }
       ]).then(
-        function(inputs) {
-          expect(inputs instanceof Inputs).toBe(true);
-          expect(inputs[0].score).toBeDefined();
+        function(response) {
+          expect(response.hits[0].score).toBeDefined();
           done();
         },
         errorHandler.bind(done)
@@ -657,16 +698,11 @@ describe('Clarifai JS SDK', function() {
 
     it('Filter by concepts/inputs only', function(done) {
       app.inputs.search([
-        {
-          'url': sampleImage
-        },
-        {
-          "url": sampleImage5,
-        }
+        { 'input': { 'url': sampleImage } },
+        { 'input': { 'url': sampleImage5 } }
       ]).then(
-        function(inputs) {
-          expect(inputs instanceof Inputs).toBe(true);
-          expect(inputs[0].score).toBeDefined();
+        function(response) {
+          expect(response.hits[0].score).toBeDefined();
           done();
         },
         errorHandler.bind(done)
@@ -675,16 +711,11 @@ describe('Clarifai JS SDK', function() {
 
     it('Filter by images and concepts', function(done) {
       app.inputs.search([
-        {
-          'url': sampleImage
-        },
-        {
-          'name': ferrariId
-        }
+        { 'input': { 'url': sampleImage } },
+        { 'concept': { 'name': ferrariId } }
       ]).then(
-        function(inputs) {
-          expect(inputs instanceof Inputs).toBe(true);
-          expect(inputs[0].score).toBeDefined();
+        function(response) {
+          expect(response.hits[0].score).toBeDefined();
           done();
         },
         errorHandler.bind(done)
@@ -692,14 +723,12 @@ describe('Clarifai JS SDK', function() {
     });
 
     it('Filter with metadata only', function(done) {
-      app.inputs.search([{
-        'metadata': {
-          'baz': 'blah'
-        }
-      }]).then(
-        function(inputs) {
-          expect(inputs instanceof Inputs).toBe(true);
-          expect(inputs.length).toBe(2);
+      app.inputs.search([
+        { 'input': { 'metadata': { 'baz': 'blah' }, 'type': 'input' } }
+      ]).then(
+        function(response) {
+          expect(response.hits[0].score).toBeDefined();
+          expect(response.hits.length).toBe(2);
           done();
         },
         errorHandler.bind(done)
@@ -715,9 +744,8 @@ describe('Clarifai JS SDK', function() {
           }
         }
       ]).then(
-        function(inputs) {
-          expect(inputs instanceof Inputs).toBe(true);
-          expect(inputs[0].score).toBeDefined();
+        function(response) {
+          expect(response.hits[0].score).toBeDefined();
           // robert: comment out tentatively to solve the constant test failing on staging
           //expect(inputs[0].id).toBe(inputId1);
           done();
@@ -735,7 +763,18 @@ describe('Clarifai JS SDK', function() {
           expect(data.status).toBeDefined();
           expect(data.status.code).toBe(10000);
           expect(data.status.description).toBe('Ok');
-          done();
+          pollStatus(function(interval) {
+            app.inputs.getStatus().then(
+              function(data) {
+                console.log('[INPUTS STATUS]', data);
+                if (data['counts']['processed'] == lastCount - 1) {
+                  clearInterval(interval);
+                  done();
+                }
+              },
+              errorHandler.bind(done)
+            );
+          });
         },
         errorHandler.bind(done)
       );
@@ -764,10 +803,9 @@ describe('Clarifai JS SDK', function() {
     it('Allows you to delete a single model version', function(done) {
       app.models.delete(testModelId, testModelVersionId).then(
         function(response) {
-          var data = response.data;
-          expect(data.status).toBeDefined();
-          expect(data.status.code).toBe(10000);
-          expect(data.status.description).toBe('Ok');
+          expect(response.status).toBeDefined();
+          expect(response.status.code).toBe(10000);
+          expect(response.status.description).toBe('Ok');
           done();
         },
         errorHandler.bind(done)
@@ -791,10 +829,9 @@ describe('Clarifai JS SDK', function() {
             if (completed === totalToDelete) {
               app.models.delete(modelIds).then(
                 function(response) {
-                  var data = response.data;
-                  expect(data.status).toBeDefined();
-                  expect(data.status.code).toBe(10000);
-                  expect(data.status.description).toBe('Ok');
+                  expect(response.status).toBeDefined();
+                  expect(response.status.code).toBe(10000);
+                  expect(response.status.description).toBe('Ok');
                   done();
                 },
                 errorHandler.bind(done)
@@ -812,9 +849,9 @@ describe('Clarifai JS SDK', function() {
         function(response) {
           app.models.delete(modelId).then(
             function(response) {
-              expect(response.data.status).toBeDefined();
-              expect(response.data.status.code).toBe(10000);
-              expect(response.data.status.description).toBe('Ok');
+              expect(response.status).toBeDefined();
+              expect(response.status.code).toBe(10000);
+              expect(response.status.description).toBe('Ok');
               done();
             },
             errorHandler.bind(done)
@@ -830,9 +867,26 @@ describe('Clarifai JS SDK', function() {
         function(response) {
           app.models.delete([modelId]).then(
             function(response) {
-              expect(response.data.status).toBeDefined();
-              expect(response.data.status.code).toBe(10000);
-              expect(response.data.status.description).toBe('Ok');
+              expect(response.status).toBeDefined();
+              expect(response.status.code).toBe(10000);
+              expect(response.status.description).toBe('Ok');
+              done();
+            },
+            errorHandler.bind(done)
+          );
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Allows you to have special chars in model id', function(done) {
+      var modelId = 'whois?' + Date.now();
+      app.models.create(modelId).then(
+        function(response) {
+          app.models.get(modelId).then(
+            function(response) {
+              expect(response instanceof Model).toBe(true);
+              expect(response.rawData.id).toBe(modelId);
               done();
             },
             errorHandler.bind(done)
@@ -845,10 +899,9 @@ describe('Clarifai JS SDK', function() {
     it('Allows you to delete all models', function(done) {
       app.models.delete().then(
         function(response) {
-          var data = response.data;
-          expect(data.status).toBeDefined();
-          expect(data.status.code).toBe(10000);
-          expect(data.status.description).toBe('Ok');
+          expect(response.status).toBeDefined();
+          expect(response.status.code).toBe(10000);
+          expect(response.status.description).toBe('Ok');
           done();
         },
         errorHandler.bind(done)
@@ -856,6 +909,13 @@ describe('Clarifai JS SDK', function() {
     });
   });
 });
+
+
+function pollStatus(fn) {
+  var getStatus = setInterval(function() {
+    fn(getStatus)
+  }, 100);
+}
 
 function responseHandler(response) {
   expect(true).toBe(true);
@@ -865,10 +925,10 @@ function responseHandler(response) {
 function errorHandler(err) {
   expect(err.status).toBe(true);
   expect(err.data).toBe(true);
-  log(obj);
+  log(err);
   this();
 };
 
 function log(obj) {
-  console.log(JSON.stringify(obj, null, 2));
+  console.log('[ERROR]', JSON.stringify(obj));
 };
