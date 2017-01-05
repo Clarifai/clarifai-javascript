@@ -87,6 +87,11 @@ module.exports = {
   },
   formatImagesSearch: (image)=> {
     let imageQuery;
+    let input = {
+      'input': {
+        'data': {}
+      }
+    };
     let formatted = [];
     if (typeof image === 'string') {
       imageQuery = {
@@ -100,30 +105,21 @@ module.exports = {
       };
     }
 
-    if (imageQuery.url || imageQuery.baseQuery) {
-      let input = {
-        'input': {
-          'data': {
-            'image': imageQuery
-          }
-        }
-      };
-      if (image.type !== 'input') {
-        input = {'output': input};
-      }
-      formatted.push(input);
+    input['input']['data'] = {
+      'image': imageQuery
+    };
+    if (image.id) {
+      input['input']['id'] = image.id;
     }
-
     if (image.metadata !== undefined) {
-      formatted.push({
-        'input': {
-          'data': {
-            'metadata': image.metadata
-          }
-        }
-      });
+      input['input']['data'] = {
+        'metadata': image.metadata
+      };
     }
-
+    if (image.type !== 'input') {
+      input = { 'output': input };
+    }
+    formatted.push(input);
     return formatted;
   },
   formatConcept: (concept)=> {
@@ -137,18 +133,14 @@ module.exports = {
   },
   formatConceptsSearch: (query)=> {
     if (checkType(/String/, query)) {
-      query = {name: query};
+      query = {id: query};
     }
     let v =  {};
     let type = query.type === 'input'? 'input': 'output';
+    delete query.type;
     v[type] = {
       'data': {
-        'concepts': [
-          {
-            'name': query.name,
-            'value': query.value === undefined? true: !!query.value
-          }
-        ]
+        'concepts': [query]
       }
     };
     return v;

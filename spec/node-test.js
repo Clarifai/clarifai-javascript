@@ -735,7 +735,8 @@ describe('Clarifai JS SDK', function() {
       app.inputs.search([{
         'metadata': {
           'baz': 'blah'
-        }
+        },
+        'type': 'input'
       }]).then(
         function(response) {
           expect(response.hits[0].score).toBeDefined();
@@ -922,10 +923,10 @@ function responseHandler(response) {
 function errorHandler(err) {
   expect(err.status).toBe(true);
   expect(err.data).toBe(true);
-  log(obj);
+  log(err);
   this();
 };
 
 function log(obj) {
-  console.log(JSON.stringify(obj, null, 2));
+  console.log('[ERROR]', JSON.stringify(obj));
 };

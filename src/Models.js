@@ -95,6 +95,64 @@ class Models {
     });
   }
   /**
+   * Returns a version of the model specified by its id
+   * @param {string|object}            model       If string, it is assumed to be model id. Otherwise, if object is given, it can have any of the following keys:
+   *   @param {string}                   model.id          Model id
+   *   @param {string}                   model.name        Model name
+   *   @param {string}                   model.version     Model version
+   *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+   * @param {string}     versionId   The model's id
+   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+   */
+  getVersion(model, versionId) {
+    return new Promise((resolve, reject)=> {
+      this.initModel(model).then((model)=> {
+        model.getVersion(versionId)
+          .then(resolve, reject)
+          .catch(reject);
+      }, reject);
+    });
+  }
+  /**
+  * Returns a list of versions of the model
+  * @param {string|object}            model       If string, it is assumed to be model id. Otherwise, if object is given, it can have any of the following keys:
+  *   @param {string}                   model.id          Model id
+  *   @param {string}                   model.name        Model name
+  *   @param {string}                   model.version     Model version
+  *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+  * @param {object}                   options     Object with keys explained below: (optional)
+  *   @param {number}                   options.page        The page number (optional, default: 1)
+  *   @param {number}                   options.perPage     Number of images to return per page (optional, default: 20)
+  * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
+  */
+  getVersions(model, options={page: 1, perPage: 20}) {
+    return new Promise((resolve, reject)=> {
+      this.initModel(model).then((model)=> {
+        model.getVersions()
+          .then(resolve, reject)
+          .catch(reject);
+      }, reject);
+    });
+  }
+  /**
+  * Returns all the model's output info
+  * @param {string|object}            model       If string, it is assumed to be model id. Otherwise, if object is given, it can have any of the following keys:
+  *   @param {string}                   model.id          Model id
+  *   @param {string}                   model.name        Model name
+  *   @param {string}                   model.version     Model version
+  *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+  * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
+  */
+  getOutputInfo(model) {
+    return new Promise((resolve, reject)=> {
+      this.initModel(model).then((model)=> {
+        model.getOutputInfo()
+          .then(resolve, reject)
+          .catch(reject);
+      }, reject);
+    });
+  }
+  /**
    * Returns all the models
    * @param {Object}     options     Object with keys explained below: (optional)
    *   @param {Number}     options.page        The page number (optional, default: 1)

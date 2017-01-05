@@ -216,10 +216,11 @@ class Inputs {
   *   @param {object[]}               queries          List of all predictions to match with
   *     @param {object}                 queries[].concept            An object with the following keys:
   *       @param {string}                 queries[].concept.type        Search over 'input' or 'output' (default: 'output')
+  *       @param {string}                 queries[].concept.id          The concept id
   *       @param {string}                 queries[].concept.name        The concept name
   *       @param {boolean}                queries[].concept.value       Indicates whether or not the term should match with the prediction returned (default: true)
   *     @param {object}                 queries[].image              An image object that contains the following keys:
-  *       @param {string}                 queries[].image.type          Search over 'input' or 'output' (default: 'output')
+  *       @param {string}                 queries[].image.type          Search over 'input' to get input matches to criteria or 'output' to get inputs that are visually similar to the criteria (default: 'output')
   *       @param {string}                 queries[].image.(base64|url)  Can be a publicly accessibly url or base64 string representing image bytes (required)
   *       @param {number[]}               queries[].image.crop          An array containing the percent to be cropped from top, left, bottom and right (optional)
   *       @param {object}                 queries[].image.metadata      An object with key and value specified by user to refine search with (optional)
