@@ -27,6 +27,7 @@ var _require3 = require('./helpers');
 
 var isSuccess = _require3.isSuccess;
 var checkType = _require3.checkType;
+var clone = _require3.clone;
 
 var MAX_BATCH_SIZE = 128;
 
@@ -340,7 +341,9 @@ var Inputs = function () {
         return new Promise(function (resolve, reject) {
           axios.post(url, data, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
-              resolve(response.data);
+              var _data = clone(response.data);
+              _data.rawData = clone(response.data);
+              resolve(_data);
             } else {
               reject(response);
             }
@@ -361,7 +364,9 @@ var Inputs = function () {
         return new Promise(function (resolve, reject) {
           axios.get(url, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
-              resolve(response.data);
+              var data = clone(response.data);
+              data.rawData = clone(response.data);
+              resolve(data);
             } else {
               reject(response);
             }

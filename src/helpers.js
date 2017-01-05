@@ -16,6 +16,14 @@ module.exports = {
       }
     });
   },
+  clone: (obj)=> {
+    let keys = Object.keys(obj);
+    let copy = {};
+    keys.forEach((k) => {
+      copy[k] = obj[k];
+    });
+    return copy;
+  },
   checkType: (regex, val)=> {
     if ((regex instanceof RegExp) === false) {
       regex = new RegExp(regex);

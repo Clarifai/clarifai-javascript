@@ -1,7 +1,7 @@
 /**
  * Clarifai JavaScript SDK v2.1.0-dev
  *
- * Last updated: Thu Jan 05 2017 13:43:03 GMT-0500 (EST)
+ * Last updated: Thu Jan 05 2017 15:03:53 GMT-0500 (EST)
  *
  * Visit https://developer.clarifai.com
  *
@@ -4052,6 +4052,7 @@ var _require3 = require('./helpers');
 
 var isSuccess = _require3.isSuccess;
 var checkType = _require3.checkType;
+var clone = _require3.clone;
 
 var MAX_BATCH_SIZE = 128;
 
@@ -4365,7 +4366,9 @@ var Inputs = function () {
         return new Promise(function (resolve, reject) {
           axios.post(url, data, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
-              resolve(response.data);
+              var _data = clone(response.data);
+              _data.rawData = clone(response.data);
+              resolve(_data);
             } else {
               reject(response);
             }
@@ -4386,7 +4389,9 @@ var Inputs = function () {
         return new Promise(function (resolve, reject) {
           axios.get(url, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
-              resolve(response.data);
+              var data = clone(response.data);
+              data.rawData = clone(response.data);
+              resolve(data);
             } else {
               reject(response);
             }
@@ -4418,6 +4423,7 @@ var _require = require('./helpers');
 
 var isSuccess = _require.isSuccess;
 var checkType = _require.checkType;
+var clone = _require.clone;
 
 var _require2 = require('./constants');
 
@@ -4617,7 +4623,9 @@ var Model = function () {
         };
         return new Promise(function (resolve, reject) {
           axios.post(url, params, { headers: headers }).then(function (response) {
-            resolve(response.data);
+            var data = clone(response.data);
+            data.rawData = clone(response.data);
+            resolve(data);
           }, reject);
         });
       });
@@ -4635,7 +4643,9 @@ var Model = function () {
       return wrapToken(this._config, function (headers) {
         return new Promise(function (resolve, reject) {
           axios.get(url, { headers: headers }).then(function (response) {
-            resolve(response.data);
+            var data = clone(response.data);
+            data.rawData = clone(response.data);
+            resolve(data);
           }, reject);
         });
       });
@@ -4661,7 +4671,9 @@ var Model = function () {
         };
         return new Promise(function (resolve, reject) {
           axios.get(url, data).then(function (response) {
-            resolve(response.data);
+            var data = clone(response.data);
+            data.rawData = clone(response.data);
+            resolve(data);
           }, reject);
         });
       });
@@ -4705,7 +4717,9 @@ var Model = function () {
             params: { 'per_page': options.perPage, 'page': options.page },
             headers: headers
           }).then(function (response) {
-            resolve(response.data);
+            var data = clone(response.data);
+            data.rawData = clone(response.data);
+            resolve(data);
           }, reject);
         });
       });
@@ -5091,9 +5105,6 @@ var Models = function () {
     * Update model by merging concepts
     * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
     *   @param {string}               id                                    The id of the model to apply changes to (Required)
-    *   @param {string}               name                                  The new name of the model to update with
-    *   @param {boolean}              conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
-    *   @param {boolean}              closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
     *   @param {object[]}             concepts                              An array of concept objects or string
     *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
     *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
@@ -5111,9 +5122,6 @@ var Models = function () {
     * Update model by removing concepts
     * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
     *   @param {string}               id                                    The id of the model to apply changes to (Required)
-    *   @param {string}               name                                  The new name of the model to update with
-    *   @param {boolean}              conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
-    *   @param {boolean}              closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
     *   @param {object[]}             concepts                              An array of concept objects or string
     *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
     *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
@@ -5131,9 +5139,6 @@ var Models = function () {
     * Update model by overwriting concepts
     * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
     *   @param {string}               id                                    The id of the model to apply changes to (Required)
-    *   @param {string}               name                                  The new name of the model to update with
-    *   @param {boolean}              conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
-    *   @param {boolean}              closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
     *   @param {object[]}             concepts                              An array of concept objects or string
     *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
     *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
@@ -5304,7 +5309,7 @@ module.exports = global.Clarifai = {
   BLUR: 'ddd9d34872ab32be9f0e3b2b98a87be2'
 };
 
-}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_4ed3d604.js","/")
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_1fbdbbee.js","/")
 },{"./../package.json":24,"./App":25,"1YiZ5S":23,"buffer":20}],34:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 'use strict';
@@ -5323,6 +5328,14 @@ module.exports = {
         delete obj[key];
       }
     });
+  },
+  clone: function clone(obj) {
+    var keys = Object.keys(obj);
+    var copy = {};
+    keys.forEach(function (k) {
+      copy[k] = obj[k];
+    });
+    return copy;
   },
   checkType: function checkType(regex, val) {
     if (regex instanceof RegExp === false) {

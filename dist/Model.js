@@ -10,6 +10,7 @@ var _require = require('./helpers');
 
 var isSuccess = _require.isSuccess;
 var checkType = _require.checkType;
+var clone = _require.clone;
 
 var _require2 = require('./constants');
 
@@ -209,7 +210,9 @@ var Model = function () {
         };
         return new Promise(function (resolve, reject) {
           axios.post(url, params, { headers: headers }).then(function (response) {
-            resolve(response.data);
+            var data = clone(response.data);
+            data.rawData = clone(response.data);
+            resolve(data);
           }, reject);
         });
       });
@@ -227,7 +230,9 @@ var Model = function () {
       return wrapToken(this._config, function (headers) {
         return new Promise(function (resolve, reject) {
           axios.get(url, { headers: headers }).then(function (response) {
-            resolve(response.data);
+            var data = clone(response.data);
+            data.rawData = clone(response.data);
+            resolve(data);
           }, reject);
         });
       });
@@ -253,7 +258,9 @@ var Model = function () {
         };
         return new Promise(function (resolve, reject) {
           axios.get(url, data).then(function (response) {
-            resolve(response.data);
+            var data = clone(response.data);
+            data.rawData = clone(response.data);
+            resolve(data);
           }, reject);
         });
       });
@@ -297,7 +304,9 @@ var Model = function () {
             params: { 'per_page': options.perPage, 'page': options.page },
             headers: headers
           }).then(function (response) {
-            resolve(response.data);
+            var data = clone(response.data);
+            data.rawData = clone(response.data);
+            resolve(data);
           }, reject);
         });
       });

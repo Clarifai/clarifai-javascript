@@ -1,5 +1,5 @@
 let axios = require('axios');
-let {isSuccess, checkType} = require('./helpers');
+let {isSuccess, checkType, clone} = require('./helpers');
 let {API, SYNC_TIMEOUT, replaceVars} = require('./constants');
 let {wrapToken, formatImagePredict} = require('./utils');
 let {
@@ -157,7 +157,9 @@ class Model {
       };
       return new Promise((resolve, reject)=> {
         axios.post(url, params, {headers}).then((response)=> {
-          resolve(response.data);
+          let data = clone(response.data);
+          data.rawData = clone(response.data);
+          resolve(data);
         }, reject);
       });
     });
@@ -172,7 +174,9 @@ class Model {
     return wrapToken(this._config, (headers)=> {
       return new Promise((resolve, reject)=> {
         axios.get(url, {headers}).then((response)=> {
-          resolve(response.data);
+          let data = clone(response.data);
+          data.rawData = clone(response.data);
+          resolve(data);
         }, reject);
       });
     });
@@ -193,7 +197,9 @@ class Model {
       };
       return new Promise((resolve, reject)=> {
         axios.get(url, data).then((response)=> {
-          resolve(response.data);
+          let data = clone(response.data);
+          data.rawData = clone(response.data);
+          resolve(data);
         }, reject);
       });
     });
@@ -229,7 +235,9 @@ class Model {
           params: {'per_page': options.perPage, 'page': options.page},
           headers
         }).then((response)=> {
-          resolve(response.data);
+          let data = clone(response.data);
+          data.rawData = clone(response.data);
+          resolve(data);
         }, reject);
       });
     });

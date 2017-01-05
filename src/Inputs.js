@@ -3,7 +3,7 @@ let Input = require('./Input');
 let {API, replaceVars} = require('./constants');
 let {INPUT_PATH, INPUTS_PATH, INPUTS_STATUS_PATH, SEARCH_PATH} = API;
 let {wrapToken, formatInput, formatImagesSearch, formatConceptsSearch} = require('./utils');
-let {isSuccess, checkType} = require('./helpers');
+let {isSuccess, checkType, clone} = require('./helpers');
 const MAX_BATCH_SIZE = 128;
 
 /**
@@ -261,7 +261,9 @@ class Inputs {
         axios.post(url, data, {headers})
         .then((response)=> {
           if (isSuccess(response)) {
-            resolve(response.data);
+            let data = clone(response.data);
+            data.rawData = clone(response.data);
+            resolve(data);
           } else {
             reject(response);
           }
@@ -280,7 +282,9 @@ class Inputs {
         axios.get(url, {headers})
         .then((response)=> {
           if (isSuccess(response)) {
-            resolve(response.data);
+            let data = clone(response.data);
+            data.rawData = clone(response.data);
+            resolve(data);
           } else {
             reject(response);
           }
