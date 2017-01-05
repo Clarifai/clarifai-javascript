@@ -1,5 +1,5 @@
 let App = require('./App');
-let {version: VERSION} = require('./../package.json');
+let {version} = require('./../package.json');
 
 module.exports = global.Clarifai = {
   version,
