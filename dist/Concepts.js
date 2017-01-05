@@ -110,7 +110,7 @@ var Concepts = function () {
     *   @param  {object|string}    concepts[].concept         If string, this is assumed to be the concept id. Otherwise, an object with the following attributes
     *     @param  {object}           concepts[].concept.id      The new concept's id (Required)
     *     @param  {object}           concepts[].concept.name    The new concept's name
-    * @return {Promise(Concept, error)}             A Promise that is fulfilled with a Concept instance or rejected with an error
+    * @return {Promise(Concepts, error)}             A Promise that is fulfilled with a Concepts instance or rejected with an error
     */
 
   }, {
@@ -142,7 +142,7 @@ var Concepts = function () {
     /**
     * Search for a concept given a name. A wildcard can be given (example: The name "bo*" will match with "boat" and "bow" given those concepts exist
     * @param  {string}   name  The name of the concept to search for
-    * @return {Promise(Models, error)} A Promise that is fulfilled with a Concepts instance or rejected with an error
+    * @return {Promise(Concepts, error)} A Promise that is fulfilled with a Concepts instance or rejected with an error
     */
 
   }, {
@@ -166,26 +166,6 @@ var Concepts = function () {
             }
           }, reject);
         });
-      });
-    }
-  }, {
-    key: 'toObjects',
-    value: function toObjects() {
-      for (var _len = arguments.length, keys = Array(_len), _key = 0; _key < _len; _key++) {
-        keys[_key] = arguments[_key];
-      }
-
-      return Array.prototype.map.call(this, function (concept, i) {
-        var val = void 0;
-        if (keys.length > 0) {
-          val = {};
-          keys.forEach(function (k) {
-            val[k] = concept[k];
-          });
-        } else {
-          val = concept.toObject();
-        }
-        return val;
       });
     }
   }]);
