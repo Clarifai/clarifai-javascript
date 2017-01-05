@@ -685,9 +685,7 @@ describe('Clarifai JS SDK', function() {
   describe('Search', function() {
     it('Filter by images/inputs only', function(done) {
       app.inputs.search([
-        {
-          'url': sampleImage
-        }
+        { 'input': { 'url': sampleImage } }
       ]).then(
         function(response) {
           expect(response.hits[0].score).toBeDefined();
@@ -699,12 +697,8 @@ describe('Clarifai JS SDK', function() {
 
     it('Filter by concepts/inputs only', function(done) {
       app.inputs.search([
-        {
-          'url': sampleImage
-        },
-        {
-          "url": sampleImage5,
-        }
+        { 'input': { 'url': sampleImage } },
+        { 'input': { 'url': sampleImage5 } }
       ]).then(
         function(response) {
           expect(response.hits[0].score).toBeDefined();
@@ -716,12 +710,8 @@ describe('Clarifai JS SDK', function() {
 
     it('Filter by images and concepts', function(done) {
       app.inputs.search([
-        {
-          'url': sampleImage
-        },
-        {
-          'name': ferrariId
-        }
+        { 'input': { 'url': sampleImage } },
+        { 'concept': { 'name': ferrariId } }
       ]).then(
         function(response) {
           expect(response.hits[0].score).toBeDefined();
@@ -732,12 +722,9 @@ describe('Clarifai JS SDK', function() {
     });
 
     it('Filter with metadata only', function(done) {
-      app.inputs.search([{
-        'metadata': {
-          'baz': 'blah'
-        },
-        'type': 'input'
-      }]).then(
+      app.inputs.search([
+        { 'input': { 'metadata': { 'baz': 'blah' }, 'type': 'input' } }
+      ]).then(
         function(response) {
           expect(response.hits[0].score).toBeDefined();
           expect(response.hits.length).toBe(2);

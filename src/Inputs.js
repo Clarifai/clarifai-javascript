@@ -215,21 +215,22 @@ class Inputs {
   * Search for inputs or outputs based on concepts or images
   *   @param {object[]}               queries          List of all predictions to match with
   *     @param {object}                 queries[].concept            An object with the following keys:
-  *       @param {string}                 queries[].concept.type        Search over 'input' or 'output' (default: 'output')
   *       @param {string}                 queries[].concept.id          The concept id
+  *       @param {string}                 queries[].concept.type        Search over 'input' to get input matches to criteria or 'output' to get inputs that are visually similar to the criteria (default: 'output')
   *       @param {string}                 queries[].concept.name        The concept name
   *       @param {boolean}                queries[].concept.value       Indicates whether or not the term should match with the prediction returned (default: true)
-  *     @param {object}                 queries[].image              An image object that contains the following keys:
-  *       @param {string}                 queries[].image.type          Search over 'input' to get input matches to criteria or 'output' to get inputs that are visually similar to the criteria (default: 'output')
-  *       @param {string}                 queries[].image.(base64|url)  Can be a publicly accessibly url or base64 string representing image bytes (required)
-  *       @param {number[]}               queries[].image.crop          An array containing the percent to be cropped from top, left, bottom and right (optional)
-  *       @param {object}                 queries[].image.metadata      An object with key and value specified by user to refine search with (optional)
+  *     @param {object}                 queries[].input              An image object that contains the following keys:
+  *       @param {string}                 queries[].input.id            The input id
+  *       @param {string}                 queries[].input.type          Search over 'input' to get input matches to criteria or 'output' to get inputs that are visually similar to the criteria (default: 'output')
+  *       @param {string}                 queries[].input.(base64|url)  Can be a publicly accessibly url or base64 string representing image bytes (required)
+  *       @param {number[]}               queries[].input.crop          An array containing the percent to be cropped from top, left, bottom and right (optional)
+  *       @param {object}                 queries[].input.metadata      An object with key and value specified by user to refine search with (optional)
   * @param {Object}                   options       Object with keys explained below: (optional)
   *    @param {Number}                  options.page          The page number (optional, default: 1)
   *    @param {Number}                  options.perPage       Number of images to return per page (optional, default: 20)
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
-  search(ands=[], options={page: 1, perPage: 20}) {
+  search(queries=[], options={page: 1, perPage: 20}) {
     let formattedAnds = [];
     let url = `${this._config.apiEndpoint}${SEARCH_PATH}`;
     let data = {
@@ -242,13 +243,16 @@ class Inputs {
       }
     };
 
-    if (!Array.isArray(ands)) {
-      ands = [ands];
+    if (!Array.isArray(queries)) {
+      queries = [queries];
     }
-    if (ands.length > 0) {
-      ands.forEach(function(andQuery) {
-        let el = andQuery.name? formatConceptsSearch(andQuery): formatImagesSearch(andQuery);
-        formattedAnds = formattedAnds.concat(el);
+    if (queries.length > 0) {
+      queries.forEach(function(query) {
+        if (query['input']) {
+          formattedAnds = formattedAnds.concat(formatImagesSearch(query['input']));
+        } else if (query['concept']) {
+          formattedAnds = formattedAnds.concat(formatConceptsSearch(query['concept']));
+        }
       });
       data['query']['ands'] = formattedAnds;
     }
