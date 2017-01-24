@@ -6,34 +6,34 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var axios = require('axios');
 
-var _require = require('./helpers');
+var _require = require('./helpers'),
+    isSuccess = _require.isSuccess,
+    checkType = _require.checkType,
+    clone = _require.clone;
 
-var isSuccess = _require.isSuccess;
-var checkType = _require.checkType;
-var clone = _require.clone;
+var _require2 = require('./constants'),
+    API = _require2.API,
+    SYNC_TIMEOUT = _require2.SYNC_TIMEOUT,
+    replaceVars = _require2.replaceVars,
+    STATUS = _require2.STATUS,
+    POLLTIME = _require2.POLLTIME;
 
-var _require2 = require('./constants');
+var MODEL_QUEUED_FOR_TRAINING = STATUS.MODEL_QUEUED_FOR_TRAINING,
+    MODEL_TRAINING = STATUS.MODEL_TRAINING;
 
-var API = _require2.API;
-var SYNC_TIMEOUT = _require2.SYNC_TIMEOUT;
-var replaceVars = _require2.replaceVars;
+var _require3 = require('./utils'),
+    wrapToken = _require3.wrapToken,
+    formatImagePredict = _require3.formatImagePredict,
+    formatModel = _require3.formatModel;
 
-var _require3 = require('./utils');
-
-var wrapToken = _require3.wrapToken;
-var formatImagePredict = _require3.formatImagePredict;
-var MODEL_VERSIONS_PATH = API.MODEL_VERSIONS_PATH;
-var MODEL_VERSION_PATH = API.MODEL_VERSION_PATH;
-var MODELS_PATH = API.MODELS_PATH;
-var PREDICT_PATH = API.PREDICT_PATH;
-var VERSION_PREDICT_PATH = API.VERSION_PREDICT_PATH;
-var MODEL_INPUTS_PATH = API.MODEL_INPUTS_PATH;
-var MODEL_OUTPUT_PATH = API.MODEL_OUTPUT_PATH;
-var MODEL_VERSION_INPUTS_PATH = API.MODEL_VERSION_INPUTS_PATH;
-
-var MODEL_QUEUED_FOR_TRAINING = '21103';
-var MODEL_TRAINING = '21101';
-var POLLTIME = 2000;
+var MODEL_VERSIONS_PATH = API.MODEL_VERSIONS_PATH,
+    MODEL_VERSION_PATH = API.MODEL_VERSION_PATH,
+    MODELS_PATH = API.MODELS_PATH,
+    PREDICT_PATH = API.PREDICT_PATH,
+    VERSION_PREDICT_PATH = API.VERSION_PREDICT_PATH,
+    MODEL_INPUTS_PATH = API.MODEL_INPUTS_PATH,
+    MODEL_OUTPUT_PATH = API.MODEL_OUTPUT_PATH,
+    MODEL_VERSION_INPUTS_PATH = API.MODEL_VERSION_INPUTS_PATH;
 
 /**
 * class representing a model

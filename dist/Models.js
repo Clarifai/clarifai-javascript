@@ -6,32 +6,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var axios = require('axios');
 
-var _require = require('es6-promise');
-
-var Promise = _require.Promise;
+var _require = require('es6-promise'),
+    Promise = _require.Promise;
 
 var Model = require('./Model');
 var Concepts = require('./Concepts');
 
-var _require2 = require('./constants');
+var _require2 = require('./constants'),
+    API = _require2.API,
+    ERRORS = _require2.ERRORS,
+    replaceVars = _require2.replaceVars;
 
-var API = _require2.API;
-var replaceVars = _require2.replaceVars;
+var _require3 = require('./helpers'),
+    isSuccess = _require3.isSuccess,
+    checkType = _require3.checkType,
+    clone = _require3.clone;
 
-var _require3 = require('./helpers');
+var _require4 = require('./utils'),
+    wrapToken = _require4.wrapToken,
+    formatModel = _require4.formatModel;
 
-var isSuccess = _require3.isSuccess;
-var checkType = _require3.checkType;
-var clone = _require3.clone;
-
-var _require4 = require('./utils');
-
-var wrapToken = _require4.wrapToken;
-var formatModel = _require4.formatModel;
-var MODELS_PATH = API.MODELS_PATH;
-var MODEL_PATH = API.MODEL_PATH;
-var MODEL_SEARCH_PATH = API.MODEL_SEARCH_PATH;
-var MODEL_VERSION_PATH = API.MODEL_VERSION_PATH;
+var MODELS_PATH = API.MODELS_PATH,
+    MODEL_PATH = API.MODEL_PATH,
+    MODEL_SEARCH_PATH = API.MODEL_SEARCH_PATH,
+    MODEL_VERSION_PATH = API.MODEL_VERSION_PATH;
 
 /**
 * class representing a collection of models
@@ -275,7 +273,7 @@ var Models = function () {
         modelObj = { id: model, name: model };
       }
       if (modelObj.id === undefined) {
-        throw new Error('Model ID is required');
+        throw ERRORS.paramsRequired('Model ID');
       }
       var url = '' + this._config.apiEndpoint + MODELS_PATH;
       var data = { model: modelObj };
@@ -327,31 +325,27 @@ var Models = function () {
     }
     /**
     * Update a model's or a list of models' output config or concepts
-    * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
-    *   @param {string}               id                                    The id of the model to apply changes to (Required)
-    *   @param {string}               name                                  The new name of the model to update with
-    *   @param {boolean}              conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
-    *   @param {boolean}              closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
-    *   @param {object[]}             concepts                              An array of concept objects or string
-    *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
-    *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
-    *   @param {object[]}             action                                The action to perform on the given concepts. Possible values are 'merge', 'remove', or 'overwrite'. Default: 'merge'
+    * @param {object|object[]}      models                                 Can be a single model object or list of model objects with the following attrs:
+    *   @param {string}               models.id                                    The id of the model to apply changes to (Required)
+    *   @param {string}               models.name                                  The new name of the model to update with
+    *   @param {boolean}              models.conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
+    *   @param {boolean}              models.closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
+    *   @param {object[]}             models.concepts                              An array of concept objects or string
+    *     @param {object|string}        models.concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
+    *       @param {string}             models.concepts[].concept.id                   The id of the concept to attach to the model
+    *   @param {object[]}             models.action                                The action to perform on the given concepts. Possible values are 'merge', 'remove', or 'overwrite'. Default: 'merge'
     * @return {Promise(Models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
     */
 
   }, {
     key: 'update',
-    value: function update(obj) {
+    value: function update(models) {
       var _this11 = this;
 
       var url = '' + this._config.apiEndpoint + MODELS_PATH;
-      var models = obj;
-      if (checkType(/Object/, obj)) {
-        models = [obj];
-      }
-      var data = { models: models.map(formatModel) };
-      data['action'] = obj.action || 'merge';
-
+      var modelsList = Array.isArray(models) ? models : [models];
+      var data = { models: modelsList.map(formatModel) };
+      data['action'] = models.action || 'merge';
       return wrapToken(this._config, function (headers) {
         return new Promise(function (resolve, reject) {
           axios.patch(url, data, { headers: headers }).then(function (response) {
@@ -367,58 +361,58 @@ var Models = function () {
     /**
     * Update model by merging concepts
     * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
-    *   @param {string}               id                                    The id of the model to apply changes to (Required)
-    *   @param {object[]}             concepts                              An array of concept objects or string
-    *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
-    *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
+    *   @param {string}               model.id                                    The id of the model to apply changes to (Required)
+    *   @param {object[]}             model.concepts                              An array of concept objects or string
+    *     @param {object|string}        model.concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
+    *       @param {string}             model.concepts[].concept.id                   The id of the concept to attach to the model
     */
 
   }, {
     key: 'mergeConcepts',
     value: function mergeConcepts() {
-      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var model = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      data.action = 'merge';
-      return this.update(data);
+      model.action = 'merge';
+      return this.update(model);
     }
     /**
     * Update model by removing concepts
     * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
-    *   @param {string}               id                                    The id of the model to apply changes to (Required)
-    *   @param {object[]}             concepts                              An array of concept objects or string
-    *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
-    *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
+    *   @param {string}               model.id                                    The id of the model to apply changes to (Required)
+    *   @param {object[]}             model.concepts                              An array of concept objects or string
+    *     @param {object|string}        model.concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
+    *       @param {string}             model.concepts[].concept.id                   The id of the concept to attach to the model
     */
 
   }, {
     key: 'deleteConcepts',
     value: function deleteConcepts() {
-      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var model = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      data.action = 'remove';
-      return this.update(data);
+      model.action = 'remove';
+      return this.update(model);
     }
     /**
     * Update model by overwriting concepts
     * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
-    *   @param {string}               id                                    The id of the model to apply changes to (Required)
-    *   @param {object[]}             concepts                              An array of concept objects or string
-    *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
-    *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
+    *   @param {string}               model.id                                    The id of the model to apply changes to (Required)
+    *   @param {object[]}             model.concepts                              An array of concept objects or string
+    *     @param {object|string}        model.concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
+    *       @param {string}             model.concepts[].concept.id                   The id of the concept to attach to the model
     */
 
   }, {
     key: 'overwriteConcepts',
     value: function overwriteConcepts() {
-      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var model = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      data.action = 'overwrite';
-      return this.update(data);
+      model.action = 'overwrite';
+      return this.update(model);
     }
     /**
      * Deletes all models (if no ids and versionId given) or a model (if given id) or a model version (if given id and verion id)
      * @param {String|String[]}      ids         Can be a single string or an array of strings representing the model ids
-     * @param {String}                versionId   The model's version id
+     * @param {String}               versionId   The model's version id
      * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
      */
 
@@ -455,7 +449,7 @@ var Models = function () {
           url = '' + this._config.apiEndpoint + MODELS_PATH;
           data = { ids: ids };
         } else {
-          throw new Error('Wrong arguments passed. You can only delete all\nmodels (provide no arguments), delete select\nmodels (provide list of ids), delete a single\nmodel (providing a single id) or delete a model\nversion (provide a single id and version id)');
+          throw ERRORS.INVALID_DELETE_ARGS;
         }
         request = wrapToken(this._config, function (headers) {
           return new Promise(function (resolve, reject) {

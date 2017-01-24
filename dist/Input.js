@@ -7,9 +7,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var axios = require('axios');
 var Concepts = require('./Concepts');
 
-var _require = require('./constants');
+var _require = require('./constants'),
+    API = _require.API;
 
-var API = _require.API;
 var INPUTS_PATH = API.INPUTS_PATH;
 
 /**
@@ -26,6 +26,10 @@ var Input = function () {
     this.imageUrl = data.data.image.url;
     this.concepts = new Concepts(_config, data.data.concepts);
     this.score = data.score;
+    this.metadata = data.data.metadata;
+    if (data.data.geo && data.data.geo['geo_point']) {
+      this.geo = { geoPoint: data.data.geo['geo_point'] };
+    }
     this.rawData = data;
     this._config = _config;
   }

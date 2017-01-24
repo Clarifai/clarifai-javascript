@@ -7,28 +7,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var axios = require('axios');
 var Concept = require('./Concept');
 
-var _require = require('./constants');
+var _require = require('./constants'),
+    API = _require.API,
+    replaceVars = _require.replaceVars;
 
-var API = _require.API;
-var replaceVars = _require.replaceVars;
-var CONCEPTS_PATH = API.CONCEPTS_PATH;
-var CONCEPT_PATH = API.CONCEPT_PATH;
-var CONCEPT_SEARCH_PATH = API.CONCEPT_SEARCH_PATH;
+var CONCEPTS_PATH = API.CONCEPTS_PATH,
+    CONCEPT_PATH = API.CONCEPT_PATH,
+    CONCEPT_SEARCH_PATH = API.CONCEPT_SEARCH_PATH;
 
-var _require2 = require('./utils');
+var _require2 = require('./utils'),
+    wrapToken = _require2.wrapToken,
+    formatConcept = _require2.formatConcept;
 
-var wrapToken = _require2.wrapToken;
-var formatConcept = _require2.formatConcept;
-
-var _require3 = require('./helpers');
-
-var isSuccess = _require3.isSuccess;
-var checkType = _require3.checkType;
+var _require3 = require('./helpers'),
+    isSuccess = _require3.isSuccess,
+    checkType = _require3.checkType;
 
 /**
 * class representing a collection of concepts
 * @class
 */
+
 
 var Concepts = function () {
   function Concepts(_config) {

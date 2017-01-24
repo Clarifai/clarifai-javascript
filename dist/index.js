@@ -2,10 +2,8 @@
 
 var App = require('./App');
 
-var _require = require('./../package.json');
-
-var version = _require.version;
-
+var _require = require('./../package.json'),
+    version = _require.version;
 
 module.exports = global.Clarifai = {
   version: version,

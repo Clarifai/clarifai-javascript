@@ -1,5 +1,13 @@
 'use strict';
 
+var MAX_BATCH_SIZE = 128;
+var GEO_LIMIT_TYPES = ['withinMiles', 'withinKilometers', 'withinRadians', 'withinDegrees'];
+var URL_REGEX = /^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i;
+var SYNC_TIMEOUT = 60000;
+var MODEL_QUEUED_FOR_TRAINING = '21103';
+var MODEL_TRAINING = '21101';
+var POLLTIME = 2000;
+
 module.exports = {
   API: {
     TOKEN_PATH: '/v2/token',
@@ -22,6 +30,19 @@ module.exports = {
     INPUTS_STATUS_PATH: '/v2/inputs/status',
     SEARCH_PATH: '/v2/searches'
   },
+  ERRORS: {
+    paramsRequired: function paramsRequired(param) {
+      var paramList = Array.isArray(param) ? param : [param];
+      return new Error('The following ' + (paramList.length > 1 ? 'params are' : 'param is') + ' required: ' + paramList.join(', '));
+    },
+    MAX_INPUTS: new Error('Number of inputs passed exceeded max of ' + MAX_BATCH_SIZE),
+    INVALID_GEOLIMIT_TYPE: new Error('Incorrect geo_limit type. Value must be any of the following: ' + GEO_LIMIT_TYPES.join(', ')),
+    INVALID_DELETE_ARGS: new Error('Wrong arguments passed. You can only delete all models (provide no arguments), delete select models (provide list of ids),\n    delete a single model (providing a single id) or delete a model version (provide a single id and version id)')
+  },
+  STATUS: {
+    MODEL_QUEUED_FOR_TRAINING: MODEL_QUEUED_FOR_TRAINING,
+    MODEL_TRAINING: MODEL_TRAINING
+  },
   // var replacement must be given in order
   replaceVars: function replaceVars(path) {
     var vars = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
@@ -35,6 +56,9 @@ module.exports = {
     });
     return newPath;
   },
-  URL_REGEX: /^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i,
-  SYNC_TIMEOUT: 60000
+  GEO_LIMIT_TYPES: GEO_LIMIT_TYPES,
+  MAX_BATCH_SIZE: MAX_BATCH_SIZE,
+  URL_REGEX: URL_REGEX,
+  SYNC_TIMEOUT: SYNC_TIMEOUT,
+  POLLTIME: POLLTIME
 };

@@ -1,7 +1,14 @@
 let axios = require('axios');
 let {isSuccess, checkType, clone} = require('./helpers');
-let {API, SYNC_TIMEOUT, replaceVars} = require('./constants');
-let {wrapToken, formatImagePredict} = require('./utils');
+let {
+  API,
+  SYNC_TIMEOUT,
+  replaceVars,
+  STATUS,
+  POLLTIME
+} = require('./constants');
+let {MODEL_QUEUED_FOR_TRAINING, MODEL_TRAINING} = STATUS;
+let {wrapToken, formatImagePredict, formatModel} = require('./utils');
 let {
   MODEL_VERSIONS_PATH,
   MODEL_VERSION_PATH,
@@ -12,9 +19,6 @@ let {
   MODEL_OUTPUT_PATH,
   MODEL_VERSION_INPUTS_PATH
 } = API;
-const MODEL_QUEUED_FOR_TRAINING = '21103';
-const MODEL_TRAINING = '21101';
-const POLLTIME = 2000;
 
 /**
 * class representing a model

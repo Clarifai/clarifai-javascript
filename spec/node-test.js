@@ -4,7 +4,7 @@ var Models = require('./../src/Models');
 var Model = require('./../src/Model');
 var Inputs = require('./../src/Inputs');
 
-var sampleImage  = 'https://s3.amazonaws.com/samples.clarifai.com/metro-north.jpg';
+var sampleImage1 = 'https://s3.amazonaws.com/samples.clarifai.com/metro-north.jpg';
 var sampleImage2 = 'https://s3.amazonaws.com/samples.clarifai.com/wedding.jpg';
 var sampleImage3 = 'https://s3.amazonaws.com/samples.clarifai.com/cookies.jpeg';
 var sampleImage4 = 'https://s3.amazonaws.com/samples.clarifai.com/beer.jpeg';
@@ -22,6 +22,9 @@ var ferrariId = 'ferrari' + Date.now();
 var d = Date.now();
 var inputId1 = 'foobar' + d;
 var inputId2 = 'foobaz' + d;
+var inputId3 = 'input-with-geodata-1';
+var inputId4 = 'input-with-geodata-2';
+var inputId5 = 'input-with-geodata-3';
 var testModelId;
 var testModelVersionId;
 
@@ -31,7 +34,8 @@ describe('Clarifai JS SDK', function() {
       process.env.CLIENT_ID,
       process.env.CLIENT_SECRET,
       {
-        'apiEndpoint': process.env.API_ENDPOINT
+        apiEndpoint: process.env.API_ENDPOINT,
+        token: process.env.CLIENT_TOKEN
       }
     );
   });
@@ -41,7 +45,7 @@ describe('Clarifai JS SDK', function() {
     it('Gets a token as a string', function(done) {
       app._config.token().then(
         function(response) {
-          expect(response['access_token']).toEqual(jasmine.any(String));
+          expect(response.accessToken).toEqual(jasmine.any(String));
           done();
         },
         errorHandler.bind(done)
@@ -52,14 +56,13 @@ describe('Clarifai JS SDK', function() {
       var token = {
         'access_token': 'foo',
         'token_type': 'Bearer',
-        'expires_in': 176400,
+        'expires_in': 100000,
         'scope': 'api_access_write api_access api_access_read'
       };
-      var tokenSet = app.setToken(token);
-      app._config.token().then(
+      var app2 = new Clarifai.App(null, null, {token: token});
+      app2._config.token().then(
           function(response) {
-            expect(tokenSet).toEqual(true);
-            expect(response['access_token']).toEqual(jasmine.any(String));
+            expect(response.accessToken).toEqual('foo');
             done();
           },
           errorHandler.bind(done)
@@ -67,11 +70,10 @@ describe('Clarifai JS SDK', function() {
       });
 
     it('Sets a token with a string', function(done) {
-      var tokenSet = app.setToken('foo');
-      app._config.token().then(
+      var app3 = new Clarifai.App(null, null, {token: 'bar'});
+      app3._config.token().then(
         function(response) {
-          expect(tokenSet).toEqual(true);
-          expect(response['access_token']).toEqual(jasmine.any(String));
+          expect(response.accessToken).toEqual('bar');
           done();
         },
         errorHandler.bind(done)
@@ -109,7 +111,7 @@ describe('Clarifai JS SDK', function() {
       it('Adds an input', function(done) {
         app.inputs.create([
           {
-            url: sampleImage,
+            url: sampleImage1,
             allowDuplicateUrl: true
           }
         ]).then(
@@ -130,7 +132,7 @@ describe('Clarifai JS SDK', function() {
       it('Adds an input with concepts', function(done) {
         app.inputs.create([
           {
-            url: sampleImage,
+            url: sampleImage1,
             allowDuplicateUrl: true,
             concepts: [
               {
@@ -202,10 +204,72 @@ describe('Clarifai JS SDK', function() {
         );
       });
 
+      it('Adds input with geodata', function(done) {
+        app.inputs.create([
+          {
+            id: inputId3,
+            url: sampleImage1,
+            allowDuplicateUrl: true,
+            concepts: [{ id: beerId }],
+            geo: { longitude: -30, latitude: 40 }
+          },
+          {
+            id: inputId4,
+            url: sampleImage2,
+            allowDuplicateUrl: true,
+            concepts: [{ id: beerId }],
+            geo: { longitude: -20, latitude: 42.05},
+            metadata: { test: [1, 2, 3, 4] }
+          },
+          {
+            id: inputId5,
+            url: sampleImage3,
+            allowDuplicateUrl: true,
+            concepts: [{ id: beerId }],
+            geo: { longitude: -20, latitude: 42.05},
+            metadata: { test: [1, 2, 3, 4] }
+          }
+        ]).then(
+          function(inputs) {
+            expect(inputs).toBeDefined();
+            expect(inputs instanceof Inputs).toBe(true);
+            expect(inputs.length).toBe(3);
+            expect(inputs[0].id).toBe(inputId3);
+            expect(inputs[1].id).toBe(inputId4);
+            expect(inputs[0].geo.geoPoint.latitude).toBe(40);
+            expect(inputs[0].geo.geoPoint.longitude).toBe(-30);
+            expect(inputs[1].geo.geoPoint.latitude).toBe(42.05);
+            expect(inputs[1].geo.geoPoint.longitude).toBe(-20);
+            expect(inputs[1].rawData.data.metadata.test).toBeDefined();
+            expect(inputs[1].rawData.data.metadata.test[0]).toBe(1);
+            expect(inputs[1].rawData.data.metadata.test[1]).toBe(2);
+            expect(inputs[1].metadata.test).toBeDefined();
+            expect(inputs[1].metadata.test[2]).toBe(3);
+            expect(inputs[1].metadata.test[3]).toBe(4);
+            pollStatus(function(interval) {
+              app.inputs.getStatus().then(
+                function(data) {
+                  if (data['counts']['to_process'] == 0) {
+                    clearInterval(interval);
+                    if (data['errors'] > 0) {
+                      throw new Error('Error processing inputs', data);
+                    } else {
+                      done();
+                    }
+                  }
+                },
+                errorHandler.bind(done)
+              );
+            });
+          },
+          errorHandler.bind(done)
+        );
+      });
+
       it('Bulk adds inputs', function(done) {
         app.inputs.create([
           {
-            url: sampleImage,
+            url: sampleImage1,
             allowDuplicateUrl: true
           },
           {
@@ -464,7 +528,7 @@ describe('Clarifai JS SDK', function() {
     it('Throws an error if no model id is given', function(done) {
       expect(function(){
         app.models.create({name: 'asdf'}, [{'id': ferrariId}]);
-      }).toThrow(new Error('Model ID is required'));
+      }).toThrow(new Error('The following param is required: Model ID'));
       done();
     });
 
@@ -686,7 +750,7 @@ describe('Clarifai JS SDK', function() {
   describe('Search', function() {
     it('Filter by images/inputs only', function(done) {
       app.inputs.search([
-        { 'input': { 'url': sampleImage } }
+        { 'input': { 'url': sampleImage1 } }
       ]).then(
         function(response) {
           expect(response.hits[0].score).toBeDefined();
@@ -698,7 +762,7 @@ describe('Clarifai JS SDK', function() {
 
     it('Filter by concepts/inputs only', function(done) {
       app.inputs.search([
-        { 'input': { 'url': sampleImage } },
+        { 'input': { 'url': sampleImage1 } },
         { 'input': { 'url': sampleImage5 } }
       ]).then(
         function(response) {
@@ -711,7 +775,7 @@ describe('Clarifai JS SDK', function() {
 
     it('Filter by images and concepts', function(done) {
       app.inputs.search([
-        { 'input': { 'url': sampleImage } },
+        { 'input': { 'url': sampleImage1 } },
         { 'concept': { 'name': ferrariId } }
       ]).then(
         function(response) {
@@ -735,23 +799,87 @@ describe('Clarifai JS SDK', function() {
       )
     });
 
+    it('Filter with geopoint and a radius', function(done) {
+      app.inputs.search({
+        input: {
+          geo: {
+            longitude: -19,
+            latitude: 43,
+            type: 'withinRadians',
+            value: 1
+          }
+        }
+      }).then(
+        function(response) {
+          expect(response.hits.length).toBe(3);
+          expect(response.hits[0].score).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Filter with geo box', function(done) {
+      app.inputs.search({
+        input: {
+          geo: [{
+            latitude: 41,
+            longitude: -31
+          }, {
+            latitude: 43.05,
+            longitude: -19
+          }]
+        }
+      }).then(
+        function(response) {
+          expect(response.hits.length).toBe(2);
+          expect(response.hits[0].score).toBeDefined();
+          expect(response.hits[1].score).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Filter with metadata and geodata', function(done) {
+      app.inputs.search({
+        'input': {
+          'metadata': {
+            'test': [1, 2, 3, 4]
+          },
+          'geo': [{
+            latitude: 41,
+            longitude: -31
+          }, {
+            latitude: 43.05,
+            longitude: -19
+          }]
+        }
+      }).then(
+        function(response) {
+          expect(response.hits[0].score).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
     it('Filter with metadata and image url', function(done) {
-      app.inputs.search([
-        {
+      app.inputs.search({
+        input: {
           'url': sampleImage4,
           'metadata': {
             'foo': 'bar'
           }
         }
-      ]).then(
+      }).then(
         function(response) {
+          expect(response.hits.length).toBe(1);
           expect(response.hits[0].score).toBeDefined();
-          // robert: comment out tentatively to solve the constant test failing on staging
-          //expect(inputs[0].id).toBe(inputId1);
           done();
         },
         errorHandler.bind(done)
-      )
+      );
     });
   });
 

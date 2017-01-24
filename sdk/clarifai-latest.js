@@ -1,7 +1,7 @@
 /**
- * Clarifai JavaScript SDK v2.1.0-dev
+ * Clarifai JavaScript SDK v2.1.1-dev
  *
- * Last updated: Thu Jan 05 2017 17:10:25 GMT-0500 (EST)
+ * Last updated: Tue Jan 24 2017 14:15:24 GMT-0500 (EST)
  *
  * Visit https://developer.clarifai.com
  *
@@ -3504,7 +3504,7 @@ process.chdir = function (dir) {
 },{"1YiZ5S":23,"buffer":20}],24:[function(require,module,exports){
 module.exports={
   "name": "clarifai",
-  "version": "2.1.0-dev",
+  "version": "2.1.1-dev",
   "description": "Official Clarifai Javascript SDK",
   "main": "dist/index.js",
   "repository": "https://github.com/Clarifai/clarifai-javascript",
@@ -3531,13 +3531,10 @@ module.exports={
     "gulp-babel": "^6.1.2",
     "gulp-browserify": "0.5.1",
     "gulp-concat": "2.6.0",
-    "gulp-data": "1.2.1",
     "gulp-eslint": "2.0.0",
     "gulp-if": "2.0.0",
-    "gulp-imagemin": "2.3.0",
     "gulp-insert": "0.5.0",
     "gulp-jasmine": "^2.2.1",
-    "gulp-newer": "0.5.1",
     "gulp-notify": "2.2.0",
     "gulp-rename": "1.2.2",
     "gulp-replace-task": "0.11.0",
@@ -3559,14 +3556,21 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var axios = require('axios');
-var es6Promise = require('es6-promise');
-var Promise = es6Promise.Promise;
+
+var _require = require('es6-promise'),
+    Promise = _require.Promise;
+
+var _require2 = require('./helpers'),
+    checkType = _require2.checkType;
 
 var Models = require('./Models');
 var Inputs = require('./Inputs');
 var Concepts = require('./Concepts');
-var constants = require('./constants');
-var API = constants.API;
+
+var _require3 = require('./constants'),
+    API = _require3.API,
+    ERRORS = _require3.ERRORS;
+
 var TOKEN_PATH = API.TOKEN_PATH;
 
 /**
@@ -3602,14 +3606,23 @@ var App = function () {
     key: 'setToken',
     value: function setToken(_token) {
       var token = _token;
+      var now = new Date().getTime();
       if (typeof _token === 'string') {
         token = {
-          'access_token': _token,
-          'expires_in': 176400
+          accessToken: _token,
+          expiresIn: 176400
+        };
+      } else {
+        token = {
+          accessToken: _token.access_token || _token.accessToken,
+          expiresIn: _token.expires_in || _token.expiresIn
         };
       }
-      if (token.access_token && token.expires_in) {
-        this._config['_token'] = token;
+      if (token.accessToken && token.expiresIn || token.access_token && token.expires_in) {
+        if (!token.expireTime) {
+          token.expireTime = now + token.expiresIn * 1000;
+        }
+        this._config._token = token;
         return true;
       }
       return false;
@@ -3617,8 +3630,8 @@ var App = function () {
   }, {
     key: '_validate',
     value: function _validate(clientId, clientSecret, options) {
-      if (clientId === undefined || clientSecret === undefined) {
-        throw new Error('Client ID and client secret is required');
+      if ((!clientId || !clientSecret) && !options.token) {
+        throw ERRORS.paramsRequired(['Client ID', 'Client Secret']);
       }
     }
   }, {
@@ -3629,14 +3642,13 @@ var App = function () {
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
       this._config = {
-        'apiEndpoint': options.apiEndpoint || process && process.env && process.env.API_ENDPOINT || 'https://api.clarifai.com',
-        'clientId': clientId,
-        'clientSecret': clientSecret,
-        '_token': null,
+        apiEndpoint: options.apiEndpoint || process && process.env && process.env.API_ENDPOINT || 'https://api.clarifai.com',
+        clientId: clientId,
+        clientSecret: clientSecret,
         token: function token() {
           return new Promise(function (resolve, reject) {
             var now = new Date().getTime();
-            if (_this._config._token !== null && _this._config._token.expireTime > now) {
+            if (checkType(/Object/, _this._config._token) && _this._config._token.expireTime > now) {
               resolve(_this._config._token);
             } else {
               _this._getToken(resolve, reject);
@@ -3644,6 +3656,9 @@ var App = function () {
           });
         }
       };
+      if (options.token) {
+        this.setToken(options.token);
+      }
       this.models = new Models(this._config);
       this.inputs = new Inputs(this._config);
       this.concepts = new Concepts(this._config);
@@ -3655,11 +3670,8 @@ var App = function () {
 
       this._requestToken().then(function (response) {
         if (response.status === 200) {
-          var token = response.data;
-          var now = new Date().getTime();
-          token.expireTime = now + token.expires_in * 1000;
-          _this2.setToken(token);
-          resolve(token);
+          _this2.setToken(response.data);
+          resolve(_this2._config._token);
         } else {
           reject(response);
         }
@@ -3668,9 +3680,9 @@ var App = function () {
   }, {
     key: '_requestToken',
     value: function _requestToken() {
-      var url = '' + this._config['apiEndpoint'] + TOKEN_PATH;
-      var clientId = this._config['clientId'];
-      var clientSecret = this._config['clientSecret'];
+      var url = '' + this._config.apiEndpoint + TOKEN_PATH;
+      var clientId = this._config.clientId;
+      var clientSecret = this._config.clientSecret;
       return axios({
         'url': url,
         'method': 'POST',
@@ -3690,7 +3702,7 @@ var App = function () {
 module.exports = App;
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/App.js","/")
-},{"./Concepts":27,"./Inputs":29,"./Models":31,"./constants":32,"1YiZ5S":23,"axios":1,"buffer":20,"es6-promise":19}],26:[function(require,module,exports){
+},{"./Concepts":27,"./Inputs":29,"./Models":31,"./constants":32,"./helpers":34,"1YiZ5S":23,"axios":1,"buffer":20,"es6-promise":19}],26:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 "use strict";
 
@@ -3728,28 +3740,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var axios = require('axios');
 var Concept = require('./Concept');
 
-var _require = require('./constants');
+var _require = require('./constants'),
+    API = _require.API,
+    replaceVars = _require.replaceVars;
 
-var API = _require.API;
-var replaceVars = _require.replaceVars;
-var CONCEPTS_PATH = API.CONCEPTS_PATH;
-var CONCEPT_PATH = API.CONCEPT_PATH;
-var CONCEPT_SEARCH_PATH = API.CONCEPT_SEARCH_PATH;
+var CONCEPTS_PATH = API.CONCEPTS_PATH,
+    CONCEPT_PATH = API.CONCEPT_PATH,
+    CONCEPT_SEARCH_PATH = API.CONCEPT_SEARCH_PATH;
 
-var _require2 = require('./utils');
+var _require2 = require('./utils'),
+    wrapToken = _require2.wrapToken,
+    formatConcept = _require2.formatConcept;
 
-var wrapToken = _require2.wrapToken;
-var formatConcept = _require2.formatConcept;
-
-var _require3 = require('./helpers');
-
-var isSuccess = _require3.isSuccess;
-var checkType = _require3.checkType;
+var _require3 = require('./helpers'),
+    isSuccess = _require3.isSuccess,
+    checkType = _require3.checkType;
 
 /**
 * class representing a collection of concepts
 * @class
 */
+
 
 var Concepts = function () {
   function Concepts(_config) {
@@ -3910,9 +3921,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var axios = require('axios');
 var Concepts = require('./Concepts');
 
-var _require = require('./constants');
+var _require = require('./constants'),
+    API = _require.API;
 
-var API = _require.API;
 var INPUTS_PATH = API.INPUTS_PATH;
 
 /**
@@ -3929,6 +3940,10 @@ var Input = function () {
     this.imageUrl = data.data.image.url;
     this.concepts = new Concepts(_config, data.data.concepts);
     this.score = data.score;
+    this.metadata = data.data.metadata;
+    if (data.data.geo && data.data.geo['geo_point']) {
+      this.geo = { geoPoint: data.data.geo['geo_point'] };
+    }
     this.rawData = data;
     this._config = _config;
   }
@@ -4032,34 +4047,33 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var axios = require('axios');
 var Input = require('./Input');
 
-var _require = require('./constants');
+var _require = require('./constants'),
+    API = _require.API,
+    ERRORS = _require.ERRORS,
+    MAX_BATCH_SIZE = _require.MAX_BATCH_SIZE,
+    replaceVars = _require.replaceVars;
 
-var API = _require.API;
-var replaceVars = _require.replaceVars;
-var INPUT_PATH = API.INPUT_PATH;
-var INPUTS_PATH = API.INPUTS_PATH;
-var INPUTS_STATUS_PATH = API.INPUTS_STATUS_PATH;
-var SEARCH_PATH = API.SEARCH_PATH;
+var INPUT_PATH = API.INPUT_PATH,
+    INPUTS_PATH = API.INPUTS_PATH,
+    INPUTS_STATUS_PATH = API.INPUTS_STATUS_PATH,
+    SEARCH_PATH = API.SEARCH_PATH;
 
-var _require2 = require('./utils');
+var _require2 = require('./utils'),
+    wrapToken = _require2.wrapToken,
+    formatInput = _require2.formatInput,
+    formatImagesSearch = _require2.formatImagesSearch,
+    formatConceptsSearch = _require2.formatConceptsSearch;
 
-var wrapToken = _require2.wrapToken;
-var formatInput = _require2.formatInput;
-var formatImagesSearch = _require2.formatImagesSearch;
-var formatConceptsSearch = _require2.formatConceptsSearch;
-
-var _require3 = require('./helpers');
-
-var isSuccess = _require3.isSuccess;
-var checkType = _require3.checkType;
-var clone = _require3.clone;
-
-var MAX_BATCH_SIZE = 128;
+var _require3 = require('./helpers'),
+    isSuccess = _require3.isSuccess,
+    checkType = _require3.checkType,
+    clone = _require3.clone;
 
 /**
-* class representing a collection of inputs
-* @class
-*/
+ * class representing a collection of inputs
+ * @class
+ */
+
 
 var Inputs = function () {
   function Inputs(_config) {
@@ -4081,8 +4095,8 @@ var Inputs = function () {
     this._config = _config;
   }
   /**
-  * Get all inputs in app
-  * @param {Object}    options  Object with keys explained below: (optional)
+   * Get all inputs in app
+   * @param {Object}    options  Object with keys explained below: (optional)
   *   @param {Number}    options.page  The page number (optional, default: 1)
   *   @param {Number}    options.perPage  Number of images to return per page (optional, default: 20)
   * @return {Promise(Inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
@@ -4102,8 +4116,8 @@ var Inputs = function () {
           axios.get(url, {
             headers: headers,
             params: {
-              'page': options.page,
-              'per_page': options.perPage
+              page: options.page,
+              per_page: options.perPage
             }
           }).then(function (response) {
             if (isSuccess(response)) {
@@ -4143,11 +4157,11 @@ var Inputs = function () {
       }
       var url = '' + this._config.apiEndpoint + INPUTS_PATH;
       if (inputs.length > MAX_BATCH_SIZE) {
-        throw new Error('Number of inputs exceeded maximum of ' + MAX_BATCH_SIZE);
+        throw ERRORS.MAX_INPUTS;
       }
       return wrapToken(this._config, function (headers) {
         var data = {
-          'inputs': inputs.map(formatInput)
+          inputs: inputs.map(formatInput)
         };
         return new Promise(function (resolve, reject) {
           axios.post(url, data, { headers: headers }).then(function (response) {
@@ -4218,7 +4232,7 @@ var Inputs = function () {
 
       var url = '' + this._config.apiEndpoint + INPUTS_PATH;
       return wrapToken(this._config, function (headers) {
-        var data = id === null ? { 'delete_all': true } : { 'ids': id };
+        var data = id === null ? { delete_all: true } : { ids: id };
         return axios({
           url: url,
           method: 'delete',
@@ -4232,7 +4246,6 @@ var Inputs = function () {
     * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
     *   @param {object}           inputs[].input
     *     @param {string}           inputs[].input.id        The id of the input to update
-    *     @param {object}           inputs[].input.metadata                     Object with key values to attach to the input (optional)
     *     @param {string}           inputs[].input.concepts  Object with keys explained below:
     *       @param {object}           inputs[].input.concepts[].concept
     *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
@@ -4243,14 +4256,14 @@ var Inputs = function () {
   }, {
     key: 'mergeConcepts',
     value: function mergeConcepts(inputs) {
-      return this._update('merge', inputs);
+      inputs.action = 'merge';
+      return this.update(inputs);
     }
     /**
     * Delete concepts to inputs in bulk
     * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
     *   @param {object}           inputs[].input
     *     @param {string}           inputs[].input.id                           The id of the input to update
-    *     @param {object}           inputs[].input.metadata                     Object with key values to attach to the input (optional)
     *     @param {string}           inputs[].input.concepts                     Object with keys explained below:
     *       @param {object}           inputs[].input.concepts[].concept
     *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
@@ -4261,14 +4274,14 @@ var Inputs = function () {
   }, {
     key: 'deleteConcepts',
     value: function deleteConcepts(inputs) {
-      return this._update('remove', inputs);
+      inputs.action = 'remove';
+      return this.update(inputs);
     }
     /**
     * Overwrite inputs in bulk
     * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
     *   @param {object}           inputs[].input
     *     @param {string}           inputs[].input.id                           The id of the input to update
-    *     @param {object}           inputs[].input.metadata                     Object with key values to attach to the input (optional)
     *     @param {string}           inputs[].input.concepts                     Object with keys explained below:
     *       @param {object}           inputs[].input.concepts[].concept
     *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
@@ -4279,23 +4292,37 @@ var Inputs = function () {
   }, {
     key: 'overwriteConcepts',
     value: function overwriteConcepts(inputs) {
-      return this._update('overwrite', inputs);
+      inputs.action = 'overwrite';
+      return this.update(inputs);
     }
+    /**
+    * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
+    *   @param {object}           inputs[].input
+    *     @param {string}           inputs[].input.id                           The id of the input to update
+    *     @param {object}           inputs[].input.metadata                     Object with key values to attach to the input (optional)
+    *     @param {object}           inputs[].input.geo                          Object with latitude and longitude coordinates to associate with an input. Can be used in search query as the proximity of an input to a reference point (optional)
+    *       @param {number}           inputs[].input.geo.latitude                 +/- latitude val of geodata
+    *       @param {number}           inputs[].input.geo.longitude                +/- longitude val of geodata
+    *     @param {string}           inputs[].input.concepts                     Object with keys explained below (optional):
+    *       @param {object}           inputs[].input.concepts[].concept
+    *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
+    *         @param {boolean}          inputs[].input.concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+    * @return {Promise(Inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
+    */
+
   }, {
-    key: '_update',
-    value: function _update(action, inputs) {
+    key: 'update',
+    value: function update(inputs) {
       var _this6 = this;
 
       var url = '' + this._config.apiEndpoint + INPUTS_PATH;
-      if (checkType(/Object/, inputs)) {
-        inputs = [inputs];
-      }
-      if (inputs.length > MAX_BATCH_SIZE) {
-        throw new Error('Number of inputs exceeded maximum of ' + MAX_BATCH_SIZE);
+      var inputsList = Array.isArray(inputs) ? inputs : [inputs];
+      if (inputsList.length > MAX_BATCH_SIZE) {
+        throw ERRORS.MAX_INPUTS;
       }
       var data = {
-        action: action,
-        'inputs': inputs.map(function (input) {
+        action: inputs.action,
+        inputs: inputsList.map(function (input) {
           return formatInput(input, false);
         })
       };
@@ -4340,12 +4367,12 @@ var Inputs = function () {
       var formattedAnds = [];
       var url = '' + this._config.apiEndpoint + SEARCH_PATH;
       var data = {
-        'query': {
-          'ands': []
+        query: {
+          ands: []
         },
-        'pagination': {
-          'page': options.page,
-          'per_page': options.perPage
+        pagination: {
+          page: options.page,
+          per_page: options.perPage
         }
       };
 
@@ -4354,13 +4381,13 @@ var Inputs = function () {
       }
       if (queries.length > 0) {
         queries.forEach(function (query) {
-          if (query['input']) {
-            formattedAnds = formattedAnds.concat(formatImagesSearch(query['input']));
-          } else if (query['concept']) {
-            formattedAnds = formattedAnds.concat(formatConceptsSearch(query['concept']));
+          if (query.input) {
+            formattedAnds = formattedAnds.concat(formatImagesSearch(query.input));
+          } else if (query.concept) {
+            formattedAnds = formattedAnds.concat(formatConceptsSearch(query.concept));
           }
         });
-        data['query']['ands'] = formattedAnds;
+        data.query.ands = formattedAnds;
       }
       return wrapToken(this._config, function (headers) {
         return new Promise(function (resolve, reject) {
@@ -4419,34 +4446,34 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var axios = require('axios');
 
-var _require = require('./helpers');
+var _require = require('./helpers'),
+    isSuccess = _require.isSuccess,
+    checkType = _require.checkType,
+    clone = _require.clone;
 
-var isSuccess = _require.isSuccess;
-var checkType = _require.checkType;
-var clone = _require.clone;
+var _require2 = require('./constants'),
+    API = _require2.API,
+    SYNC_TIMEOUT = _require2.SYNC_TIMEOUT,
+    replaceVars = _require2.replaceVars,
+    STATUS = _require2.STATUS,
+    POLLTIME = _require2.POLLTIME;
 
-var _require2 = require('./constants');
+var MODEL_QUEUED_FOR_TRAINING = STATUS.MODEL_QUEUED_FOR_TRAINING,
+    MODEL_TRAINING = STATUS.MODEL_TRAINING;
 
-var API = _require2.API;
-var SYNC_TIMEOUT = _require2.SYNC_TIMEOUT;
-var replaceVars = _require2.replaceVars;
+var _require3 = require('./utils'),
+    wrapToken = _require3.wrapToken,
+    formatImagePredict = _require3.formatImagePredict,
+    formatModel = _require3.formatModel;
 
-var _require3 = require('./utils');
-
-var wrapToken = _require3.wrapToken;
-var formatImagePredict = _require3.formatImagePredict;
-var MODEL_VERSIONS_PATH = API.MODEL_VERSIONS_PATH;
-var MODEL_VERSION_PATH = API.MODEL_VERSION_PATH;
-var MODELS_PATH = API.MODELS_PATH;
-var PREDICT_PATH = API.PREDICT_PATH;
-var VERSION_PREDICT_PATH = API.VERSION_PREDICT_PATH;
-var MODEL_INPUTS_PATH = API.MODEL_INPUTS_PATH;
-var MODEL_OUTPUT_PATH = API.MODEL_OUTPUT_PATH;
-var MODEL_VERSION_INPUTS_PATH = API.MODEL_VERSION_INPUTS_PATH;
-
-var MODEL_QUEUED_FOR_TRAINING = '21103';
-var MODEL_TRAINING = '21101';
-var POLLTIME = 2000;
+var MODEL_VERSIONS_PATH = API.MODEL_VERSIONS_PATH,
+    MODEL_VERSION_PATH = API.MODEL_VERSION_PATH,
+    MODELS_PATH = API.MODELS_PATH,
+    PREDICT_PATH = API.PREDICT_PATH,
+    VERSION_PREDICT_PATH = API.VERSION_PREDICT_PATH,
+    MODEL_INPUTS_PATH = API.MODEL_INPUTS_PATH,
+    MODEL_OUTPUT_PATH = API.MODEL_OUTPUT_PATH,
+    MODEL_VERSION_INPUTS_PATH = API.MODEL_VERSION_INPUTS_PATH;
 
 /**
 * class representing a model
@@ -4744,32 +4771,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var axios = require('axios');
 
-var _require = require('es6-promise');
-
-var Promise = _require.Promise;
+var _require = require('es6-promise'),
+    Promise = _require.Promise;
 
 var Model = require('./Model');
 var Concepts = require('./Concepts');
 
-var _require2 = require('./constants');
+var _require2 = require('./constants'),
+    API = _require2.API,
+    ERRORS = _require2.ERRORS,
+    replaceVars = _require2.replaceVars;
 
-var API = _require2.API;
-var replaceVars = _require2.replaceVars;
+var _require3 = require('./helpers'),
+    isSuccess = _require3.isSuccess,
+    checkType = _require3.checkType,
+    clone = _require3.clone;
 
-var _require3 = require('./helpers');
+var _require4 = require('./utils'),
+    wrapToken = _require4.wrapToken,
+    formatModel = _require4.formatModel;
 
-var isSuccess = _require3.isSuccess;
-var checkType = _require3.checkType;
-var clone = _require3.clone;
-
-var _require4 = require('./utils');
-
-var wrapToken = _require4.wrapToken;
-var formatModel = _require4.formatModel;
-var MODELS_PATH = API.MODELS_PATH;
-var MODEL_PATH = API.MODEL_PATH;
-var MODEL_SEARCH_PATH = API.MODEL_SEARCH_PATH;
-var MODEL_VERSION_PATH = API.MODEL_VERSION_PATH;
+var MODELS_PATH = API.MODELS_PATH,
+    MODEL_PATH = API.MODEL_PATH,
+    MODEL_SEARCH_PATH = API.MODEL_SEARCH_PATH,
+    MODEL_VERSION_PATH = API.MODEL_VERSION_PATH;
 
 /**
 * class representing a collection of models
@@ -5013,7 +5038,7 @@ var Models = function () {
         modelObj = { id: model, name: model };
       }
       if (modelObj.id === undefined) {
-        throw new Error('Model ID is required');
+        throw ERRORS.paramsRequired('Model ID');
       }
       var url = '' + this._config.apiEndpoint + MODELS_PATH;
       var data = { model: modelObj };
@@ -5065,31 +5090,27 @@ var Models = function () {
     }
     /**
     * Update a model's or a list of models' output config or concepts
-    * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
-    *   @param {string}               id                                    The id of the model to apply changes to (Required)
-    *   @param {string}               name                                  The new name of the model to update with
-    *   @param {boolean}              conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
-    *   @param {boolean}              closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
-    *   @param {object[]}             concepts                              An array of concept objects or string
-    *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
-    *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
-    *   @param {object[]}             action                                The action to perform on the given concepts. Possible values are 'merge', 'remove', or 'overwrite'. Default: 'merge'
+    * @param {object|object[]}      models                                 Can be a single model object or list of model objects with the following attrs:
+    *   @param {string}               models.id                                    The id of the model to apply changes to (Required)
+    *   @param {string}               models.name                                  The new name of the model to update with
+    *   @param {boolean}              models.conceptsMutuallyExclusive             Do you expect to see more than one of the concepts in this model in the SAME image? Set to false (default) if so. Otherwise, set to true.
+    *   @param {boolean}              models.closedEnvironment                     Do you expect to run the trained model on images that do not contain ANY of the concepts in the model? Set to false (default) if so. Otherwise, set to true.
+    *   @param {object[]}             models.concepts                              An array of concept objects or string
+    *     @param {object|string}        models.concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
+    *       @param {string}             models.concepts[].concept.id                   The id of the concept to attach to the model
+    *   @param {object[]}             models.action                                The action to perform on the given concepts. Possible values are 'merge', 'remove', or 'overwrite'. Default: 'merge'
     * @return {Promise(Models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
     */
 
   }, {
     key: 'update',
-    value: function update(obj) {
+    value: function update(models) {
       var _this11 = this;
 
       var url = '' + this._config.apiEndpoint + MODELS_PATH;
-      var models = obj;
-      if (checkType(/Object/, obj)) {
-        models = [obj];
-      }
-      var data = { models: models.map(formatModel) };
-      data['action'] = obj.action || 'merge';
-
+      var modelsList = Array.isArray(models) ? models : [models];
+      var data = { models: modelsList.map(formatModel) };
+      data['action'] = models.action || 'merge';
       return wrapToken(this._config, function (headers) {
         return new Promise(function (resolve, reject) {
           axios.patch(url, data, { headers: headers }).then(function (response) {
@@ -5105,58 +5126,58 @@ var Models = function () {
     /**
     * Update model by merging concepts
     * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
-    *   @param {string}               id                                    The id of the model to apply changes to (Required)
-    *   @param {object[]}             concepts                              An array of concept objects or string
-    *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
-    *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
+    *   @param {string}               model.id                                    The id of the model to apply changes to (Required)
+    *   @param {object[]}             model.concepts                              An array of concept objects or string
+    *     @param {object|string}        model.concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
+    *       @param {string}             model.concepts[].concept.id                   The id of the concept to attach to the model
     */
 
   }, {
     key: 'mergeConcepts',
     value: function mergeConcepts() {
-      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var model = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      data.action = 'merge';
-      return this.update(data);
+      model.action = 'merge';
+      return this.update(model);
     }
     /**
     * Update model by removing concepts
     * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
-    *   @param {string}               id                                    The id of the model to apply changes to (Required)
-    *   @param {object[]}             concepts                              An array of concept objects or string
-    *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
-    *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
+    *   @param {string}               model.id                                    The id of the model to apply changes to (Required)
+    *   @param {object[]}             model.concepts                              An array of concept objects or string
+    *     @param {object|string}        model.concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
+    *       @param {string}             model.concepts[].concept.id                   The id of the concept to attach to the model
     */
 
   }, {
     key: 'deleteConcepts',
     value: function deleteConcepts() {
-      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var model = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      data.action = 'remove';
-      return this.update(data);
+      model.action = 'remove';
+      return this.update(model);
     }
     /**
     * Update model by overwriting concepts
     * @param {object|object[]}      model                                 Can be a single model object or list of model objects with the following attrs:
-    *   @param {string}               id                                    The id of the model to apply changes to (Required)
-    *   @param {object[]}             concepts                              An array of concept objects or string
-    *     @param {object|string}        concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
-    *       @param {string}             concepts[].concept.id                   The id of the concept to attach to the model
+    *   @param {string}               model.id                                    The id of the model to apply changes to (Required)
+    *   @param {object[]}             model.concepts                              An array of concept objects or string
+    *     @param {object|string}        model.concepts[].concept                    If string is given, this is interpreted as concept id. Otherwise, if object is given, client expects the following attributes
+    *       @param {string}             model.concepts[].concept.id                   The id of the concept to attach to the model
     */
 
   }, {
     key: 'overwriteConcepts',
     value: function overwriteConcepts() {
-      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var model = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      data.action = 'overwrite';
-      return this.update(data);
+      model.action = 'overwrite';
+      return this.update(model);
     }
     /**
      * Deletes all models (if no ids and versionId given) or a model (if given id) or a model version (if given id and verion id)
      * @param {String|String[]}      ids         Can be a single string or an array of strings representing the model ids
-     * @param {String}                versionId   The model's version id
+     * @param {String}               versionId   The model's version id
      * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
      */
 
@@ -5193,7 +5214,7 @@ var Models = function () {
           url = '' + this._config.apiEndpoint + MODELS_PATH;
           data = { ids: ids };
         } else {
-          throw new Error('Wrong arguments passed. You can only delete all\nmodels (provide no arguments), delete select\nmodels (provide list of ids), delete a single\nmodel (providing a single id) or delete a model\nversion (provide a single id and version id)');
+          throw ERRORS.INVALID_DELETE_ARGS;
         }
         request = wrapToken(this._config, function (headers) {
           return new Promise(function (resolve, reject) {
@@ -5260,6 +5281,14 @@ module.exports = Models;
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 'use strict';
 
+var MAX_BATCH_SIZE = 128;
+var GEO_LIMIT_TYPES = ['withinMiles', 'withinKilometers', 'withinRadians', 'withinDegrees'];
+var URL_REGEX = /^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i;
+var SYNC_TIMEOUT = 60000;
+var MODEL_QUEUED_FOR_TRAINING = '21103';
+var MODEL_TRAINING = '21101';
+var POLLTIME = 2000;
+
 module.exports = {
   API: {
     TOKEN_PATH: '/v2/token',
@@ -5282,6 +5311,19 @@ module.exports = {
     INPUTS_STATUS_PATH: '/v2/inputs/status',
     SEARCH_PATH: '/v2/searches'
   },
+  ERRORS: {
+    paramsRequired: function paramsRequired(param) {
+      var paramList = Array.isArray(param) ? param : [param];
+      return new Error('The following ' + (paramList.length > 1 ? 'params are' : 'param is') + ' required: ' + paramList.join(', '));
+    },
+    MAX_INPUTS: new Error('Number of inputs passed exceeded max of ' + MAX_BATCH_SIZE),
+    INVALID_GEOLIMIT_TYPE: new Error('Incorrect geo_limit type. Value must be any of the following: ' + GEO_LIMIT_TYPES.join(', ')),
+    INVALID_DELETE_ARGS: new Error('Wrong arguments passed. You can only delete all models (provide no arguments), delete select models (provide list of ids),\n    delete a single model (providing a single id) or delete a model version (provide a single id and version id)')
+  },
+  STATUS: {
+    MODEL_QUEUED_FOR_TRAINING: MODEL_QUEUED_FOR_TRAINING,
+    MODEL_TRAINING: MODEL_TRAINING
+  },
   // var replacement must be given in order
   replaceVars: function replaceVars(path) {
     var vars = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
@@ -5295,8 +5337,11 @@ module.exports = {
     });
     return newPath;
   },
-  URL_REGEX: /^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i,
-  SYNC_TIMEOUT: 60000
+  GEO_LIMIT_TYPES: GEO_LIMIT_TYPES,
+  MAX_BATCH_SIZE: MAX_BATCH_SIZE,
+  URL_REGEX: URL_REGEX,
+  SYNC_TIMEOUT: SYNC_TIMEOUT,
+  POLLTIME: POLLTIME
 };
 
 }).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/constants.js","/")
@@ -5306,10 +5351,8 @@ module.exports = {
 
 var App = require('./App');
 
-var _require = require('./../package.json');
-
-var version = _require.version;
-
+var _require = require('./../package.json'),
+    version = _require.version;
 
 module.exports = global.Clarifai = {
   version: version,
@@ -5325,7 +5368,7 @@ module.exports = global.Clarifai = {
   BLUR: 'ddd9d34872ab32be9f0e3b2b98a87be2'
 };
 
-}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_f8d1d51b.js","/")
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_1dc7f456.js","/")
 },{"./../package.json":24,"./App":25,"1YiZ5S":23,"buffer":20}],34:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 'use strict';
@@ -5366,29 +5409,27 @@ module.exports = {
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 'use strict';
 
-var _require = require('es6-promise');
+var _require = require('es6-promise'),
+    Promise = _require.Promise;
 
-var Promise = _require.Promise;
+var _require2 = require('./constants'),
+    URL_REGEX = _require2.URL_REGEX,
+    GEO_LIMIT_TYPES = _require2.GEO_LIMIT_TYPES,
+    ERRORS = _require2.ERRORS;
 
-var _require2 = require('./constants');
+var _require3 = require('./helpers'),
+    checkType = _require3.checkType,
+    clone = _require3.clone;
 
-var URL_REGEX = _require2.URL_REGEX;
-
-var _require3 = require('./helpers');
-
-var checkType = _require3.checkType;
-
-var _require4 = require('./../package.json');
-
-var VERSION = _require4.version;
-
+var _require4 = require('./../package.json'),
+    VERSION = _require4.version;
 
 module.exports = {
   wrapToken: function wrapToken(_config, requestFn) {
     return new Promise(function (resolve, reject) {
       _config.token().then(function (token) {
         var headers = {
-          'Authorization': 'Bearer ' + token['access_token'],
+          Authorization: 'Bearer ' + token.accessToken,
           'X-Clarifai-Client': 'js:' + VERSION
         };
         requestFn(headers).then(resolve, reject);
@@ -5400,48 +5441,51 @@ module.exports = {
 
     var formatted = {};
     if (data.id === null || data.id === undefined) {
-      throw new Error('Model id is required');
+      throw ERRORS.paramsRequired('Model ID');
     }
     formatted.id = data.id;
     if (data.name) {
       formatted.name = data.name;
     }
-    formatted['output_info'] = {};
+    formatted.output_info = {};
     if (data.conceptsMutuallyExclusive !== undefined) {
-      formatted['output_info']['output_config'] = formatted['output_info']['output_config'] || {};
-      formatted['output_info']['output_config']['concepts_mutually_exclusive'] = !!data.conceptsMutuallyExclusive;
+      formatted.output_info.output_config = formatted.output_info.output_config || {};
+      formatted.output_info.output_config.concepts_mutually_exclusive = !!data.conceptsMutuallyExclusive;
     }
     if (data.closedEnvironment !== undefined) {
-      formatted['output_info']['output_config'] = formatted['output_info']['output_config'] || {};
-      formatted['output_info']['output_config']['closed_environment'] = !!data.closedEnvironment;
+      formatted.output_info.output_config = formatted.output_info.output_config || {};
+      formatted.output_info.output_config.closed_environment = !!data.closedEnvironment;
     }
     if (data.concepts) {
-      formatted['output_info']['data'] = {
-        'concepts': data.concepts.map(module.exports.formatConcept)
+      formatted.output_info.data = {
+        concepts: data.concepts.map(module.exports.formatConcept)
       };
     }
     return formatted;
   },
   formatInput: function formatInput(data, includeImage) {
-    var input = checkType(/String/, data) ? { 'url': data } : data;
+    var input = checkType(/String/, data) ? { url: data } : data;
     var formatted = {
-      'id': input['id'] || null,
-      'data': {}
+      id: input.id || null,
+      data: {}
     };
-    if (input['concepts']) {
-      formatted['data']['concepts'] = input['concepts'];
+    if (input.concepts) {
+      formatted.data.concepts = input.concepts;
     }
-    if (input['metadata']) {
-      formatted['data']['metadata'] = input['metadata'];
+    if (input.metadata) {
+      formatted.data.metadata = input.metadata;
+    }
+    if (input.geo) {
+      formatted.data.geo = { geo_point: input.geo };
     }
     if (includeImage !== false) {
-      formatted.data['image'] = {
-        'url': input['url'],
-        'base64': input['base64'],
-        'crop': input['crop']
+      formatted.data.image = {
+        url: input.url,
+        base64: input.base64,
+        crop: input.crop
       };
       if (data.allowDuplicateUrl) {
-        formatted.data.image['allow_duplicate_url'] = true;
+        formatted.data.image.allow_duplicate_url = true;
       }
     }
     return formatted;
@@ -5451,55 +5495,79 @@ module.exports = {
     if (checkType(/String/, data)) {
       if (URL_REGEX.test(image) === true) {
         image = {
-          'url': data
+          url: data
         };
       } else {
         image = {
-          'base64': data
+          base64: data
         };
       }
     }
     return {
-      'data': {
+      data: {
         image: image
       }
     };
   },
   formatImagesSearch: function formatImagesSearch(image) {
     var imageQuery = void 0;
-    var input = {
-      'input': {
-        'data': {}
-      }
-    };
+    var input = { 'input': { 'data': {} } };
     var formatted = [];
-    if (typeof image === 'string') {
-      imageQuery = {
-        'url': image
-      };
+    if (checkType(/String/, image)) {
+      imageQuery = { 'url': image };
     } else {
-      imageQuery = {
-        'url': image['url'] || null,
-        'base64': image['base64'] || null,
-        'crop': image['crop'] || null
-      };
+      imageQuery = image.url || image.base64 ? {
+        image: {
+          url: image.url,
+          base64: image.base64,
+          crop: image.crop
+        }
+      } : {};
     }
 
-    input['input']['data'] = {
-      'image': imageQuery
-    };
+    input.input.data = imageQuery;
     if (image.id) {
-      input['input']['id'] = image.id;
+      input.input.id = image.id;
     }
     if (image.metadata !== undefined) {
-      input['input']['data'] = {
-        'metadata': image.metadata
-      };
+      input.input.data.metadata = image.metadata;
     }
-    if (image.type !== 'input') {
-      input = { 'output': input };
+    if (image.geo !== undefined) {
+      if (checkType(/Array/, image.geo)) {
+        input.input.data.geo = {
+          geo_box: image.geo.map(function (p) {
+            return { geo_point: p };
+          })
+        };
+      } else if (checkType(/Object/, image.geo)) {
+        if (GEO_LIMIT_TYPES.indexOf(image.geo.type) === -1) {
+          throw ERRORS.INVALID_GEOLIMIT_TYPE;
+        }
+        input.input.data.geo = {
+          geo_point: {
+            latitude: image.geo.latitude,
+            longitude: image.geo.longitude
+          },
+          geo_limit: {
+            type: image.geo.type,
+            value: image.geo.value
+          }
+        };
+      }
     }
-    formatted.push(input);
+    if (image.type !== 'input' && input.input.data.image) {
+      if (input.input.data.metadata || input.input.data.geo) {
+        var dataCopy = { input: { data: clone(input.input.data) } };
+        var imageCopy = { input: { data: clone(input.input.data) } };
+        delete dataCopy.input.data.image;
+        delete imageCopy.input.data.metadata;
+        delete imageCopy.input.data.geo;
+        input = [{ output: imageCopy }, dataCopy];
+      } else {
+        input = [{ output: input }];
+      }
+    }
+    formatted = formatted.concat(input);
     return formatted;
   },
   formatConcept: function formatConcept(concept) {
@@ -5519,8 +5587,8 @@ module.exports = {
     var type = query.type === 'input' ? 'input' : 'output';
     delete query.type;
     v[type] = {
-      'data': {
-        'concepts': [query]
+      data: {
+        concepts: [query]
       }
     };
     return v;

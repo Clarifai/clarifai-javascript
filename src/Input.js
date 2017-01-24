@@ -14,6 +14,10 @@ class Input {
     this.imageUrl = data.data.image.url;
     this.concepts = new Concepts(_config, data.data.concepts);
     this.score = data.score;
+    this.metadata = data.data.metadata;
+    if (data.data.geo && data.data.geo['geo_point']) {
+      this.geo = { geoPoint: data.data.geo['geo_point'] };
+    }
     this.rawData = data;
     this._config = _config;
   }

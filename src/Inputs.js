@@ -1,15 +1,14 @@
 let axios = require('axios');
 let Input = require('./Input');
-let {API, replaceVars} = require('./constants');
+let {API, ERRORS, MAX_BATCH_SIZE, replaceVars} = require('./constants');
 let {INPUT_PATH, INPUTS_PATH, INPUTS_STATUS_PATH, SEARCH_PATH} = API;
 let {wrapToken, formatInput, formatImagesSearch, formatConceptsSearch} = require('./utils');
 let {isSuccess, checkType, clone} = require('./helpers');
-const MAX_BATCH_SIZE = 128;
 
 /**
-* class representing a collection of inputs
-* @class
-*/
+ * class representing a collection of inputs
+ * @class
+ */
 class Inputs {
   constructor(_config, rawData=[]) {
     this.rawData = rawData;
@@ -24,8 +23,8 @@ class Inputs {
     this._config = _config;
   }
   /**
-  * Get all inputs in app
-  * @param {Object}    options  Object with keys explained below: (optional)
+   * Get all inputs in app
+   * @param {Object}    options  Object with keys explained below: (optional)
   *   @param {Number}    options.page  The page number (optional, default: 1)
   *   @param {Number}    options.perPage  Number of images to return per page (optional, default: 20)
   * @return {Promise(Inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
@@ -37,8 +36,8 @@ class Inputs {
         axios.get(url, {
           headers,
           params: {
-            'page': options.page,
-            'per_page': options.perPage,
+            page: options.page,
+            per_page: options.perPage,
           }
         }).then((response)=> {
           if (isSuccess(response)) {
@@ -73,11 +72,11 @@ class Inputs {
     }
     let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
     if (inputs.length > MAX_BATCH_SIZE) {
-      throw new Error(`Number of inputs exceeded maximum of ${MAX_BATCH_SIZE}`);
+      throw ERRORS.MAX_INPUTS;
     }
     return wrapToken(this._config, (headers)=> {
       let data = {
-        'inputs': inputs.map(formatInput)
+        inputs: inputs.map(formatInput)
       };
       return new Promise((resolve, reject)=> {
         axios.post(url, data, {headers})
@@ -131,8 +130,8 @@ class Inputs {
   _deleteInputs(id=null) {
     let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
     return wrapToken(this._config, (headers)=> {
-      let data = id === null? {'delete_all': true}:
-        {'ids': id};
+      let data = id === null? {delete_all: true}:
+        {ids: id};
       return axios({
         url,
         method: 'delete',
@@ -146,7 +145,6 @@ class Inputs {
   * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
   *   @param {object}           inputs[].input
   *     @param {string}           inputs[].input.id        The id of the input to update
-  *     @param {object}           inputs[].input.metadata                     Object with key values to attach to the input (optional)
   *     @param {string}           inputs[].input.concepts  Object with keys explained below:
   *       @param {object}           inputs[].input.concepts[].concept
   *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
@@ -154,14 +152,14 @@ class Inputs {
   * @return {Promise(Inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
   */
   mergeConcepts(inputs) {
-    return this._update('merge', inputs);
+    inputs.action = 'merge';
+    return this.update(inputs);
   }
   /**
   * Delete concepts to inputs in bulk
   * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
   *   @param {object}           inputs[].input
   *     @param {string}           inputs[].input.id                           The id of the input to update
-  *     @param {object}           inputs[].input.metadata                     Object with key values to attach to the input (optional)
   *     @param {string}           inputs[].input.concepts                     Object with keys explained below:
   *       @param {object}           inputs[].input.concepts[].concept
   *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
@@ -169,14 +167,14 @@ class Inputs {
   * @return {Promise(Inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
   */
   deleteConcepts(inputs) {
-    return this._update('remove', inputs);
+    inputs.action = 'remove';
+    return this.update(inputs);
   }
   /**
   * Overwrite inputs in bulk
   * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
   *   @param {object}           inputs[].input
   *     @param {string}           inputs[].input.id                           The id of the input to update
-  *     @param {object}           inputs[].input.metadata                     Object with key values to attach to the input (optional)
   *     @param {string}           inputs[].input.concepts                     Object with keys explained below:
   *       @param {object}           inputs[].input.concepts[].concept
   *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
@@ -184,19 +182,32 @@ class Inputs {
   * @return {Promise(Inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
   */
   overwriteConcepts(inputs) {
-    return this._update('overwrite', inputs);
+    inputs.action = 'overwrite';
+    return this.update(inputs);
   }
-  _update(action, inputs) {
+  /**
+  * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
+  *   @param {object}           inputs[].input
+  *     @param {string}           inputs[].input.id                           The id of the input to update
+  *     @param {object}           inputs[].input.metadata                     Object with key values to attach to the input (optional)
+  *     @param {object}           inputs[].input.geo                          Object with latitude and longitude coordinates to associate with an input. Can be used in search query as the proximity of an input to a reference point (optional)
+  *       @param {number}           inputs[].input.geo.latitude                 +/- latitude val of geodata
+  *       @param {number}           inputs[].input.geo.longitude                +/- longitude val of geodata
+  *     @param {string}           inputs[].input.concepts                     Object with keys explained below (optional):
+  *       @param {object}           inputs[].input.concepts[].concept
+  *         @param {string}           inputs[].input.concepts[].concept.id        The concept id (required)
+  *         @param {boolean}          inputs[].input.concepts[].concept.value     Whether or not the input is a positive (true) or negative (false) example of the concept (default: true)
+  * @return {Promise(Inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
+  */
+  update(inputs) {
     let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
-    if (checkType(/Object/, inputs)) {
-      inputs = [inputs];
-    }
-    if (inputs.length > MAX_BATCH_SIZE) {
-      throw new Error(`Number of inputs exceeded maximum of ${MAX_BATCH_SIZE}`);
+    let inputsList = Array.isArray(inputs)? inputs: [inputs];
+    if (inputsList.length > MAX_BATCH_SIZE) {
+      throw ERRORS.MAX_INPUTS;
     }
     let data = {
-      action,
-      'inputs': inputs.map((input)=> formatInput(input, false))
+      action: inputs.action,
+      inputs: inputsList.map((input)=> formatInput(input, false))
     };
     return wrapToken(this._config, (headers)=> {
       return new Promise((resolve, reject)=> {
@@ -234,12 +245,12 @@ class Inputs {
     let formattedAnds = [];
     let url = `${this._config.apiEndpoint}${SEARCH_PATH}`;
     let data = {
-      'query': {
-        'ands': []
+      query: {
+        ands: []
       },
-      'pagination': {
-        'page': options.page,
-        'per_page': options.perPage
+      pagination: {
+        page: options.page,
+        per_page: options.perPage
       }
     };
 
@@ -248,13 +259,13 @@ class Inputs {
     }
     if (queries.length > 0) {
       queries.forEach(function(query) {
-        if (query['input']) {
-          formattedAnds = formattedAnds.concat(formatImagesSearch(query['input']));
-        } else if (query['concept']) {
-          formattedAnds = formattedAnds.concat(formatConceptsSearch(query['concept']));
+        if (query.input) {
+          formattedAnds = formattedAnds.concat(formatImagesSearch(query.input));
+        } else if (query.concept) {
+          formattedAnds = formattedAnds.concat(formatConceptsSearch(query.concept));
         }
       });
-      data['query']['ands'] = formattedAnds;
+      data.query.ands = formattedAnds;
     }
     return wrapToken(this._config, (headers)=> {
       return new Promise((resolve, reject)=> {

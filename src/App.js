@@ -1,11 +1,10 @@
 let axios = require('axios');
-let es6Promise = require('es6-promise');
-let {Promise} = es6Promise;
+let {Promise}  = require('es6-promise');
+let {checkType} = require('./helpers');
 let Models = require('./Models');
 let Inputs = require('./Inputs');
 let Concepts = require('./Concepts');
-let constants = require('./constants');
-let {API} = constants;
+let {API, ERRORS}  = require('./constants');
 let {TOKEN_PATH} = API;
 
 
@@ -32,35 +31,44 @@ class App {
   */
   setToken(_token) {
     let token = _token;
+    let now = new Date().getTime();
     if (typeof _token === 'string') {
       token = {
-        'access_token': _token,
-        'expires_in': 176400
+        accessToken: _token,
+        expiresIn: 176400
+      };
+    } else {
+      token = {
+        accessToken: _token.access_token || _token.accessToken,
+        expiresIn: _token.expires_in || _token.expiresIn
       };
     }
-    if (token.access_token && token.expires_in) {
-      this._config['_token'] = token;
+    if ((token.accessToken && token.expiresIn) ||
+        (token.access_token && token.expires_in)) {
+      if (!token.expireTime) {
+        token.expireTime = now + (token.expiresIn * 1000);
+      }
+      this._config._token = token;
       return true;
     }
     return false;
   }
   _validate(clientId, clientSecret, options) {
-    if (clientId === undefined || clientSecret === undefined) {
-      throw new Error('Client ID and client secret is required');
+    if ((!clientId || !clientSecret) && !options.token) {
+      throw ERRORS.paramsRequired(['Client ID', 'Client Secret']);
     }
   }
   _init(clientId, clientSecret, options={}) {
     this._config = {
-      'apiEndpoint': options.apiEndpoint ||
+      apiEndpoint: options.apiEndpoint ||
         (process && process.env && process.env.API_ENDPOINT) ||
         'https://api.clarifai.com',
-      'clientId': clientId,
-      'clientSecret': clientSecret,
-      '_token': null,
+      clientId,
+      clientSecret,
       token: ()=> {
         return new Promise((resolve, reject)=> {
           let now = new Date().getTime();
-          if (this._config._token !== null && this._config._token.expireTime > now) {
+          if (checkType(/Object/, this._config._token) && this._config._token.expireTime > now) {
             resolve(this._config._token);
           } else {
             this._getToken(resolve, reject);
@@ -68,6 +76,9 @@ class App {
         });
       }
     };
+    if (options.token) {
+      this.setToken(options.token);
+    }
     this.models = new Models(this._config);
     this.inputs = new Inputs(this._config);
     this.concepts = new Concepts(this._config);
@@ -76,11 +87,8 @@ class App {
     this._requestToken().then(
       (response)=> {
         if (response.status === 200) {
-          let token = response.data;
-          let now = new Date().getTime();
-          token.expireTime = now + (token.expires_in * 1000);
-          this.setToken(token);
-          resolve(token);
+          this.setToken(response.data);
+          resolve(this._config._token);
         } else {
           reject(response);
         }
@@ -89,9 +97,9 @@ class App {
     );
   }
   _requestToken() {
-    let url = `${this._config['apiEndpoint']}${TOKEN_PATH}`;
-    let clientId = this._config['clientId'];
-    let clientSecret = this._config['clientSecret'];
+    let url = `${this._config.apiEndpoint}${TOKEN_PATH}`;
+    let clientId = this._config.clientId;
+    let clientSecret = this._config.clientSecret;
     return axios({
       'url': url,
       'method': 'POST',
