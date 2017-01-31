@@ -194,20 +194,28 @@ var Model = function () {
     *    @param {object}                      inputs[].image     Object with keys explained below:
     *       @param {string}                     inputs[].image.(url|base64)   Can be a publicly accessibly url or base64 string representing image bytes (required)
     *       @param {number[]}                   inputs[].image.crop           An array containing the percent to be cropped from top, left, bottom and right (optional)
+    * @param {string}                       language  A string code representing the language to return results in (example: 'zh' for simplified Chinese, 'ru' for Russian, 'ja' for Japanese)
     * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
     */
 
   }, {
     key: 'predict',
-    value: function predict(inputs) {
+    value: function predict(inputs, language) {
       if (checkType(/(Object|String)/, inputs)) {
         inputs = [inputs];
       }
       var url = '' + this._config.apiEndpoint + (this.versionId ? replaceVars(VERSION_PREDICT_PATH, [this.id, this.versionId]) : replaceVars(PREDICT_PATH, [this.id]));
       return wrapToken(this._config, function (headers) {
-        var params = {
-          'inputs': inputs.map(formatImagePredict)
-        };
+        var params = { inputs: inputs.map(formatImagePredict) };
+        if (language) {
+          params['model'] = {
+            output_info: {
+              output_config: {
+                language: language
+              }
+            }
+          };
+        }
         return new Promise(function (resolve, reject) {
           axios.post(url, params, { headers: headers }).then(function (response) {
             var data = clone(response.data);

@@ -60,6 +60,7 @@ class Models {
    *   @param {string}                   model.id          Model id
    *   @param {string}                   model.name        Model name
    *   @param {string}                   model.version     Model version
+   *   @param {string}                   model.language    Model language (only for Clarifai's public models)
    *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
    * @param {object[]|object|string}   inputs    An array of objects/object/string pointing to an image resource. A string can either be a url or base64 image bytes. Object keys explained below:
    *    @param {object}                  inputs[].image     Object with keys explained below:
@@ -68,8 +69,8 @@ class Models {
    */
   predict(model, inputs) {
     return new Promise((resolve, reject)=> {
-      this.initModel(model).then((model)=> {
-        model.predict(inputs)
+      this.initModel(model).then((modelObj)=> {
+        modelObj.predict(inputs, model.language)
           .then(resolve, reject)
           .catch(reject);
       }, reject);

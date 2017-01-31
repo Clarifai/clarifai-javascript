@@ -149,12 +149,12 @@ var Concepts = function () {
     value: function search(name) {
       var _this5 = this;
 
+      var language = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
       var url = '' + this._config.apiEndpoint + CONCEPT_SEARCH_PATH;
       return wrapToken(this._config, function (headers) {
         var params = {
-          'concept_query': {
-            name: name
-          }
+          'concept_query': { name: name, language: language }
         };
         return new Promise(function (resolve, reject) {
           axios.post(url, params, { headers: headers }).then(function (response) {

@@ -98,13 +98,11 @@ class Concepts {
   * @param  {string}   name  The name of the concept to search for
   * @return {Promise(Concepts, error)} A Promise that is fulfilled with a Concepts instance or rejected with an error
   */
-  search(name) {
+  search(name, language=null) {
     let url = `${this._config.apiEndpoint}${CONCEPT_SEARCH_PATH}`;
     return wrapToken(this._config, (headers)=> {
       let params = {
-        'concept_query': {
-          name
-        }
+        'concept_query': { name, language }
       };
       return new Promise((resolve, reject)=> {
         axios.post(url, params, {headers}).then((response)=> {

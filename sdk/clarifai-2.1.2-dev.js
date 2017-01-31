@@ -1,7 +1,7 @@
 /**
- * Clarifai JavaScript SDK v2.1.1-dev
+ * Clarifai JavaScript SDK v2.1.2-dev
  *
- * Last updated: Tue Jan 24 2017 14:15:24 GMT-0500 (EST)
+ * Last updated: Tue Jan 31 2017 18:14:33 GMT-0500 (EST)
  *
  * Visit https://developer.clarifai.com
  *
@@ -3504,7 +3504,7 @@ process.chdir = function (dir) {
 },{"1YiZ5S":23,"buffer":20}],24:[function(require,module,exports){
 module.exports={
   "name": "clarifai",
-  "version": "2.1.1-dev",
+  "version": "2.1.2-dev",
   "description": "Official Clarifai Javascript SDK",
   "main": "dist/index.js",
   "repository": "https://github.com/Clarifai/clarifai-javascript",
@@ -3882,12 +3882,12 @@ var Concepts = function () {
     value: function search(name) {
       var _this5 = this;
 
+      var language = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
       var url = '' + this._config.apiEndpoint + CONCEPT_SEARCH_PATH;
       return wrapToken(this._config, function (headers) {
         var params = {
-          'concept_query': {
-            name: name
-          }
+          'concept_query': { name: name, language: language }
         };
         return new Promise(function (resolve, reject) {
           axios.post(url, params, { headers: headers }).then(function (response) {
@@ -4634,20 +4634,28 @@ var Model = function () {
     *    @param {object}                      inputs[].image     Object with keys explained below:
     *       @param {string}                     inputs[].image.(url|base64)   Can be a publicly accessibly url or base64 string representing image bytes (required)
     *       @param {number[]}                   inputs[].image.crop           An array containing the percent to be cropped from top, left, bottom and right (optional)
+    * @param {string}                       language  A string code representing the language to return results in (example: 'zh' for simplified Chinese, 'ru' for Russian, 'ja' for Japanese)
     * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
     */
 
   }, {
     key: 'predict',
-    value: function predict(inputs) {
+    value: function predict(inputs, language) {
       if (checkType(/(Object|String)/, inputs)) {
         inputs = [inputs];
       }
       var url = '' + this._config.apiEndpoint + (this.versionId ? replaceVars(VERSION_PREDICT_PATH, [this.id, this.versionId]) : replaceVars(PREDICT_PATH, [this.id]));
       return wrapToken(this._config, function (headers) {
-        var params = {
-          'inputs': inputs.map(formatImagePredict)
-        };
+        var params = { inputs: inputs.map(formatImagePredict) };
+        if (language) {
+          params['model'] = {
+            output_info: {
+              output_config: {
+                language: language
+              }
+            }
+          };
+        }
         return new Promise(function (resolve, reject) {
           axios.post(url, params, { headers: headers }).then(function (response) {
             var data = clone(response.data);
@@ -4864,6 +4872,7 @@ var Models = function () {
      *   @param {string}                   model.id          Model id
      *   @param {string}                   model.name        Model name
      *   @param {string}                   model.version     Model version
+     *   @param {string}                   model.language    Model language (only for Clarifai's public models)
      *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
      * @param {object[]|object|string}   inputs    An array of objects/object/string pointing to an image resource. A string can either be a url or base64 image bytes. Object keys explained below:
      *    @param {object}                  inputs[].image     Object with keys explained below:
@@ -4877,8 +4886,8 @@ var Models = function () {
       var _this3 = this;
 
       return new Promise(function (resolve, reject) {
-        _this3.initModel(model).then(function (model) {
-          model.predict(inputs).then(resolve, reject).catch(reject);
+        _this3.initModel(model).then(function (modelObj) {
+          modelObj.predict(inputs, model.language).then(resolve, reject).catch(reject);
         }, reject);
       });
     }
@@ -5368,7 +5377,7 @@ module.exports = global.Clarifai = {
   BLUR: 'ddd9d34872ab32be9f0e3b2b98a87be2'
 };
 
-}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_1dc7f456.js","/")
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_fe52e460.js","/")
 },{"./../package.json":24,"./App":25,"1YiZ5S":23,"buffer":20}],34:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 'use strict';

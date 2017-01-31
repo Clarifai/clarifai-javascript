@@ -16,6 +16,7 @@ var sampleImage9 = 'https://s3.amazonaws.com/samples.clarifai.com/black-car.jpg'
 var lastCount;
 var inputsIDs = [];
 var conceptsIds;
+var langConceptId = '的な' + Date.now();
 var app;
 var beerId = 'beer' + Date.now();
 var ferrariId = 'ferrari' + Date.now();
@@ -54,10 +55,10 @@ describe('Clarifai JS SDK', function() {
 
     it('Sets a token with an object', function(done) {
       var token = {
-        'access_token': 'foo',
-        'token_type': 'Bearer',
-        'expires_in': 100000,
-        'scope': 'api_access_write api_access api_access_read'
+        access_token: 'foo',
+        token_type: 'Bearer',
+        expires_in: 100000,
+        scope: 'api_access_write api_access api_access_read'
       };
       var app2 = new Clarifai.App(null, null, {token: token});
       app2._config.token().then(
@@ -86,6 +87,7 @@ describe('Clarifai JS SDK', function() {
       'porsche' + Date.now(),
       'rolls royce' + Date.now(),
       'lamborghini' + Date.now(),
+      langConceptId,
       beerId,
       ferrariId
     ];
@@ -98,6 +100,38 @@ describe('Clarifai JS SDK', function() {
           expect(concepts[0].id).toBe(conceptsIds[0]);
           expect(concepts[1].id).toBe(conceptsIds[1]);
           expect(concepts[2].id).toBe(conceptsIds[2]);
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('gets concept with id in a different language', function(done) {
+      app.concepts.get(langConceptId).then(
+        function(concept) {
+          expect(concept.id).toBe(langConceptId);
+          expect(concept.name).toBe(langConceptId);
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('search concepts', function(done) {
+      app.concepts.search('lab*').then(
+        function(concepts) {
+          expect(concepts.length).toBe(6);
+          expect(concepts[0].name).toBe('label');
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('search concepts in a different language', function(done) {
+      app.concepts.search('狗*', 'zh').then(
+        function(concepts) {
+          expect(concepts.length).toBe(3);
           done();
         },
         errorHandler.bind(done)
@@ -142,6 +176,9 @@ describe('Clarifai JS SDK', function() {
               {
                 id: "car",
                 value: false
+              },
+              {
+                id: "的な"
               }
             ]
           }
@@ -310,13 +347,9 @@ describe('Clarifai JS SDK', function() {
             url: sampleImage6,
             allowDuplicateUrl: true,
             concepts: [
-              {
-                id: ferrariId
-              },
-              {
-                id: "outdoors",
-                value: false
-              }
+              { id: ferrariId },
+              { id: "outdoors", value: false },
+              { id: langConceptId }
             ]
           },
           {
@@ -363,8 +396,8 @@ describe('Clarifai JS SDK', function() {
 
       it('Gets all inputs', function(done) {
         app.inputs.list({
-        'page': 1,
-        'perPage': 5
+          page: 1,
+          perPage: 5
         }).then(
           function(inputs) {
             expect(inputs).toBeDefined();
@@ -507,7 +540,10 @@ describe('Clarifai JS SDK', function() {
     it('Creates a new model', function(done) {
       app.models.create(testModelId, [
         {
-          'id': ferrariId
+          id: ferrariId
+        },
+        {
+          id: langConceptId
         }
       ]).then(
         function(model) {
@@ -527,7 +563,7 @@ describe('Clarifai JS SDK', function() {
 
     it('Throws an error if no model id is given', function(done) {
       expect(function(){
-        app.models.create({name: 'asdf'}, [{'id': ferrariId}]);
+        app.models.create({name: 'asdf'}, [{id: ferrariId}]);
       }).toThrow(new Error('The following param is required: Model ID'));
       done();
     });
@@ -570,10 +606,10 @@ describe('Clarifai JS SDK', function() {
     it('Call predict on models collection given a model id', function(done) {
       app.models.predict(Clarifai.GENERAL_MODEL, [
         {
-          'url': sampleImage8
+          url: sampleImage8
         },
         {
-          'url': sampleImage9
+          url: sampleImage9
         }
       ]).then(
         function(response) {
@@ -597,10 +633,10 @@ describe('Clarifai JS SDK', function() {
       app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
         generalModel.predict([
           {
-            'url': sampleImage8
+            url: sampleImage8
           },
           {
-            'url': sampleImage9
+            url: sampleImage9
           }
         ]).then(
           function(response) {
@@ -614,6 +650,57 @@ describe('Clarifai JS SDK', function() {
             expect(output.model).toBeDefined();
             expect(output.created_at).toBeDefined();
             expect(output.data).toBeDefined();
+            done();
+          },
+          errorHandler.bind(done)
+        )
+      });
+    });
+
+    it('Can predict on public models in a different language (simplified chinese)', function(done) {
+      app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
+        generalModel.predict(sampleImage1, 'zh').then(
+          function(response) {
+            expect(response.outputs).toBeDefined();
+            var concepts = response['outputs'][0]['data']['concepts']
+            expect(concepts[0]['id']).toBe('ai_HLmqFqBf');
+            expect(concepts[0]['name']).toBe('铁路列车');
+            expect(concepts[1]['id']).toBe('ai_fvlBqXZR')
+            expect(concepts[1]['name']).toBe('铁路')
+            done();
+          },
+          errorHandler.bind(done)
+        )
+      });
+    });
+
+    it('Can predict on public models in a different language (japanese)', function(done) {
+      app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
+        generalModel.predict(sampleImage1, 'ja').then(
+          function(response) {
+            expect(response.outputs).toBeDefined();
+            var concepts = response['outputs'][0]['data']['concepts']
+            expect(concepts[0]['id']).toBe('ai_HLmqFqBf');
+            expect(concepts[0]['name']).toBe('列車');
+            expect(concepts[1]['id']).toBe('ai_fvlBqXZR')
+            expect(concepts[1]['name']).toBe('鉄道')
+            done();
+          },
+          errorHandler.bind(done)
+        )
+      });
+    });
+
+    it('Can predict on public models in a different language (russian)', function(done) {
+      app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
+        generalModel.predict(sampleImage1, 'ru').then(
+          function(response) {
+            expect(response.outputs).toBeDefined();
+            var concepts = response['outputs'][0]['data']['concepts']
+            expect(concepts[0]['id']).toBe('ai_HLmqFqBf');
+            expect(concepts[0]['name']).toBe('поезд');
+            expect(concepts[1]['id']).toBe('ai_fvlBqXZR')
+            expect(concepts[1]['name']).toBe('железная дорога')
             done();
           },
           errorHandler.bind(done)
@@ -750,7 +837,7 @@ describe('Clarifai JS SDK', function() {
   describe('Search', function() {
     it('Filter by images/inputs only', function(done) {
       app.inputs.search([
-        { 'input': { 'url': sampleImage1 } }
+        { input: { url: sampleImage1 } }
       ]).then(
         function(response) {
           expect(response.hits[0].score).toBeDefined();
@@ -762,8 +849,8 @@ describe('Clarifai JS SDK', function() {
 
     it('Filter by concepts/inputs only', function(done) {
       app.inputs.search([
-        { 'input': { 'url': sampleImage1 } },
-        { 'input': { 'url': sampleImage5 } }
+        { input: { url: sampleImage1 } },
+        { input: { url: sampleImage5 } }
       ]).then(
         function(response) {
           expect(response.hits[0].score).toBeDefined();
@@ -775,8 +862,8 @@ describe('Clarifai JS SDK', function() {
 
     it('Filter by images and concepts', function(done) {
       app.inputs.search([
-        { 'input': { 'url': sampleImage1 } },
-        { 'concept': { 'name': ferrariId } }
+        { input: { url: sampleImage1 } },
+        { concept: { name: ferrariId } }
       ]).then(
         function(response) {
           expect(response.hits[0].score).toBeDefined();
@@ -788,7 +875,7 @@ describe('Clarifai JS SDK', function() {
 
     it('Filter with metadata only', function(done) {
       app.inputs.search([
-        { 'input': { 'metadata': { 'baz': 'blah' }, 'type': 'input' } }
+        { input: { metadata: { baz: 'blah' }, type: 'input' } }
       ]).then(
         function(response) {
           expect(response.hits[0].score).toBeDefined();
@@ -843,11 +930,11 @@ describe('Clarifai JS SDK', function() {
 
     it('Filter with metadata and geodata', function(done) {
       app.inputs.search({
-        'input': {
-          'metadata': {
-            'test': [1, 2, 3, 4]
+        input: {
+          metadata: {
+            test: [1, 2, 3, 4]
           },
-          'geo': [{
+          geo: [{
             latitude: 41,
             longitude: -31
           }, {
@@ -867,15 +954,31 @@ describe('Clarifai JS SDK', function() {
     it('Filter with metadata and image url', function(done) {
       app.inputs.search({
         input: {
-          'url': sampleImage4,
-          'metadata': {
-            'foo': 'bar'
+          url: sampleImage4,
+          metadata: {
+            foo: 'bar'
           }
         }
       }).then(
         function(response) {
           expect(response.hits.length).toBe(1);
           expect(response.hits[0].score).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Search with concept in a different language (japanese)', function(done) {
+      app.inputs.search({
+        concept: {
+          name: langConceptId,
+          type: 'input'
+        },
+        language: 'ja'
+      }).then(
+        function(response) {
+          expect(response.hits.length).toBe(1);
           done();
         },
         errorHandler.bind(done)
