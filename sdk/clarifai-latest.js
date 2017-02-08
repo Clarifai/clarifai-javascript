@@ -1,7 +1,7 @@
 /**
- * Clarifai JavaScript SDK v2.1.2-dev
+ * Clarifai JavaScript SDK v2.1.3-dev
  *
- * Last updated: Tue Jan 31 2017 18:14:33 GMT-0500 (EST)
+ * Last updated: Wed Feb 08 2017 12:58:17 GMT-0500 (EST)
  *
  * Visit https://developer.clarifai.com
  *
@@ -3504,7 +3504,7 @@ process.chdir = function (dir) {
 },{"1YiZ5S":23,"buffer":20}],24:[function(require,module,exports){
 module.exports={
   "name": "clarifai",
-  "version": "2.1.2-dev",
+  "version": "2.1.3-dev",
   "description": "Official Clarifai Javascript SDK",
   "main": "dist/index.js",
   "repository": "https://github.com/Clarifai/clarifai-javascript",
@@ -5292,7 +5292,7 @@ module.exports = Models;
 
 var MAX_BATCH_SIZE = 128;
 var GEO_LIMIT_TYPES = ['withinMiles', 'withinKilometers', 'withinRadians', 'withinDegrees'];
-var URL_REGEX = /^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i;
+var URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/i;
 var SYNC_TIMEOUT = 60000;
 var MODEL_QUEUED_FOR_TRAINING = '21103';
 var MODEL_TRAINING = '21101';
@@ -5377,7 +5377,7 @@ module.exports = global.Clarifai = {
   BLUR: 'ddd9d34872ab32be9f0e3b2b98a87be2'
 };
 
-}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_fe52e460.js","/")
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_c24d027c.js","/")
 },{"./../package.json":24,"./App":25,"1YiZ5S":23,"buffer":20}],34:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 'use strict';
