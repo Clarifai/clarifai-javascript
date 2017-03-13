@@ -5,20 +5,18 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var axios = require('axios');
+var Promise = require('promise');
 
-var _require = require('es6-promise'),
-    Promise = _require.Promise;
-
-var _require2 = require('./helpers'),
-    checkType = _require2.checkType;
+var _require = require('./helpers'),
+    checkType = _require.checkType;
 
 var Models = require('./Models');
 var Inputs = require('./Inputs');
 var Concepts = require('./Concepts');
 
-var _require3 = require('./constants'),
-    API = _require3.API,
-    ERRORS = _require3.ERRORS;
+var _require2 = require('./constants'),
+    API = _require2.API,
+    ERRORS = _require2.ERRORS;
 
 var TOKEN_PATH = API.TOKEN_PATH;
 

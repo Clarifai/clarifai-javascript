@@ -1,4 +1,4 @@
-let {Promise} = require('es6-promise');
+let Promise = require('promise');
 let {URL_REGEX, GEO_LIMIT_TYPES, ERRORS} = require('./constants');
 let {checkType, clone} = require('./helpers');
 let {version: VERSION} = require('./../package.json');

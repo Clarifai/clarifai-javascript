@@ -1,5 +1,5 @@
 let axios = require('axios');
-let {Promise}  = require('es6-promise');
+let Promise = require('promise');
 let {checkType} = require('./helpers');
 let Models = require('./Models');
 let Inputs = require('./Inputs');

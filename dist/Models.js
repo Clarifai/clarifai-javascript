@@ -5,26 +5,23 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var axios = require('axios');
-
-var _require = require('es6-promise'),
-    Promise = _require.Promise;
-
+var Promise = require('promise');
 var Model = require('./Model');
 var Concepts = require('./Concepts');
 
-var _require2 = require('./constants'),
-    API = _require2.API,
-    ERRORS = _require2.ERRORS,
-    replaceVars = _require2.replaceVars;
+var _require = require('./constants'),
+    API = _require.API,
+    ERRORS = _require.ERRORS,
+    replaceVars = _require.replaceVars;
 
-var _require3 = require('./helpers'),
-    isSuccess = _require3.isSuccess,
-    checkType = _require3.checkType,
-    clone = _require3.clone;
+var _require2 = require('./helpers'),
+    isSuccess = _require2.isSuccess,
+    checkType = _require2.checkType,
+    clone = _require2.clone;
 
-var _require4 = require('./utils'),
-    wrapToken = _require4.wrapToken,
-    formatModel = _require4.formatModel;
+var _require3 = require('./utils'),
+    wrapToken = _require3.wrapToken,
+    formatModel = _require3.formatModel;
 
 var MODELS_PATH = API.MODELS_PATH,
     MODEL_PATH = API.MODEL_PATH,

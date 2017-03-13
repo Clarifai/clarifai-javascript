@@ -1,5 +1,5 @@
 let axios = require('axios');
-let {Promise} = require('es6-promise');
+let Promise = require('promise');
 let Model = require('./Model');
 let Concepts = require('./Concepts');
 let {API, ERRORS, replaceVars} = require('./constants');

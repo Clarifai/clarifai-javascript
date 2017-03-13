@@ -1,19 +1,18 @@
 'use strict';
 
-var _require = require('es6-promise'),
-    Promise = _require.Promise;
+var Promise = require('promise');
 
-var _require2 = require('./constants'),
-    URL_REGEX = _require2.URL_REGEX,
-    GEO_LIMIT_TYPES = _require2.GEO_LIMIT_TYPES,
-    ERRORS = _require2.ERRORS;
+var _require = require('./constants'),
+    URL_REGEX = _require.URL_REGEX,
+    GEO_LIMIT_TYPES = _require.GEO_LIMIT_TYPES,
+    ERRORS = _require.ERRORS;
 
-var _require3 = require('./helpers'),
-    checkType = _require3.checkType,
-    clone = _require3.clone;
+var _require2 = require('./helpers'),
+    checkType = _require2.checkType,
+    clone = _require2.clone;
 
-var _require4 = require('./../package.json'),
-    VERSION = _require4.version;
+var _require3 = require('./../package.json'),
+    VERSION = _require3.version;
 
 module.exports = {
   wrapToken: function wrapToken(_config, requestFn) {
