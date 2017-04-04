@@ -1,7 +1,7 @@
 /**
- * Clarifai JavaScript SDK v2.1.4-dev
+ * Clarifai JavaScript SDK v2.1.5
  *
- * Last updated: Fri Mar 10 2017 18:18:01 GMT-0500 (EST)
+ * Last updated: Tue Apr 04 2017 12:49:44 GMT-0400 (EDT)
  *
  * Visit https://developer.clarifai.com
  *
@@ -3910,7 +3910,7 @@ Promise.disableSynchronous = function() {
 },{"./core.js":29,"1YiZ5S":27,"buffer":22}],36:[function(require,module,exports){
 module.exports={
   "name": "clarifai",
-  "version": "2.1.4-dev",
+  "version": "2.1.5",
   "description": "Official Clarifai Javascript SDK",
   "main": "dist/index.js",
   "repository": "https://github.com/Clarifai/clarifai-javascript",
@@ -4915,7 +4915,8 @@ var Model = function () {
     value: function mergeConcepts() {
       var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-      return this.update({ action: 'merge', concepts: concepts });
+      var conceptsArr = Array.isArray(concepts) ? concepts : [concepts];
+      return this.update({ action: 'merge', concepts: conceptsArr });
     }
     /**
     * Remove concepts from a model
@@ -4928,7 +4929,8 @@ var Model = function () {
     value: function deleteConcepts() {
       var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-      return this.update({ action: 'remove', concepts: concepts });
+      var conceptsArr = Array.isArray(concepts) ? concepts : [concepts];
+      return this.update({ action: 'remove', concepts: conceptsArr });
     }
     /**
     * Overwrite concepts in a model
@@ -4941,7 +4943,8 @@ var Model = function () {
     value: function overwriteConcepts() {
       var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-      return this.update({ action: 'overwrite', concepts: concepts });
+      var conceptsArr = Array.isArray(concepts) ? concepts : [concepts];
+      return this.update({ action: 'overwrite', concepts: conceptsArr });
     }
     /**
     * Update a model's output config or concepts
@@ -4963,8 +4966,10 @@ var Model = function () {
 
       var url = '' + this._config.apiEndpoint + MODELS_PATH;
       var modelData = [obj];
-      var data = { models: modelData.map(formatModel) };
-      if (data.concepts) {
+      var data = { models: modelData.map(function (m) {
+          return formatModel(Object.assign(m, { id: _this.id }));
+        }) };
+      if (Array.isArray(obj.concepts)) {
         data['action'] = obj.action || 'merge';
       }
 
@@ -5772,13 +5777,18 @@ module.exports = global.Clarifai = {
   TRAVEL_MODEL: 'eee28c313d69466f836ab83287a54ed9',
   NSFW_MODEL: 'e9576d86d2004ed1a38ba0cf39ecb4b1',
   WEDDINGS_MODEL: 'c386b7a870114f4a87477c0824499348',
+  WEDDING_MODEL: 'c386b7a870114f4a87477c0824499348',
   COLOR_MODEL: 'eeed0b6733a644cea07cf4c60f87ebb7',
   CLUSTER_MODEL: 'cccbe437d6e54e2bb911c6aa292fb072',
   FACE_DETECT_MODEL: 'a403429f2ddf4b49b307e318f00e528b',
-  BLUR: 'ddd9d34872ab32be9f0e3b2b98a87be2'
+  FOCUS_MODEL: 'c2cf7cecd8a6427da375b9f35fcd2381',
+  LOGO_MODEL: 'c443119bf2ed4da98487520d01a0b1e3',
+  DEMOGRAPHICS_MODEL: 'c0c0ac362b03416da06ab3fa36fb58e3',
+  GENERAL_EMBED_MODEL: 'bbb5f41425b8468d9b7a554ff10f8581',
+  FACE_EMBED_MODEL: 'd02b4508df58432fbb84e800597b8959'
 };
 
-}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_3cd037d.js","/")
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_63223957.js","/")
 },{"./../package.json":36,"./App":37,"1YiZ5S":27,"buffer":22}],46:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 'use strict';

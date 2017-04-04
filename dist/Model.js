@@ -71,7 +71,8 @@ var Model = function () {
     value: function mergeConcepts() {
       var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-      return this.update({ action: 'merge', concepts: concepts });
+      var conceptsArr = Array.isArray(concepts) ? concepts : [concepts];
+      return this.update({ action: 'merge', concepts: conceptsArr });
     }
     /**
     * Remove concepts from a model
@@ -84,7 +85,8 @@ var Model = function () {
     value: function deleteConcepts() {
       var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-      return this.update({ action: 'remove', concepts: concepts });
+      var conceptsArr = Array.isArray(concepts) ? concepts : [concepts];
+      return this.update({ action: 'remove', concepts: conceptsArr });
     }
     /**
     * Overwrite concepts in a model
@@ -97,7 +99,8 @@ var Model = function () {
     value: function overwriteConcepts() {
       var concepts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-      return this.update({ action: 'overwrite', concepts: concepts });
+      var conceptsArr = Array.isArray(concepts) ? concepts : [concepts];
+      return this.update({ action: 'overwrite', concepts: conceptsArr });
     }
     /**
     * Update a model's output config or concepts
@@ -119,8 +122,10 @@ var Model = function () {
 
       var url = '' + this._config.apiEndpoint + MODELS_PATH;
       var modelData = [obj];
-      var data = { models: modelData.map(formatModel) };
-      if (data.concepts) {
+      var data = { models: modelData.map(function (m) {
+          return formatModel(Object.assign(m, { id: _this.id }));
+        }) };
+      if (Array.isArray(obj.concepts)) {
         data['action'] = obj.action || 'merge';
       }
 

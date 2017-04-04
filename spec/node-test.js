@@ -16,6 +16,7 @@ var sampleImage9 = 'https://s3.amazonaws.com/samples.clarifai.com/black-car.jpg'
 var lastCount;
 var inputsIDs = [];
 var conceptsIds;
+var conceptsCount = 0;
 var langConceptId = '的な' + Date.now();
 var app;
 var beerId = 'beer' + Date.now();
@@ -770,6 +771,7 @@ describe('Clarifai JS SDK', function() {
             function(model) {
               expect(model.outputInfo).toBeDefined();
               expect(model.outputInfo.data.concepts.length).toBe(conceptsIds.length + testConcepts.length);
+              conceptsCount = model.outputInfo.data.concepts.length;
               var conceptsCopy = Array.from(model.outputInfo.data.concepts).map(function(el) { return el.id; });
               var totalFound = 0;
               for (var i = 0; i < testConcepts.length; i++) {
@@ -785,6 +787,27 @@ describe('Clarifai JS SDK', function() {
             errorHandler.bind(done)
           );
         },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Updates a single model', function(done) {
+      var testConcepts = ['random-concept-0'];
+      app.models.initModel(testModel.id).then(function(model) {
+          model.mergeConcepts(testConcepts).then(
+            function(response) {
+              console.log(response);
+              expect(response.outputInfo).toBeDefined();
+              expect(response.modelVersion.active_concept_count > conceptsCount).toBe(true);
+              done();
+            },
+            errorHandler.bind(done)
+          ).catch(
+            errorHandler.bind(done)
+          );
+        },
+        errorHandler.bind(done)
+      ).catch(
         errorHandler.bind(done)
       );
     });

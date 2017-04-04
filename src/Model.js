@@ -47,7 +47,8 @@ class Model {
   * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
   */
   mergeConcepts(concepts=[]) {
-    return this.update({action: 'merge', concepts});
+    let conceptsArr = Array.isArray(concepts)? concepts: [concepts];
+    return this.update({action: 'merge', concepts: conceptsArr});
   }
   /**
   * Remove concepts from a model
@@ -55,7 +56,8 @@ class Model {
   * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
   */
   deleteConcepts(concepts=[]) {
-    return this.update({action: 'remove', concepts});
+    let conceptsArr = Array.isArray(concepts)? concepts: [concepts];
+    return this.update({action: 'remove', concepts: conceptsArr});
   }
   /**
   * Overwrite concepts in a model
@@ -63,7 +65,8 @@ class Model {
   * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
   */
   overwriteConcepts(concepts=[]) {
-    return this.update({action: 'overwrite', concepts});
+    let conceptsArr = Array.isArray(concepts)? concepts: [concepts];
+    return this.update({action: 'overwrite', concepts: conceptsArr});
   }
   /**
   * Update a model's output config or concepts
@@ -80,8 +83,8 @@ class Model {
   update(obj) {
     let url = `${this._config.apiEndpoint}${MODELS_PATH}`;
     let modelData = [obj];
-    let data = {models: modelData.map(formatModel)};
-    if (data.concepts) {
+    let data = {models: modelData.map(m => formatModel(Object.assign(m, {id: this.id})))};
+    if (Array.isArray(obj.concepts)) {
       data['action'] = obj.action || 'merge';
     }
 
