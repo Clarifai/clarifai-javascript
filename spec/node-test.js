@@ -19,6 +19,7 @@ var conceptsIds;
 var conceptsCount = 0;
 var langConceptId = '的な' + Date.now();
 var app;
+var app3;
 var beerId = 'beer' + Date.now();
 var ferrariId = 'ferrari' + Date.now();
 var d = Date.now();
@@ -41,19 +42,44 @@ describe('Clarifai JS SDK', function() {
       }
     );
   });
-
-  describe('Token', function() {
-
-    it('Gets a token as a string', function(done) {
-      app._config.token().then(
+  describe('Options', function() {
+    it('can initialize an app with just the options object', function(done) {
+      var app2 = new Clarifai.App({clientId: process.env.CLIENT_ID, clientSecret: process.env.CLIENT_SECRET});
+      expect(app2._config.clientId).toEqual(process.env.CLIENT_ID);
+      done();
+    });
+  });
+  describe('API key', function() {
+    it('can initialize an app with an api key', function(done) {
+      app3 = new Clarifai.App({apiKey: process.env.API_KEY});
+      expect(app3._config.apiKey).toEqual(process.env.API_KEY);
+      done();
+    });
+    it('can make calls with an api key', function(done) {
+      app3.models.predict(Clarifai.GENERAL_MODEL, [
+        {
+          'url': sampleImage8
+        },
+        {
+          'url': sampleImage9
+        }
+      ]).then(
         function(response) {
-          expect(response.accessToken).toEqual(jasmine.any(String));
+          expect(response.outputs).toBeDefined();
+          var outputs = response.outputs;
+          expect(outputs.length).toBe(2);
+          var output = outputs[0];
+          expect(output.id).toBeDefined();
+          expect(output.status).toBeDefined();
+          expect(output.input).toBeDefined();
+          expect(output.model).toBeDefined();
+          expect(output.created_at).toBeDefined();
+          expect(output.data).toBeDefined();
           done();
         },
         errorHandler.bind(done)
       );
     });
-
     it('Sets a token with an object', function(done) {
       var token = {
         access_token: 'foo',

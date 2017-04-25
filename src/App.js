@@ -13,9 +13,16 @@ let {TOKEN_PATH} = API;
 * @class
 */
 class App {
-  constructor(clientId, clientSecret, options) {
-    this._validate(clientId, clientSecret, options);
-    this._init(clientId, clientSecret, options);
+  constructor(arg1, arg2, arg3) {
+    let optionsObj = arg1;
+    if (typeof arg1 !== 'object' || arg1 === null) {
+      optionsObj = arg3 || {};
+      optionsObj.clientId = arg1;
+      optionsObj.clientSecret = arg2;
+    }
+    this._validate(optionsObj);
+    this._init(optionsObj);
+
   }
   /**
   * Gets a token from the API using client credentials
@@ -53,18 +60,19 @@ class App {
     }
     return false;
   }
-  _validate(clientId, clientSecret, options) {
-    if ((!clientId || !clientSecret) && !options.token) {
+  _validate({clientId, clientSecret, token, apiKey}) {
+    if ((!clientId || !clientSecret) && !token && !apiKey) {
       throw ERRORS.paramsRequired(['Client ID', 'Client Secret']);
     }
   }
-  _init(clientId, clientSecret, options={}) {
+  _init(options) {
     this._config = {
       apiEndpoint: options.apiEndpoint ||
         (process && process.env && process.env.API_ENDPOINT) ||
         'https://api.clarifai.com',
-      clientId,
-      clientSecret,
+      clientId: options.clientId,
+      clientSecret: options.clientSecret,
+      apiKey: options.apiKey,
       token: ()=> {
         return new Promise((resolve, reject)=> {
           let now = new Date().getTime();
