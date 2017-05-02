@@ -101,10 +101,10 @@ module.exports = {
   },
   formatImagesSearch: function formatImagesSearch(image) {
     var imageQuery = void 0;
-    var input = { 'input': { 'data': {} } };
+    var input = { input: { data: {} } };
     var formatted = [];
     if (checkType(/String/, image)) {
-      imageQuery = { 'url': image };
+      imageQuery = { url: image };
     } else {
       imageQuery = image.url || image.base64 ? {
         image: {
@@ -118,6 +118,7 @@ module.exports = {
     input.input.data = imageQuery;
     if (image.id) {
       input.input.id = image.id;
+      input.input.data = { image: {} };
     }
     if (image.metadata !== undefined) {
       input.input.data.metadata = image.metadata;

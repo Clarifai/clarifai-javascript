@@ -90,12 +90,12 @@ module.exports = {
   },
   formatImagesSearch: (image)=> {
     let imageQuery;
-    let input = { 'input': { 'data': {} } };
+    let input = {input: {data: {} } };
     let formatted = [];
     if (checkType(/String/, image)) {
-      imageQuery = { 'url': image };
+      imageQuery = {url: image};
     } else {
-      imageQuery = image.url || image.base64? {
+      imageQuery = (image.url || image.base64)? {
         image: {
           url: image.url,
           base64: image.base64,
@@ -107,6 +107,7 @@ module.exports = {
     input.input.data = imageQuery;
     if (image.id) {
       input.input.id = image.id;
+      input.input.data = {image: {}};
     }
     if (image.metadata !== undefined) {
       input.input.data.metadata = image.metadata;

@@ -896,6 +896,26 @@ describe('Clarifai JS SDK', function() {
       )
     });
 
+    it('Filter by image id', function(done) {
+      app.inputs.search({input: {id: inputId1}}).then(
+        function(response) {
+          expect(response.hits[0].score).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      )
+    });
+
+    it('Filter by image id and url', function(done) {
+      app.inputs.search({input: {id: inputId1, url: sampleImage1}}).then(
+        function(response) {
+          expect(response.hits[0].score).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      )
+    });
+
     it('Filter with metadata only', function(done) {
       app.inputs.search([
         { input: { metadata: { baz: 'blah' }, type: 'input' } }
