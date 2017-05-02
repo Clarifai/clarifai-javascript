@@ -1,7 +1,7 @@
 /**
- * Clarifai JavaScript SDK v2.1.5
+ * Clarifai JavaScript SDK v2.1.6
  *
- * Last updated: Mon May 01 2017 18:29:07 GMT-0400 (EDT)
+ * Last updated: Tue May 02 2017 10:25:44 GMT-0400 (EDT)
  *
  * Visit https://developer.clarifai.com
  *
@@ -3910,7 +3910,7 @@ Promise.disableSynchronous = function() {
 },{"./core.js":29,"1YiZ5S":27,"buffer":22}],36:[function(require,module,exports){
 module.exports={
   "name": "clarifai",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "description": "Official Clarifai Javascript SDK",
   "main": "dist/index.js",
   "repository": "https://github.com/Clarifai/clarifai-javascript",
@@ -5788,7 +5788,7 @@ module.exports = global.Clarifai = {
   FACE_EMBED_MODEL: 'd02b4508df58432fbb84e800597b8959'
 };
 
-}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_d8e47102.js","/")
+}).call(this,require("1YiZ5S"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],"/fake_8d137c3a.js","/")
 },{"./../package.json":36,"./App":37,"1YiZ5S":27,"buffer":22}],46:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,__filename,__dirname){
 'use strict';
