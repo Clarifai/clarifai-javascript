@@ -22,7 +22,7 @@ You can also use the SDK by adding this script to your HTML:
 
 ```js
 
-<script type="text/javascript" src="https://sdk.clarifai.com/js/clarifai-2.0.9.js"></script>
+<script type="text/javascript" src="https://sdk.clarifai.com/js/clarifai-latest.js"></script>
 <script>
   var app = new Clarifai.App(
     '{clientId}',
