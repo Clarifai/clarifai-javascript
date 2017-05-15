@@ -1,4 +1,21 @@
 language: node_js
 node_js:
-  - "iojs"
-  - "6"
+- '6'
+script:
+- npm run deploy
+deploy:
+- provider: npm
+  email: jade@clarifai.com
+  api_key:
+    secure: wzhUlIh+OrjDSzthz+l7KRPbAFa6k73+XEFkeW04JRaxFWXl35CueXaCZwtAWBGJ1hZAL6gcF1WxNyvC8vEzEFavQgzA0fX0X8bFZG39u60vheJvEgvY3vja3Cx0At5zGCApTtbrh1W6T0ZmQ6f1XG4vzR6iXmr2PZVrsjoDsuAXX/FwYxl27YNr2fBSuboLWGOl+Rsjsq+Au9gvkuyn1XHS5z04pZ+kTU9B3+iD24rPbWX10fUj0ZqVikkukClYnQOLfziz+woAZqAmfKrnSX62G7DRvB+0lRhSI0Qp0MLDP7gzIiGhVT/ofW6vhwZ9ATiybxUVAz0QlB6iD/eyKPSUEVyBIvdSb4qiH2QSAjFeFi/iwQedkEg3fzEZX+1ASD7eJKoxUGX6wQUSStRELGkGEQG0kVWPyTpRzCmV6ujp1OoMG4Ljzx1ubWMQ/o+EMq8F0+wGssgaF3rhROvkC0AgFVdt2APl1pU8I6G8nQfdl5zF+0cP2zzLhQAge/felKPefAPzmGEAZxzg0L6LitIcIsvOkRUD6NfggkDSkGD9XK7L4HbzLP0ACu6jtwANO1l2HyLIDWRxVpg1RRErHxUulWeKUCxs827xKYzP5OfimRCD6TKNWyzIIIuaDg04mIUhh4FObyOfRibEvwVDMq25YTyNOS9maZRouG5L5uA=
+  on:
+    tags: true
+    repo: Clarifai/clarifai-javascript
+- provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: KKWKInkGNttMYh4YiuGslDadwLOt64Y7E2qlhv5VIHn7vt8AbzFh9dPsAOH/h42ohC3EugD6ki0FL17e8L5042ipYjf8APnKOLcB9jVTAQT0zV5KG3XJllQPc2EtEUdnTwxrL0NIeCIov3BBRwBKReREE/6D7V8eSzcQ8bljJfztEispwKoyjy4sSsZnBkGATlTndwOQBph1E7mPrlqMDt+mkRNxOpyX0YowbNY70wxZsUkrgHQeoFbXMdM/pBvkO8RCQAQzxfdr0Ty1DB/jZO5zSwVBoLhEDRcTCTW4k0wYdJLZ/jF674jfbV8+OXB2XqhraoHLe7fRyfNiZkY2QmG08TG7RQL3xt+rw4c+nIAmMiNOHCtZO8oIpmbFbMOOX6hGk02j5L8gMpMtZm+5I++TphEppyt1/3WsCBuFmYtknyFwBEFuHzKHtDDtUlUqXS8w9m9hKNqO+N+V69qpbs/uh9JJyRY3wEMeZ3Jm+LWZQ5orUwHtfrV8DQpAVVaMajR2XlBCe/gzfu16Sgzj+z4aQq16TntmdSdRuK7iplmZFnLOLB3L0mZgHMQm3QfM/Uot8NrUjj5Ja25/jo3YgrV/a+kZPG4NOHXNiXDOhnRWhdlIIJIKroEG3PZp1ghJEr3hWlK26nrmJAaAPVVBmxreaWejv8aEnWBISG5SkFA=
+  file_glob: true
+  file: sdk/*
+  on:
+    tags: true
