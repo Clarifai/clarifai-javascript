@@ -6,3 +6,4 @@ npm-debug.log
 .awspublish*
 out/*
 docs/*
+.idea

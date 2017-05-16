@@ -17,6 +17,13 @@ var _require3 = require('./../package.json'),
 module.exports = {
   wrapToken: function wrapToken(_config, requestFn) {
     return new Promise(function (resolve, reject) {
+      if (_config.apiKey) {
+        var headers = {
+          Authorization: 'Key ' + _config.apiKey,
+          'X-Clarifai-Client': 'js:' + VERSION
+        };
+        return requestFn(headers).then(resolve, reject);
+      }
       _config.token().then(function (token) {
         var headers = {
           Authorization: 'Bearer ' + token.accessToken,

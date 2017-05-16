@@ -1,5 +1,7 @@
 'use strict';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -26,11 +28,17 @@ var TOKEN_PATH = API.TOKEN_PATH;
 */
 
 var App = function () {
-  function App(clientId, clientSecret, options) {
+  function App(arg1, arg2, arg3) {
     _classCallCheck(this, App);
 
-    this._validate(clientId, clientSecret, options);
-    this._init(clientId, clientSecret, options);
+    var optionsObj = arg1;
+    if ((typeof arg1 === 'undefined' ? 'undefined' : _typeof(arg1)) !== 'object' || arg1 === null) {
+      optionsObj = arg3 || {};
+      optionsObj.clientId = arg1;
+      optionsObj.clientSecret = arg2;
+    }
+    this._validate(optionsObj);
+    this._init(optionsObj);
   }
   /**
   * Gets a token from the API using client credentials
@@ -76,22 +84,26 @@ var App = function () {
     }
   }, {
     key: '_validate',
-    value: function _validate(clientId, clientSecret, options) {
-      if ((!clientId || !clientSecret) && !options.token) {
+    value: function _validate(_ref) {
+      var clientId = _ref.clientId,
+          clientSecret = _ref.clientSecret,
+          token = _ref.token,
+          apiKey = _ref.apiKey;
+
+      if ((!clientId || !clientSecret) && !token && !apiKey) {
         throw ERRORS.paramsRequired(['Client ID', 'Client Secret']);
       }
     }
   }, {
     key: '_init',
-    value: function _init(clientId, clientSecret) {
+    value: function _init(options) {
       var _this = this;
-
-      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
       this._config = {
         apiEndpoint: options.apiEndpoint || process && process.env && process.env.API_ENDPOINT || 'https://api.clarifai.com',
-        clientId: clientId,
-        clientSecret: clientSecret,
+        clientId: options.clientId,
+        clientSecret: options.clientSecret,
+        apiKey: options.apiKey,
         token: function token() {
           return new Promise(function (resolve, reject) {
             var now = new Date().getTime();

@@ -6,6 +6,13 @@ let {version: VERSION} = require('./../package.json');
 module.exports = {
   wrapToken: (_config, requestFn)=> {
     return new Promise((resolve, reject)=> {
+      if (_config.apiKey) {
+        let headers = {
+          Authorization: `Key ${_config.apiKey}`,
+          'X-Clarifai-Client': `js:${VERSION}`
+        };
+        return requestFn(headers).then(resolve, reject);
+      }
       _config.token().then((token)=> {
         let headers = {
           Authorization: `Bearer ${token.accessToken}`,

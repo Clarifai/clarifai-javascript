@@ -167,19 +167,15 @@ var Inputs = function () {
   }, {
     key: 'delete',
     value: function _delete() {
-      var _this5 = this;
-
       var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       var val = void 0;
       // delete an input
       if (checkType(/String/, id)) {
-        (function () {
-          var url = '' + _this5._config.apiEndpoint + replaceVars(INPUT_PATH, [id]);
-          val = wrapToken(_this5._config, function (headers) {
-            return axios.delete(url, { headers: headers });
-          });
-        })();
+        var url = '' + this._config.apiEndpoint + replaceVars(INPUT_PATH, [id]);
+        val = wrapToken(this._config, function (headers) {
+          return axios.delete(url, { headers: headers });
+        });
       } else {
         val = this._deleteInputs(id);
       }
@@ -273,7 +269,7 @@ var Inputs = function () {
   }, {
     key: 'update',
     value: function update(inputs) {
-      var _this6 = this;
+      var _this5 = this;
 
       var url = '' + this._config.apiEndpoint + INPUTS_PATH;
       var inputsList = Array.isArray(inputs) ? inputs : [inputs];
@@ -290,7 +286,7 @@ var Inputs = function () {
         return new Promise(function (resolve, reject) {
           axios.patch(url, data, { headers: headers }).then(function (response) {
             if (isSuccess(response)) {
-              resolve(new Inputs(_this6._config, response.data.inputs));
+              resolve(new Inputs(_this5._config, response.data.inputs));
             } else {
               reject(response);
             }
