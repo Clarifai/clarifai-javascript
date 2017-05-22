@@ -9,8 +9,10 @@
   "scripts": {
     "jsdoc": "jsdoc src/* -t node_modules/minami -d docs/$npm_package_version && jsdoc src/* -t node_modules/minami -d docs/latest",
     "test": "gulp test",
-    "build": "npm run jsdoc && gulp build",
-    "release": "release-it "
+    "watch": "gulp watch",
+    "build": "npm run clean && npm run jsdoc && gulp build",
+    "release": "release-it",
+    "clean": "gulp cleanbuild"
   },
   "dependencies": {
     "axios": "0.11.1",

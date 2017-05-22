@@ -139,7 +139,7 @@ buildVars.prod = {
 };
 
 function getBuildVars() {
-  var stageString = gutil.env.stage || 'dev';
+  var stageString = process.env.CLARIFAI_DEPLOY || gutil.env.stage || 'dev';
   return buildVars[stageString];
 }
 
