@@ -7,3 +7,5 @@ npm-debug.log
 out/*
 docs/*
 .idea
+dist
+sdk/*
