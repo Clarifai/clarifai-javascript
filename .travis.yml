@@ -1,9 +1,12 @@
 language: node_js
 node_js:
 - '6'
+cache:
+  directories:
+    - node_modules
 script:
 - npm run test
-- npm run deploy
+- npm run build
 deploy:
 - provider: npm
   email: jade@clarifai.com
@@ -18,5 +21,27 @@ deploy:
     secure: KKWKInkGNttMYh4YiuGslDadwLOt64Y7E2qlhv5VIHn7vt8AbzFh9dPsAOH/h42ohC3EugD6ki0FL17e8L5042ipYjf8APnKOLcB9jVTAQT0zV5KG3XJllQPc2EtEUdnTwxrL0NIeCIov3BBRwBKReREE/6D7V8eSzcQ8bljJfztEispwKoyjy4sSsZnBkGATlTndwOQBph1E7mPrlqMDt+mkRNxOpyX0YowbNY70wxZsUkrgHQeoFbXMdM/pBvkO8RCQAQzxfdr0Ty1DB/jZO5zSwVBoLhEDRcTCTW4k0wYdJLZ/jF674jfbV8+OXB2XqhraoHLe7fRyfNiZkY2QmG08TG7RQL3xt+rw4c+nIAmMiNOHCtZO8oIpmbFbMOOX6hGk02j5L8gMpMtZm+5I++TphEppyt1/3WsCBuFmYtknyFwBEFuHzKHtDDtUlUqXS8w9m9hKNqO+N+V69qpbs/uh9JJyRY3wEMeZ3Jm+LWZQ5orUwHtfrV8DQpAVVaMajR2XlBCe/gzfu16Sgzj+z4aQq16TntmdSdRuK7iplmZFnLOLB3L0mZgHMQm3QfM/Uot8NrUjj5Ja25/jo3YgrV/a+kZPG4NOHXNiXDOhnRWhdlIIJIKroEG3PZp1ghJEr3hWlK26nrmJAaAPVVBmxreaWejv8aEnWBISG5SkFA=
   file_glob: true
   file: sdk/*
+  on:
+    tags: true
+- provider: s3
+  access_key_id: ${AWS_ACCESS_KEY_ID}
+  secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+  bucket: ${AWS_BUCKET}
+  skip_cleanup: true
+  acl: public_read
+  upload-dir: js
+  cache_control: "max-age=21600, no-transform, public"
+  local_dir: sdk
+  on:
+    tags: true
+- provider: s3
+  access_key_id: ${AWS_ACCESS_KEY_ID}
+  secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+  bucket: ${AWS_BUCKET}
+  skip_cleanup: true
+  acl: public_read
+  upload-dir: js
+  cache_control: "max-age=21600, no-transform, public"
+  local_dir: docs
   on:
     tags: true
