@@ -239,23 +239,17 @@ gulp.task(
 
 // publish to S3
 function publish() {
-  var aws;
-  if ( gutil.env.aws ) {
-    console.log('Using aws:', 'vars');
-    aws = JSON.parse(gutil.env.aws);
-  } else {
-    console.log('Using aws:', 'file');
-    aws = JSON.parse(fs.readFileSync('./../aws.json'));
-  }
-  console.log('Deploying to bucket:', aws.params.Bucket);
-  var publisher = awspublish.create(aws);
+  var awsBucket =  process.env.AWS_BUCKET;
+
+  console.log('Deploying to bucket:', awsBucket);
+  var publisher = awspublish.create({params: {Bucket: awsBucket}});
   //315360000
   var headers = {
     'Cache-Control': 'max-age=21600, no-transform, public'
   };
   return gulp.src(['./../sdk/**', './../docs/**'])
     .pipe(rename(function (path) {
-        path.dirname = '/js/' + path.dirname;
+      path.dirname = '/js/' + path.dirname;
     }))
     .pipe(publisher.publish(headers))
     .pipe(awspublish.reporter());

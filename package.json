@@ -7,7 +7,10 @@
   "author": "Clarifai Inc.",
   "license": "Apache-2.0",
   "scripts": {
-    "jsdoc": "jsdoc src/* -t node_modules/minami -d docs/$npm_package_version && jsdoc src/* -t node_modules/minami -d docs/latest"
+    "jsdoc": "jsdoc src/* -t node_modules/minami -d docs/$npm_package_version && jsdoc src/* -t node_modules/minami -d docs/latest",
+    "test": "gulp test --gulpfile gulp/gulpfile.js",
+    "deploy": "npm run jsdoc && gulp build --gulpfile gulp/gulpfile.js && gulp deploy --gulpfile gulp/gulpfile.js",
+    "release": "release-it "
   },
   "dependencies": {
     "axios": "0.11.1",
@@ -38,6 +41,7 @@
     "gulp-util": "3.0.6",
     "jsdoc": "^3.4.1",
     "minami": "^1.1.1",
+    "release-it": "^2.7.3",
     "require-dir": "0.3.0",
     "serve-static": "1.10.0"
   }
