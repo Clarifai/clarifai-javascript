@@ -3,18 +3,14 @@ var gutil = require('gulp-util');
 var browserify = require('gulp-browserify');
 var babel = require('gulp-babel');
 var notify = require('gulp-notify');
-var gulpif = require('gulp-if');
 var uglify = require('gulp-uglify');
 var replace = require('gulp-replace-task');
-var envify = require('envify');
 var rename = require('gulp-rename');
 var insert = require('gulp-insert');
 var eslint = require('gulp-eslint');
 var jasmine = require('gulp-jasmine');
 var del = require('del');
-var fs = require('fs');
-var awspublish = require('gulp-awspublish');
-var VERSION = require('./../package.json').version;
+var VERSION = require('./package.json').version;
 
 
 var tasks = [
@@ -33,14 +29,15 @@ gulp.task(
 
 // will do an initial build, then build on any changes to src
 function watchFiles() {
-  gulp.watch('./../src/**', ['jslint', 'browserify']);
+  gulp.watch('./src/**', ['jslint', 'browserify']);
 }
 
 // delete the contents of build folder
 gulp.task('cleanbuild', function() {
   return del([
-    './../dist/**',
-    './../sdk/**',
+    './dist/**',
+    './sdk/**',
+    './docs/**',
     ], {'force': true});
 });
 
@@ -62,7 +59,7 @@ gulp.task('browserify', ['cleanbuild'], function() {
     }
   ];
 
-  return gulp.src('./../src/index.js')
+  return gulp.src('./src/index.js')
     .pipe(browserify({
       'insertGlobals': true,
       'debug': false,
@@ -82,28 +79,28 @@ gulp.task('browserify', ['cleanbuild'], function() {
       path.basename = 'clarifai-' + VERSION;
     }))
     .pipe(insert.prepend(BROWSER_HEADER))
-    .pipe(gulp.dest('./../sdk'))
+    .pipe(gulp.dest('./sdk'))
     .pipe(rename(function (path) {
       path.basename = 'clarifai-latest';
     }))
-    .pipe(gulp.dest('./../sdk'))
+    .pipe(gulp.dest('./sdk'))
     .pipe(uglify())
     .pipe(rename(function (path) {
       path.basename = 'clarifai-' + VERSION + '.min';
     }))
-    .pipe(gulp.dest('./../sdk'))
+    .pipe(gulp.dest('./sdk'))
     .pipe(rename(function (path) {
       path.basename = 'clarifai-latest.min';
     }))
-    .pipe(gulp.dest('./../sdk'));
+    .pipe(gulp.dest('./sdk'));
 });
 
 gulp.task('dist', ['browserify'], function() {
-  return gulp.src('./../src/**/*.js')
+  return gulp.src('./src/**/*.js')
     .pipe(babel({
       presets: ['es2015']
     }))
-    .pipe(gulp.dest('./../dist'));
+    .pipe(gulp.dest('./dist'));
 });
 
 var buildVars = {};
@@ -144,7 +141,7 @@ buildVars.prod = {
 function getBuildVars() {
   var stageString = gutil.env.stage || 'dev';
   return buildVars[stageString];
-};
+}
 
 var BROWSER_HEADER = (
   '/**\n' +
@@ -197,14 +194,14 @@ gulp.task('jslint', function () {
 });
 
 function dontFailOnError() {
-  return gulp.src(['./../src/**/*.js'])
+  return gulp.src(['./src/**/*.js'])
     .pipe(eslint(lintOptions))
     .pipe(eslint.format())
-    .pipe(eslint.failOnError().on('error', notify.onError("Error: <%= error.message %>")));
+    .pipe(eslint.failOnError().on('error', notify.onError('Error: <%= error.message %>')));
 };
 
 function failOnError() {
-  return gulp.src(['./../src/**/*.js'])
+  return gulp.src(['./src/**/*.js'])
     .pipe(eslint(lintOptions))
     .pipe(eslint.format())
     .pipe(eslint.failOnError().on('error', function(e) {
@@ -214,14 +211,14 @@ function failOnError() {
 };
 
 gulp.task('test', function() {
-  return gulp.src('./../spec/*.js')
+  return gulp.src('./spec/*.js')
     .pipe(jasmine({
       'includeStackTrace': true,
       'verbose': true,
       'timeout': 60000,
       'config': {
         'helpers': [
-          './../node_modules/babel-register/lib/node.js'
+          './node_modules/babel-register/lib/node.js'
         ]
       }
     }).on('end', function() {
@@ -231,26 +228,3 @@ gulp.task('test', function() {
     }));
 });
 
-// deploy to the S3 bucket set in aws.json
-gulp.task(
-  'deploy',
-  publish
-);
-
-// publish to S3
-function publish() {
-  var awsBucket =  process.env.AWS_BUCKET;
-
-  console.log('Deploying to bucket:', awsBucket);
-  var publisher = awspublish.create({params: {Bucket: awsBucket}});
-  //315360000
-  var headers = {
-    'Cache-Control': 'max-age=21600, no-transform, public'
-  };
-  return gulp.src(['./../sdk/**', './../docs/**'])
-    .pipe(rename(function (path) {
-      path.dirname = '/js/' + path.dirname;
-    }))
-    .pipe(publisher.publish(headers))
-    .pipe(awspublish.reporter());
-}

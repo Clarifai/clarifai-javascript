@@ -8,8 +8,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "jsdoc": "jsdoc src/* -t node_modules/minami -d docs/$npm_package_version && jsdoc src/* -t node_modules/minami -d docs/latest",
-    "test": "gulp test --gulpfile gulp/gulpfile.js",
-    "build": "npm run jsdoc && gulp build --gulpfile gulp/gulpfile.js",
+    "test": "gulp test",
+    "build": "npm run jsdoc && gulp build",
     "release": "release-it "
   },
   "dependencies": {
