@@ -5,36 +5,24 @@
 3. `npm run build`
 
 This will create three folders:
-`dist`
+
+- `dist`: compiled source files, suitable for the server 
+- `sdk`: bundled and minified versions of the library, suitable for browser environments
+- `docs` documentation generated from source code
 
 ## Development
 
 #### Helpful development tasks
 
-* `gulp build` - this does everything below and puts your compiled files into a *build* dir
-* `gulp watch` - this will do an initial build, then build on any changes to *src*
-* `gulp browserify` - browserify *src/js* to *build/js*
-* `gulp html` - copy *examples* to *build/examples*
-* `gulp test` - test JS files in the *src/spec* folder (See [Testing](#test) section below)
-* `gulp jslint` - shows warnings about `src/**/*.js` files in accordance with our JavaScript style guide
+* `npm run watch` - this will do an initial build, then build on any changes to *src*
+* `npm run test` - test JS files in the */spec* folder
+* `npm run clean` - empty and remove the folders created on build
 
-#### Some more helpful tasks:
-
-* `gulp webserver` - starts a webserver on port 3000 to serve the *build* folder
-* `gulp cleanbuild` - empty and remove your *build* folder
-
-#### Gulp command line optional params
+#### Command line optional params
 
 * `--stage` - if set will build with the env vars found in `gulpfile.js`. Possible values are: `dev`
 (default), `test`, `staging`, `prod`
-* `--port 4000` - if set the webserver will run on the port passed in (default 3000)
-* `--lintFailOnError true` - if set to true, will terminate process on error (default false)
 
 #### JSDocs
 
-To compile docs, run `jsdoc src/* -t node_modules/minami -d build/docs` in the root folder.
-
-## Examples
-
-* Run in the browser: `CLIENT_ID=foo CLIENT_SECRET=bar gulp build`
-* Run in node.js: `CLIENT_ID=foo CLIENT_SECRET=bar node examples/node-example`
+To compile docs, run `npm run jsdocs`
