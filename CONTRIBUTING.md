@@ -1,13 +1,11 @@
-## Build From Source
-
-If you'd like to build this from source, you can by following these steps:
+## Building
 
 1. Clone this repo
-2. `npm install`
-3. `gulp build`
+2. `npm i`
+3. `npm run build`
 
-After `gulp build` you will have a new directory in the project called *build*. These will be your compiled
-files. **These are not under source control.**
+This will create three folders:
+`dist`
 
 ## Development
 
