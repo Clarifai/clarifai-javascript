@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Clarifai/clarifai-javascript.svg?branch=master)](https://travis-ci.org/Clarifai/clarifai-javascript)
+
 # Clarifai JavaScript Client
 
 The official JavaScript client for interacting with the [Clarifai API](https://developer-preview.clarifai.com).
