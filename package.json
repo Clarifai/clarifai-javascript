@@ -9,7 +9,7 @@
   "scripts": {
     "jsdoc": "jsdoc src/* -t node_modules/minami -d docs/$npm_package_version && jsdoc src/* -t node_modules/minami -d docs/latest",
     "test": "gulp test --gulpfile gulp/gulpfile.js",
-    "deploy": "npm run jsdoc && gulp build --gulpfile gulp/gulpfile.js && gulp deploy --gulpfile gulp/gulpfile.js",
+    "build": "npm run jsdoc && gulp build --gulpfile gulp/gulpfile.js",
     "release": "release-it "
   },
   "dependencies": {
