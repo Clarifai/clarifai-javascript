@@ -5,7 +5,7 @@ aws.json
 npm-debug.log
 .awspublish*
 out/*
-docs/*
+docs
 .idea
 dist
-sdk/*
+sdk
