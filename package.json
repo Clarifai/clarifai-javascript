@@ -8,9 +8,11 @@
   "license": "Apache-2.0",
   "scripts": {
     "jsdoc": "jsdoc src/* -t node_modules/minami -d docs/$npm_package_version && jsdoc src/* -t node_modules/minami -d docs/latest",
-    "test": "gulp test --gulpfile gulp/gulpfile.js",
-    "deploy": "npm run jsdoc && gulp build --gulpfile gulp/gulpfile.js && gulp deploy --gulpfile gulp/gulpfile.js",
-    "release": "release-it "
+    "test": "gulp test",
+    "watch": "gulp watch",
+    "build": "npm run clean && gulp build && npm run jsdoc",
+    "release": "release-it",
+    "clean": "gulp cleanbuild"
   },
   "dependencies": {
     "axios": "0.11.1",
