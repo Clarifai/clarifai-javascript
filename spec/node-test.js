@@ -13,6 +13,7 @@ var sampleImage6 = 'https://s3.amazonaws.com/samples.clarifai.com/red-car-1.png'
 var sampleImage7 = 'https://s3.amazonaws.com/samples.clarifai.com/red-car-2.jpeg';
 var sampleImage8 = 'https://s3.amazonaws.com/samples.clarifai.com/red-truck.png';
 var sampleImage9 = 'https://s3.amazonaws.com/samples.clarifai.com/black-car.jpg';
+var sampleVideo1 = 'https://samples.clarifai.com/3o6gb3kkXfLvdKEZs4.gif';
 var lastCount;
 var inputsIDs = [];
 var conceptsIds;
@@ -655,7 +656,24 @@ describe('Clarifai JS SDK', function() {
         errorHandler.bind(done)
       );
     });
-
+    it('Call predict on video inputs', function(done) {
+      app.models.predict(Clarifai.GENERAL_MODEL, sampleVideo1, true).then(
+        function(response) {
+          expect(response.outputs).toBeDefined();
+          var outputs = response.outputs;
+          expect(outputs.length).toBe(1);
+          var output = outputs[0];
+          expect(output.id).toBeDefined();
+          expect(output.status).toBeDefined();
+          expect(output.input).toBeDefined();
+          expect(output.model).toBeDefined();
+          expect(output.created_at).toBeDefined();
+          expect(output.data).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      ).catch(done);
+    });
     it('Attaches model outputs', function(done) {
       app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
         generalModel.predict([
