@@ -76,22 +76,22 @@ module.exports = {
     }
     return formatted;
   },
-  formatImagePredict: (data)=> {
-    let image = data;
+  formatMediaPredict: (data, type = 'image')=> {
+    let media = data;
     if (checkType(/String/, data)) {
-      if (URL_REGEX.test(image) === true) {
-        image = {
+      if (URL_REGEX.test(media) === true) {
+        media = {
           url: data
         };
       } else {
-        image = {
+        media = {
           base64: data
         };
       }
     }
     return {
       data: {
-        image
+        [type]: media
       }
     };
   },

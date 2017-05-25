@@ -8,7 +8,7 @@ let {
   POLLTIME
 } = require('./constants');
 let {MODEL_QUEUED_FOR_TRAINING, MODEL_TRAINING} = STATUS;
-let {wrapToken, formatImagePredict, formatModel} = require('./utils');
+let {wrapToken, formatMediaPredict, formatModel} = require('./utils');
 let {
   MODEL_VERSIONS_PATH,
   MODEL_VERSION_PATH,
@@ -150,9 +150,10 @@ class Model {
   *       @param {string}                     inputs[].image.(url|base64)   Can be a publicly accessibly url or base64 string representing image bytes (required)
   *       @param {number[]}                   inputs[].image.crop           An array containing the percent to be cropped from top, left, bottom and right (optional)
   * @param {string}                       language  A string code representing the language to return results in (example: 'zh' for simplified Chinese, 'ru' for Russian, 'ja' for Japanese)
+   * @param {boolean} isVideo  indicates if the input should be processed as a video (default false)
   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
   */
-  predict(inputs, language) {
+  predict(inputs, language, isVideo = false) {
     if (checkType(/(Object|String)/, inputs)) {
       inputs = [inputs];
     }
@@ -160,7 +161,7 @@ class Model {
       replaceVars(VERSION_PREDICT_PATH, [this.id, this.versionId]):
       replaceVars(PREDICT_PATH, [this.id])}`;
     return wrapToken(this._config, (headers)=> {
-      let params = { inputs: inputs.map(formatImagePredict) };
+      let params = { inputs: inputs.map(input => formatMediaPredict(input, isVideo ? 'video' : 'image' )) };
       if (language) {
         params['model'] = {
           output_info: {

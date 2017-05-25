@@ -65,12 +65,13 @@ class Models {
    * @param {object[]|object|string}   inputs    An array of objects/object/string pointing to an image resource. A string can either be a url or base64 image bytes. Object keys explained below:
    *    @param {object}                  inputs[].image     Object with keys explained below:
    *       @param {string}                 inputs[].image.(url|base64)  Can be a publicly accessibly url or base64 string representing image bytes (required)
+   * @param {boolean} isVideo  indicates if the input should be processed as a video (default false)
    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
    */
-  predict(model, inputs) {
+  predict(model, inputs, isVideo = false) {
     return new Promise((resolve, reject)=> {
       this.initModel(model).then((modelObj)=> {
-        modelObj.predict(inputs, model.language)
+        modelObj.predict(inputs, model.language, isVideo)
           .then(resolve, reject)
           .catch(reject);
       }, reject);
