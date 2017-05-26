@@ -10,16 +10,13 @@ script:
 deploy:
 - provider: npm
   email: jade@clarifai.com
-  api_key:
-    secure: "jrLidLDEb7YintkZrl6EfHcN6wJrMOa/PoPt5tPEkOmjT1hkQZztoiDrgQmngjoLSFUo4X6U0tUBg5e71DFMXkI6/RE+ONd/XvVyO+98AjIirzyaDQLBdTdVyGZsr6rutd+nprkgV6r4ItLt2bOvu/7UNd7SEU1yMH8qweP9bJpk/WM+Bstjpyd6T3ewBJV0QFFQem+HHAd1OvaqA6k43pCsRuNE/IS2+dazUQFzD8D0W+veeiF5vWdMi62A35aDFsodjAnK4IQPJIAYUKTAgawnZcFNOS8Oe7E3448kFsQufLt75jg8JZUcFknQAtfcBwOiH8PE/z+6gD8c+Lilz7R+m09Kn7m9Ib/upE8RGhGGOEsZksJmFm1NIiStJjK1koUcz5sUmw/mxN1PfobxBKHH3BOuNxL010riH2GhyMim2OtQ0gUX6PHz7Vw9aASD8fnkPGoTOtiL73CTRlJJtWcIVWCPtfFc6F6rfpk8wEYtdWvzc4vG+FbXXYEw6dvBYEmzzh/rxGo92M+djX5iL+KHdIzDSuW3+6/45V7s2qGIgU5LrVNgpTUneaidFPnkQQn0Nt/j6gOY526UjPNRrZs6YK4EWu7Mp6oU9b8CV/EeWU7QcoSzaIatAIwAFutJW1KykhGVletl9WtpSYI5Q3jEwHT7Fu8wbCXvZubMwv0="
-
+  api_key: ${NPM_TOKEN}
   on:
     tags: true
     repo: Clarifai/clarifai-javascript
 - provider: releases
   skip_cleanup: true
-  api_key:
-    secure: "OXg6sDiMDoUQir5luZS6KNS83ehFThuL18yrELMDQQz2DVhaeNVyptW9O8f9VdWjDYPEKCEz5yqzdngnwglmUXHDKEi0LaX/bf8OxSeywUto4VovYC6c4cJscumd8GcmQ4/h4L272ycB/1/ILth+e1ifYUnqPCZF2RfMhyKkUlnL7zol2s+PYbnx0yghUmoKk/axBAFYlg3cKQmXkCe9CoYk+DX7sNVrtqkEdIvFdNsA+a1wW5gSkDtup3rwIviWg33Um/ebOFF8U1at2CpVk2Sn7czJ97WSJLoA9YGf8LolLR7vgvCAJXlF4iro2e9BXlMuyn3Wwh0JNiiSOXO8+fah42He7IKYUFddko7KJIzjcyrWyXqpERs9jyEIFdsAZdBRVIHRapI+lOYRVjXRO61uZWzfLQBQQssy+CERlVp0+yW+8pWmj4zobddwJuPR0MNWSSeT/fEILF0L3QToo6gEpSqcmM5ZLKnY9yxwzsFeFRIPWWRdN0tONmL9KWU6ZTyGmKU7LzXOTQKoavXSMCWC5tfzNrzFkM6QYB6R2bmItnvVOVapIEbL0mu2jVHIkngUv+IRqNhl4wIB4d3pYncoI2MgqKJA/OZHOxOiGi8t93G9BXSAaJgrpNHfDRdGfz98pgOhvV2K5LRm4/SbsTpuU1e9rPv5oe5CSPv7bpo="
+  api_key: ${GITHUB_TOKEN}
   file_glob: true
   file: sdk/*
   on:
