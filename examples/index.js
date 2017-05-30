@@ -1,4 +1,4 @@
-const Clarifai = require('../src');
+const Clarifai = process.env.TRAVIS ? require('clarifai') : require('../src');
 
 const clarifai = new Clarifai.App({
   apiKey: process.env.CLARIFAI_API_KEY

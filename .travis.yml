@@ -32,6 +32,7 @@ deploy:
   local_dir: sdk
   on:
     tags: true
+    repo: Clarifai/clarifai-javascript
 - provider: s3
   access_key_id: ${AWS_ACCESS_KEY_ID}
   secret_access_key: ${AWS_SECRET_ACCESS_KEY}
@@ -43,3 +44,6 @@ deploy:
   local_dir: docs
   on:
     tags: true
+    repo: Clarifai/clarifai-javascript
+
+after_deploy: cd examples && npm i clarifai@latest && CLARIFAI_API_KEY=${API_KEY} node index
