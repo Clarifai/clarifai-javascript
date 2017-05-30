@@ -1,5 +1,6 @@
 build/*
 node_modules/*
+examples/node_modules
 .DS_Store
 aws.json
 npm-debug.log
@@ -8,3 +9,4 @@ out/*
 docs
 .idea
 sdk
+dist

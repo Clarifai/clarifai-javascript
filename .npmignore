@@ -1,0 +1,9 @@
+sdk
+.DS_Store
+aws.json
+npm-debug.log
+.awspublish*
+out/*
+docs
+node_modules/*
+examples/node_modules
