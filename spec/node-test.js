@@ -840,7 +840,6 @@ describe('Clarifai JS SDK', function() {
       app.models.initModel(testModel.id).then(function(model) {
           model.mergeConcepts(testConcepts).then(
             function(response) {
-              console.log(response);
               expect(response.outputInfo).toBeDefined();
               expect(response.modelVersion.active_concept_count > conceptsCount).toBe(true);
               done();
@@ -1084,7 +1083,6 @@ describe('Clarifai JS SDK', function() {
           pollStatus(function(interval) {
             app.inputs.getStatus().then(
               function(data) {
-                console.log('[INPUTS STATUS]', data);
                 if (data['counts']['processed'] == lastCount - 1) {
                   clearInterval(interval);
                   done();
