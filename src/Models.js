@@ -70,10 +70,19 @@ class Models {
    * @param {boolean} isVideo  indicates if the input should be processed as a video (default false)
    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
    */
-  predict(model, inputs, isVideo = false) {
+  predict(model, inputs, config = {}) {
+    if (checkType(/Boolean/, config)) {
+      console.warn('"isVideo" argument is deprecated, consider using the configuration object instead');
+      config = {
+        video: config
+      };
+    }
+    if (model.language) {
+      config.language = model.language;
+    }
     return new Promise((resolve, reject) => {
       this.initModel(model).then((modelObj) => {
-        modelObj.predict(inputs, model.language, isVideo)
+        modelObj.predict(inputs, config)
           .then(resolve, reject)
           .catch(reject);
       }, reject);

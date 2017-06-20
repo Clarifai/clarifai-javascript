@@ -182,5 +182,11 @@ module.exports = {
       }
     };
     return v;
+  },
+  formatObjectForSnakeCase(obj) {
+    return Object.keys(obj).reduce((o, k) => {
+      o[k.replace(/([A-Z])/g, r => '_'+r.toLowerCase())] = obj[k];
+      return o;
+    }, {});
   }
 };
