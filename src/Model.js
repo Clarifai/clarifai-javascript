@@ -8,7 +8,7 @@ let {
   POLLTIME
 } = require('./constants');
 let {MODEL_QUEUED_FOR_TRAINING, MODEL_TRAINING} = STATUS;
-let {wrapToken, formatMediaPredict, formatModel} = require('./utils');
+let {wrapToken, formatMediaPredict, formatModel, formatObjectForSnakeCase} = require('./utils');
 let {
   MODEL_VERSIONS_PATH,
   MODEL_VERSION_PATH,
@@ -139,13 +139,14 @@ class Model {
       });
     }
     this.getOutputInfo().then((model) => {
-      let modelStatusCode = model.modelVersion.status.code.toString();
-      if (modelStatusCode === MODEL_QUEUED_FOR_TRAINING || modelStatusCode === MODEL_TRAINING) {
-        this.pollTimeout = setTimeout(() => this._pollTrain(timeStart, resolve, reject), POLLTIME);
-      } else {
-        resolve(model);
-      }
-    }, reject)
+        let modelStatusCode = model.modelVersion.status.code.toString();
+        if (modelStatusCode === MODEL_QUEUED_FOR_TRAINING || modelStatusCode === MODEL_TRAINING) {
+          this.pollTimeout = setTimeout(() => this._pollTrain(timeStart, resolve, reject), POLLTIME);
+        } else {
+          resolve(model);
+        }
+      },
+      reject)
       .catch(reject);
   }
 
@@ -155,11 +156,29 @@ class Model {
    *    @param {object}                      inputs[].image     Object with keys explained below:
    *       @param {string}                     inputs[].image.(url|base64)   Can be a publicly accessibly url or base64 string representing image bytes (required)
    *       @param {number[]}                   inputs[].image.crop           An array containing the percent to be cropped from top, left, bottom and right (optional)
-   * @param {string}                       language  A string code representing the language to return results in (example: 'zh' for simplified Chinese, 'ru' for Russian, 'ja' for Japanese)
-   * @param {boolean} isVideo  indicates if the input should be processed as a video (default false)
+   * @param {object|string} config An object with keys explained below. If a string is passed instead, it will be treated as the language (backwards compatibility)
+   *   @param {string} config.language A string code representing the language to return results in (example: 'zh' for simplified Chinese, 'ru' for Russian, 'ja' for Japanese)
+   *   @param {boolean} config.video indicates if the input should be processed as a video
+   *   @param {object[]} config.selectConcepts An array of concepts to return. Each object in the array will have a form of {name: <CONCEPT_NAME>} or {id: CONCEPT_ID}
+   *   @param {float} config.minValue The minimum confidence threshold that a result must meet. From 0.0 to 1.0
+   *   @param {number} config.maxConcepts The maximum number of concepts to return
+   * @param {boolean} isVideo  Deprecated: indicates if the input should be processed as a video (default false). Deprecated in favor of using config object
    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
    */
-  predict(inputs, language, isVideo = false) {
+  predict(inputs, config = {}, isVideo = false) {
+    if (checkType(/String/, config)) {
+      console.warn('passing the language as a string is deprecated, consider using the configuration object instead');
+      config = {
+        language: config
+      };
+    }
+
+    if (isVideo) {
+      console.warn('"isVideo" argument is deprecated, consider using the configuration object instead');
+      config.video = isVideo;
+    }
+    const video = config.video || false;
+    delete config.video;
     if (checkType(/(Object|String)/, inputs)) {
       inputs = [inputs];
     }
@@ -167,13 +186,11 @@ class Model {
       replaceVars(VERSION_PREDICT_PATH, [this.id, this.versionId]) :
       replaceVars(PREDICT_PATH, [this.id])}`;
     return wrapToken(this._config, (headers) => {
-      let params = {inputs: inputs.map(input => formatMediaPredict(input, isVideo ? 'video' : 'image'))};
-      if (language) {
+      let params = {inputs: inputs.map(input => formatMediaPredict(input, video ? 'video' : 'image'))};
+      if (config && Object.getOwnPropertyNames(config).length > 0) {
         params['model'] = {
           output_info: {
-            output_config: {
-              language
-            }
+            output_config: formatObjectForSnakeCase(config)
           }
         };
       }
@@ -269,6 +286,6 @@ class Model {
     });
   }
 }
-;
 
-module.exports = Model;
+module
+  .exports = Model;
