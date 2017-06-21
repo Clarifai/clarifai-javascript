@@ -289,7 +289,7 @@ class Model {
 
   /**
    *
-   * @param input A string pointing to an image resource. A string must be a url
+   * @param {string} input A string pointing to an image resource. A string must be a url
    * @param {object} config A configuration object consisting of the following required keys
    *   @param {string} config.id The id of the feedback request
    *   @param {object} config.data The feedback data to be sent
