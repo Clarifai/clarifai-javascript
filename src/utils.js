@@ -4,8 +4,8 @@ let {checkType, clone} = require('./helpers');
 let {version: VERSION} = require('./../package.json');
 
 module.exports = {
-  wrapToken: (_config, requestFn)=> {
-    return new Promise((resolve, reject)=> {
+  wrapToken: (_config, requestFn) => {
+    return new Promise((resolve, reject) => {
       if (_config.apiKey) {
         let headers = {
           Authorization: `Key ${_config.apiKey}`,
@@ -13,7 +13,7 @@ module.exports = {
         };
         return requestFn(headers).then(resolve, reject);
       }
-      _config.token().then((token)=> {
+      _config.token().then((token) => {
         let headers = {
           Authorization: `Bearer ${token.accessToken}`,
           'X-Clarifai-Client': `js:${VERSION}`
@@ -22,7 +22,7 @@ module.exports = {
       }, reject);
     });
   },
-  formatModel: (data={})=> {
+  formatModel: (data = {}) => {
     let formatted = {};
     if (data.id === null || data.id === undefined) {
       throw ERRORS.paramsRequired('Model ID');
@@ -47,9 +47,9 @@ module.exports = {
     }
     return formatted;
   },
-  formatInput: (data, includeImage)=> {
-    let input = checkType(/String/, data)?
-      { url: data }:
+  formatInput: (data, includeImage) => {
+    let input = checkType(/String/, data) ?
+      {url: data} :
       data;
     let formatted = {
       id: input.id || null,
@@ -62,7 +62,7 @@ module.exports = {
       formatted.data.metadata = input.metadata;
     }
     if (input.geo) {
-      formatted.data.geo = { geo_point: input.geo };
+      formatted.data.geo = {geo_point: input.geo};
     }
     if (includeImage !== false) {
       formatted.data.image = {
@@ -76,7 +76,7 @@ module.exports = {
     }
     return formatted;
   },
-  formatMediaPredict: (data, type = 'image')=> {
+  formatMediaPredict: (data, type = 'image') => {
     let media = data;
     if (checkType(/String/, data)) {
       if (URL_REGEX.test(media) === true) {
@@ -95,20 +95,20 @@ module.exports = {
       }
     };
   },
-  formatImagesSearch: (image)=> {
+  formatImagesSearch: (image) => {
     let imageQuery;
-    let input = {input: {data: {} } };
+    let input = {input: {data: {}}};
     let formatted = [];
     if (checkType(/String/, image)) {
       imageQuery = {url: image};
     } else {
-      imageQuery = (image.url || image.base64)? {
+      imageQuery = (image.url || image.base64) ? {
         image: {
           url: image.url,
           base64: image.base64,
           crop: image.crop
         }
-      }: {};
+      } : {};
     }
 
     input.input.data = imageQuery;
@@ -122,7 +122,9 @@ module.exports = {
     if (image.geo !== undefined) {
       if (checkType(/Array/, image.geo)) {
         input.input.data.geo = {
-          geo_box: image.geo.map(p => { return {geo_point: p}; })
+          geo_box: image.geo.map(p => {
+            return {geo_point: p};
+          })
         };
       } else if (checkType(/Object/, image.geo)) {
         if (GEO_LIMIT_TYPES.indexOf(image.geo.type) === -1) {
@@ -142,23 +144,23 @@ module.exports = {
     }
     if (image.type !== 'input' && input.input.data.image) {
       if (input.input.data.metadata || input.input.data.geo) {
-        let dataCopy = { input: { data: clone(input.input.data) } };
-        let imageCopy = { input: { data: clone(input.input.data) } };
+        let dataCopy = {input: {data: clone(input.input.data)}};
+        let imageCopy = {input: {data: clone(input.input.data)}};
         delete dataCopy.input.data.image;
         delete imageCopy.input.data.metadata;
         delete imageCopy.input.data.geo;
         input = [
-          { output: imageCopy },
+          {output: imageCopy},
           dataCopy
         ];
       } else {
-        input = [{ output: input }];
+        input = [{output: input}];
       }
     }
     formatted = formatted.concat(input);
     return formatted;
   },
-  formatConcept: (concept)=> {
+  formatConcept: (concept) => {
     let formatted = concept;
     if (checkType(/String/, concept)) {
       formatted = {
@@ -167,12 +169,12 @@ module.exports = {
     }
     return formatted;
   },
-  formatConceptsSearch: (query)=> {
+  formatConceptsSearch: (query) => {
     if (checkType(/String/, query)) {
       query = {id: query};
     }
-    let v =  {};
-    let type = query.type === 'input'? 'input': 'output';
+    let v = {};
+    let type = query.type === 'input' ? 'input' : 'output';
     delete query.type;
     v[type] = {
       data: {

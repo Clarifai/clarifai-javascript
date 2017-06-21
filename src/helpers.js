@@ -1,22 +1,22 @@
 const SUCCESS_CODES = [200, 201];
 
 module.exports = {
-  isSuccess: (response)=> {
+  isSuccess: (response) => {
     return SUCCESS_CODES.indexOf(response.status) > -1;
   },
-  deleteEmpty: (obj, strict=false)=> {
+  deleteEmpty: (obj, strict = false) => {
     Object.keys(obj).forEach((key) => {
       if (obj[key] === null ||
-          obj[key] === undefined ||
-          strict === true && (
-          obj[key] === '' ||
-          obj[key].length === 0 ||
-          Object.keys(obj[key]).length === 0)) {
+        obj[key] === undefined ||
+        strict === true && (
+        obj[key] === '' ||
+        obj[key].length === 0 ||
+        Object.keys(obj[key]).length === 0)) {
         delete obj[key];
       }
     });
   },
-  clone: (obj)=> {
+  clone: (obj) => {
     let keys = Object.keys(obj);
     let copy = {};
     keys.forEach((k) => {
@@ -24,7 +24,7 @@ module.exports = {
     });
     return copy;
   },
-  checkType: (regex, val)=> {
+  checkType: (regex, val) => {
     if ((regex instanceof RegExp) === false) {
       regex = new RegExp(regex);
     }
