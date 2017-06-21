@@ -737,7 +737,7 @@ describe('Clarifai JS SDK', function() {
     });
     it('Can predict on public models using a string for language (simplified chinese)', function(done) {
       app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
-        generalModel.predict(sampleImage1, {language: 'zh'}).then(
+        generalModel.predict(sampleImage1, 'zh').then(
           function(response) {
             expect(response.outputs).toBeDefined();
             var concepts = response['outputs'][0]['data']['concepts']
