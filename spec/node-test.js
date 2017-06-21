@@ -767,86 +767,167 @@ describe('Clarifai JS SDK', function() {
         )
       });
     });
-    it('Can set a max number of concepts returned for a model', function(done) {
+    it('Can set a max number of concepts returned for a model', done => {
       const MAX_CONCEPTS = 2;
-      app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
-        generalModel.predict(sampleImage1, {maxConcepts: MAX_CONCEPTS}).then(
-          function(response) {
-            expect(response.outputs).toBeDefined();
-            var concepts = response['outputs'][0]['data']['concepts'];
-            expect(concepts.length).toBe(MAX_CONCEPTS);
-            expect(concepts[0]['id']).toBe('ai_HLmqFqBf');
-            expect(concepts[0]['name']).toBe('train');
-            expect(concepts[1]['id']).toBe('ai_fvlBqXZR');
-            expect(concepts[1]['name']).toBe('railway');
-            done();
-          },
-          errorHandler.bind(done)
-        )
-      });
+      app.models.initModel(Clarifai.GENERAL_MODEL)
+        .then(generalModel => generalModel.predict(sampleImage1, {maxConcepts: MAX_CONCEPTS}))
+        .then(response => {
+          expect(response.outputs).toBeDefined();
+          const concepts = response['outputs'][0]['data']['concepts'];
+          expect(concepts.length).toBe(MAX_CONCEPTS);
+          expect(concepts[0]['id']).toBe('ai_HLmqFqBf');
+          expect(concepts[0]['name']).toBe('train');
+          expect(concepts[1]['id']).toBe('ai_fvlBqXZR');
+          expect(concepts[1]['name']).toBe('railway');
+          done();
+        }).catch(errorHandler.bind(done));
     });
-    it('Can set a min value threshold for concepts', function(done) {
+    it('Can set a min value threshold for concepts', done => {
       const MIN_VALUE = 0.95;
-      app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
-        generalModel.predict(sampleImage1, {minValue: MIN_VALUE}).then(
-          function(response) {
-            expect(response.outputs).toBeDefined();
-            var concepts = response['outputs'][0]['data']['concepts'];
-            concepts.forEach(c => expect(c.value).toBeGreaterThan(MIN_VALUE));
-            expect(concepts[0]['id']).toBe('ai_HLmqFqBf');
-            expect(concepts[0]['name']).toBe('train');
-            expect(concepts[1]['id']).toBe('ai_fvlBqXZR');
-            expect(concepts[1]['name']).toBe('railway');
-            done();
-          },
-          errorHandler.bind(done)
-        );
-      });
+      app.models.initModel(Clarifai.GENERAL_MODEL)
+        .then(generalModel => generalModel.predict(sampleImage1, {minValue: MIN_VALUE}))
+        .then(response => {
+          expect(response.outputs).toBeDefined();
+          const concepts = response['outputs'][0]['data']['concepts'];
+          concepts.forEach(c => expect(c.value).toBeGreaterThan(MIN_VALUE));
+          expect(concepts[0]['id']).toBe('ai_HLmqFqBf');
+          expect(concepts[0]['name']).toBe('train');
+          expect(concepts[1]['id']).toBe('ai_fvlBqXZR');
+          expect(concepts[1]['name']).toBe('railway');
+          done();
+        })
+        .catch(errorHandler.bind(done));
     });
-    it('Can select concepts to return', function(done) {
-      app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
-        const selectConcepts = [
-          {name: 'train'},
-          {id: 'ai_6kTjGfF6'}
-        ];
-        generalModel.predict(sampleImage1, {selectConcepts}).then(
-          function(response) {
-            expect(response.outputs).toBeDefined();
-            var concepts = response['outputs'][0]['data']['concepts'];
-            expect(concepts.length).toBe(selectConcepts.length);
-            expect(concepts[0]['id']).toBe('ai_HLmqFqBf');
-            expect(concepts[0]['name']).toBe('train');
-            expect(concepts[1]['id']).toBe('ai_6kTjGfF6');
-            expect(concepts[1]['name']).toBe('station');
-            done();
-          },
-          errorHandler.bind(done)
-        );
-      });
+    it('Can select concepts to return', done => {
+      const selectConcepts = [
+        {name: 'train'},
+        {id: 'ai_6kTjGfF6'}
+      ];
+
+      app.models.initModel(Clarifai.GENERAL_MODEL)
+        .then(generalModel => generalModel.predict(sampleImage1, {selectConcepts}))
+        .then(response => {
+          expect(response.outputs).toBeDefined();
+          const concepts = response['outputs'][0]['data']['concepts'];
+          expect(concepts.length).toBe(selectConcepts.length);
+          expect(concepts[0]['id']).toBe('ai_HLmqFqBf');
+          expect(concepts[0]['name']).toBe('train');
+          expect(concepts[1]['id']).toBe('ai_6kTjGfF6');
+          expect(concepts[1]['name']).toBe('station');
+          done();
+        }).catch(errorHandler.bind(done));
     });
-    it('Can provide feedback on concepts', function(done) {
-      app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
-        const feedbackObject = {
-          id: 'xyz',
-          data: {
-            concepts: [
-              {'id': 'mattid2', 'value': true},
-              {'id': 'lambo', 'value': false}
-            ]
-          },
-          info: {
-            'endUserId': '{{end_user_uid}}',
-            'sessionId': '{{session_id}}',
-            'outputId': '{{output_id}}'
-          }
-        };
-        generalModel.feedback(sampleImage1, feedbackObject)
-          .then(response => {
-            expect(response.status.description).toBe('Ok');
-            done();
-          })
-          .catch(errorHandler.bind(done));
-      });
+    it('Can provide feedback on regions', done => {
+      const feedbackObject = {
+        id: 'xyz',
+        data: {
+          'regions': [
+            {
+              'region_info': {
+                'bounding_box': {
+                  'top_row': 0.3,
+                  'left_col': 0.2,
+                  'bottom_row': 0.7,
+                  'right_col': 0.8
+                }
+              },
+              'data': {
+                'concepts': [
+                  {'id': 'mattid2', 'value': true},
+                  {'id': 'lambo', 'value': false}
+                ]
+              }
+            }
+          ],
+          'concepts': [
+            {'id': 'mattid2', 'value': true},
+            {'id': 'lambo', 'value': false}
+          ]
+        },
+        info: {
+          'endUserId': '{{end_user_uid}}',
+          'sessionId': '{{session_id}}',
+          'outputId': '{{output_id}}'
+        }
+      };
+
+      app.models.initModel(Clarifai.GENERAL_MODEL)
+        .then(generalModel => generalModel.feedback(sampleImage1, feedbackObject))
+        .then(response => {
+          expect(response.status.description).toBe('Ok');
+          done();
+        })
+        .catch(errorHandler.bind(done));
+    });
+    it('Can provide feedback on concepts', done => {
+      const feedbackObject = {
+        id: 'xyz',
+        data: {
+          concepts: [
+            {'id': 'mattid2', 'value': true},
+            {'id': 'lambo', 'value': false}
+          ]
+        },
+        info: {
+          'endUserId': '{{end_user_uid}}',
+          'sessionId': '{{session_id}}',
+          'outputId': '{{output_id}}'
+        }
+      };
+      app.models.initModel(Clarifai.GENERAL_MODEL)
+        .then(generalModel => generalModel.feedback(sampleImage1, feedbackObject))
+        .then(response => {
+          expect(response.status.description).toBe('Ok');
+          done();
+        })
+        .catch(errorHandler.bind(done));
+    });
+    it('Can provide feedback on faces', done => {
+      const feedbackObject = {
+        id: 'xyz',
+        data: {
+          'regions': [
+            {
+              'region_info': {
+                'bounding_box': {
+                  'top_row': 0.3,
+                  'left_col': 0.2,
+                  'bottom_row': 0.7,
+                  'right_col': 0.8
+                }
+              },
+              'data': {
+                'face': {
+                  'identity': {
+                    'concepts': [
+                      {'id': 'mattid2', 'value': true},
+                      {'id': 'lambo', 'value': false}
+                    ]
+                  },
+                  'age_appearance': {
+                    'concepts': [
+                      {'id': 'mattid2', 'value': true},
+                      {'id': 'lambo', 'value': false}
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        info: {
+          'endUserId': '{{end_user_uid}}',
+          'sessionId': '{{session_id}}',
+          'outputId': '{{output_id}}'
+        }
+      };
+      app.models.initModel(Clarifai.GENERAL_MODEL)
+        .then(generalModel => generalModel.feedback(sampleImage1, feedbackObject))
+        .then(response => {
+          expect(response.status.description).toBe('Ok');
+          done();
+        })
+        .catch(errorHandler.bind(done));
     });
     it('Update model name and config', function(done) {
       app.models.update({
@@ -1333,15 +1414,15 @@ function pollStatus(fn) {
 function responseHandler(response) {
   expect(true).toBe(true);
   this();
-};
+}
 
 function errorHandler(err) {
   expect(err.status).toBe(true);
   expect(err.data).toBe(true);
   log(err);
   this();
-};
+}
 
 function log(obj) {
   console.log('[ERROR]', JSON.stringify(obj));
-};
+}
