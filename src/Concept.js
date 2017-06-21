@@ -1,7 +1,7 @@
 /**
-* class representing a concept and its info
-* @class
-*/
+ * class representing a concept and its info
+ * @class
+ */
 class Concept {
   constructor(_config, data) {
     this.id = data.id;
@@ -12,6 +12,7 @@ class Concept {
     this._config = _config;
     this.rawData = data;
   }
-};
+}
+;
 
 module.exports = Concept;

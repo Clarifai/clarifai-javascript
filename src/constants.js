@@ -30,8 +30,8 @@ module.exports = {
   },
   ERRORS: {
     paramsRequired: (param) => {
-      let paramList = Array.isArray(param) ? param: [param];
-      return new Error(`The following ${paramList.length > 1? 'params are': 'param is'} required: ${paramList.join(', ')}`);
+      let paramList = Array.isArray(param) ? param : [param];
+      return new Error(`The following ${paramList.length > 1 ? 'params are' : 'param is'} required: ${paramList.join(', ')}`);
     },
     MAX_INPUTS: new Error(`Number of inputs passed exceeded max of ${MAX_BATCH_SIZE}`),
     INVALID_GEOLIMIT_TYPE: new Error(`Incorrect geo_limit type. Value must be any of the following: ${GEO_LIMIT_TYPES.join(', ')}`),
@@ -43,9 +43,9 @@ module.exports = {
     MODEL_TRAINING
   },
   // var replacement must be given in order
-  replaceVars: (path, vars=[])=> {
+  replaceVars: (path, vars = []) => {
     let newPath = path;
-    vars.forEach((val, index)=> {
+    vars.forEach((val, index) => {
       if (index === 0) {
         val = encodeURIComponent(val);
       }
