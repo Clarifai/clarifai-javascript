@@ -16,6 +16,8 @@ module.exports = {
     MODEL_PATCH_PATH: '/v2/models/$0/output_info/data/concepts',
     MODEL_OUTPUT_PATH: '/v2/models/$0/output_info',
     MODEL_SEARCH_PATH: '/v2/models/searches',
+    MODEL_FEEDBACK_PATH: '/v2/models/$0/feedback',
+    MODEL_VERSION_FEEDBACK_PATH: '/v2/models/$0/versions/$1/feedback',
     PREDICT_PATH: '/v2/models/$0/outputs',
     VERSION_PREDICT_PATH: '/v2/models/$0/versions/$1/outputs',
     CONCEPTS_PATH: '/v2/concepts',
