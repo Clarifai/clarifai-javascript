@@ -825,6 +825,30 @@ describe('Clarifai JS SDK', function() {
         );
       });
     });
+    it('Can provide feedback on concepts', function(done) {
+      app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
+        const feedbackObject = {
+          id: 'xyz',
+          data: {
+            concepts: [
+              {'id': 'mattid2', 'value': true},
+              {'id': 'lambo', 'value': false}
+            ]
+          },
+          info: {
+            'endUserId': '{{end_user_uid}}',
+            'sessionId': '{{session_id}}',
+            'outputId': '{{output_id}}'
+          }
+        };
+        generalModel.feedback(sampleImage1, feedbackObject)
+          .then(response => {
+            expect(response.status.description).toBe('Ok');
+            done();
+          })
+          .catch(errorHandler.bind(done));
+      });
+    });
     it('Update model name and config', function(done) {
       app.models.update({
         id: testModel.id,
