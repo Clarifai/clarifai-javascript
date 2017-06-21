@@ -90,13 +90,13 @@ describe('Clarifai JS SDK', function() {
       };
       var app2 = new Clarifai.App(null, null, {token: token});
       app2._config.token().then(
-          function(response) {
-            expect(response.accessToken).toEqual('foo');
-            done();
-          },
-          errorHandler.bind(done)
-        );
-      });
+        function(response) {
+          expect(response.accessToken).toEqual('foo');
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
 
     it('Sets a token with a string', function(done) {
       var app3 = new Clarifai.App(null, null, {token: 'bar'});
@@ -168,394 +168,394 @@ describe('Clarifai JS SDK', function() {
   });
 
   describe('Inputs', function() {
-      var inputId;
+    var inputId;
 
-      it('Adds an input', function(done) {
-        app.inputs.create([
-          {
-            url: sampleImage1,
-            allowDuplicateUrl: true
-          }
-        ]).then(
-          function(inputs) {
-            expect(inputs).toBeDefined();
-            expect(inputs instanceof Inputs).toBe(true);
-            expect(inputs.length).toBe(1);
-            expect(inputs[0].createdAt).toBeDefined();
-            expect(inputs[0].id).toBeDefined();
-            inputId = inputs[0].id;
-            expect(inputs[0].rawData).toBeDefined();
-            done();
-          },
-          errorHandler.bind(done)
-        );
-      });
+    it('Adds an input', function(done) {
+      app.inputs.create([
+        {
+          url: sampleImage1,
+          allowDuplicateUrl: true
+        }
+      ]).then(
+        function(inputs) {
+          expect(inputs).toBeDefined();
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs.length).toBe(1);
+          expect(inputs[0].createdAt).toBeDefined();
+          expect(inputs[0].id).toBeDefined();
+          inputId = inputs[0].id;
+          expect(inputs[0].rawData).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
 
-      it('Adds an input with concepts', function(done) {
-        app.inputs.create([
-          {
-            url: sampleImage1,
-            allowDuplicateUrl: true,
-            concepts: [
-              {
-                id: "train",
-                value: true
-              },
-              {
-                id: "car",
-                value: false
-              },
-              {
-                id: "的な"
-              }
-            ]
-          }
-        ]).then(
-          function(inputs) {
-            expect(inputs).toBeDefined();
-            expect(inputs instanceof Inputs).toBe(true);
-            expect(inputs.length).toBe(1);
-            expect(inputs[0].createdAt).toBeDefined();
-            expect(inputs[0].id).toBeDefined();
-            expect(inputs[0].rawData).toBeDefined();
-            done();
-          },
-          errorHandler.bind(done)
-        );
-      });
-
-      it('Adds input with metadata', function(done) {
-        app.inputs.create([
-          {
-            id: inputId1,
-            url: sampleImage4,
-            allowDuplicateUrl: true,
-            concepts: [{ id: beerId }],
-            metadata: { foo: 'bar', baz: 'blah' }
-          },
-          {
-            id: inputId2,
-            url: sampleImage4,
-            allowDuplicateUrl: true,
-            concepts: [{ id: beerId }],
-            metadata: { foo: 'baz', baz: 'blah' }
-          }
-        ]).then(
-          function(inputs) {
-            expect(inputs).toBeDefined();
-            expect(inputs instanceof Inputs).toBe(true);
-            expect(inputs.length).toBe(2);
-            expect(inputs[0].id).toBe(inputId1);
-            expect(inputs[1].id).toBe(inputId2);
-            expect(inputs[0].rawData.data.metadata.foo).toBe('bar');
-            expect(inputs[1].rawData.data.metadata.foo).toBe('baz');
-            pollStatus(function(interval) {
-              app.inputs.getStatus().then(
-                function(data) {
-                  if (data['counts']['to_process'] == 0) {
-                    clearInterval(interval);
-                    if (data['errors'] > 0) {
-                      throw new Error('Error processing inputs', data);
-                    } else {
-                      done();
-                    }
-                  }
-                },
-                errorHandler.bind(done)
-              );
-            });
-          },
-          errorHandler.bind(done)
-        );
-      });
-
-      it('Adds input with geodata', function(done) {
-        app.inputs.create([
-          {
-            id: inputId3,
-            url: sampleImage1,
-            allowDuplicateUrl: true,
-            concepts: [{ id: beerId }],
-            geo: { longitude: -30, latitude: 40 }
-          },
-          {
-            id: inputId4,
-            url: sampleImage2,
-            allowDuplicateUrl: true,
-            concepts: [{ id: beerId }],
-            geo: { longitude: -20, latitude: 42.05},
-            metadata: { test: [1, 2, 3, 4] }
-          },
-          {
-            id: inputId5,
-            url: sampleImage3,
-            allowDuplicateUrl: true,
-            concepts: [{ id: beerId }],
-            geo: { longitude: -20, latitude: 42.05},
-            metadata: { test: [1, 2, 3, 4] }
-          }
-        ]).then(
-          function(inputs) {
-            expect(inputs).toBeDefined();
-            expect(inputs instanceof Inputs).toBe(true);
-            expect(inputs.length).toBe(3);
-            expect(inputs[0].id).toBe(inputId3);
-            expect(inputs[1].id).toBe(inputId4);
-            expect(inputs[0].geo.geoPoint.latitude).toBe(40);
-            expect(inputs[0].geo.geoPoint.longitude).toBe(-30);
-            expect(inputs[1].geo.geoPoint.latitude).toBe(42.05);
-            expect(inputs[1].geo.geoPoint.longitude).toBe(-20);
-            expect(inputs[1].rawData.data.metadata.test).toBeDefined();
-            expect(inputs[1].rawData.data.metadata.test[0]).toBe(1);
-            expect(inputs[1].rawData.data.metadata.test[1]).toBe(2);
-            expect(inputs[1].metadata.test).toBeDefined();
-            expect(inputs[1].metadata.test[2]).toBe(3);
-            expect(inputs[1].metadata.test[3]).toBe(4);
-            pollStatus(function(interval) {
-              app.inputs.getStatus().then(
-                function(data) {
-                  if (data['counts']['to_process'] == 0) {
-                    clearInterval(interval);
-                    if (data['errors'] > 0) {
-                      throw new Error('Error processing inputs', data);
-                    } else {
-                      done();
-                    }
-                  }
-                },
-                errorHandler.bind(done)
-              );
-            });
-          },
-          errorHandler.bind(done)
-        );
-      });
-
-      it('Bulk adds inputs', function(done) {
-        app.inputs.create([
-          {
-            url: sampleImage1,
-            allowDuplicateUrl: true
-          },
-          {
-            url: sampleImage5,
-            allowDuplicateUrl: true
-          }
-        ]).then(
-          function(inputs) {
-            expect(inputs).toBeDefined();
-            expect(inputs instanceof Inputs).toBe(true);
-            expect(inputs.length).toBe(2);
-            expect(inputs[0].createdAt).toBeDefined();
-            expect(inputs[0].id).toBeDefined();
-            expect(inputs[0].rawData).toBeDefined();
-            pollStatus(function(interval) {
-              app.inputs.getStatus().then(
-                function(data) {
-                  if (data['counts']['to_process'] == 0) {
-                    clearInterval(interval);
-                    if (data['errors'] > 0) {
-                      throw new Error('Error processing inputs', data);
-                    } else {
-                      done();
-                    }
-                  }
-                },
-                errorHandler.bind(done)
-              );
-            });
-          },
-          errorHandler.bind(done)
-        );
-      });
-
-      it('Bulk adds inputs with concepts', function(done) {
-        app.inputs.create([
-          {
-            url: sampleImage6,
-            allowDuplicateUrl: true,
-            concepts: [
-              { id: ferrariId },
-              { id: "outdoors", value: false },
-              { id: langConceptId }
-            ]
-          },
-          {
-            url: sampleImage7,
-            allowDuplicateUrl: true,
-            concepts: [
-              {
-                id: ferrariId
-              },
-              {
-                id: "outdoors",
-                value: false
-              }
-            ]
-          }
-        ]).then(
-          function(inputs) {
-            expect(inputs).toBeDefined();
-            expect(inputs instanceof Inputs).toBe(true);
-            expect(inputs.length).toBe(2);
-            expect(inputs[0].createdAt).toBeDefined();
-            expect(inputs[0].id).toBeDefined();
-            expect(inputs[0].rawData).toBeDefined();
-            pollStatus(function(interval) {
-              app.inputs.getStatus().then(
-                function(data) {
-                  lastCount = data['counts']['processed'];
-                  if (data['counts']['to_process'] == 0) {
-                    clearInterval(interval);
-                    if (data['errors'] > 0) {
-                      throw new Error('Error processing inputs', data);
-                    } else {
-                      done();
-                    }
-                  }
-                },
-                errorHandler.bind(done)
-              );
-            });
-          },
-          errorHandler.bind(done)
-        );
-      });
-
-      it('Gets all inputs', function(done) {
-        app.inputs.list({
-          page: 1,
-          perPage: 5
-        }).then(
-          function(inputs) {
-            expect(inputs).toBeDefined();
-            expect(inputs instanceof Inputs).toBe(true);
-            expect(inputs.length).toBe(5);
-            var input = inputs[0];
-            expect(input.id).toBeDefined();
-            expect(input.createdAt).toBeDefined();
-            expect(input.rawData).toBeDefined();
-            inputs.rawData.forEach(function(input) {
-              inputsIDs.push(input.id);
-            });
-            done();
-          },
-          errorHandler.bind(done)
-        );
-      });
-
-      it('Gets a single input by id', function(done) {
-        app.inputs.get(inputId).then(
-          function(input) {
-            expect(input).toBeDefined();
-            expect(input.id).toBe(inputId);
-            expect(input.createdAt).toBeDefined();
-            expect(input.rawData).toBeDefined();
-            done();
-          },
-          errorHandler.bind(done)
-        );
-      });
-
-      it('Gets inputs status', function(done) {
-        app.inputs.getStatus().then(
-          function(response) {
-            expect(response.counts).toBeDefined();
-            var counts = response.counts;
-            expect(counts.processed).toBeDefined();
-            expect(counts.to_process).toBeDefined();
-            expect(counts.errors).toBeDefined();
-            expect(counts.errors).toBe(0);
-            done();
-          },
-          errorHandler.bind(done)
-        );
-      });
-
-      it('Updates an input by merging concepts', function(done) {
-        app.inputs.mergeConcepts([
-          {
-            id: inputId,
-            concepts: [
-              { "id":"train", "value": true },
-              { "id":"car", "value": false }
-            ]
-          }
-        ]).then(
-          function(inputs) {
-            expect(inputs).toBeDefined();
-            expect(inputs.length).toBe(1);
-            expect(inputs instanceof Inputs).toBe(true);
-            expect(inputs[0].createdAt).toBeDefined();
-            expect(inputs[0].id).toBeDefined();
-            expect(inputs[0].rawData).toBeDefined();
-            done();
-          },
-          errorHandler.bind(done)
-        );
-      });
-
-      it('Updates an input by overwriting concepts', function(done) {
-        app.inputs.overwriteConcepts([
-          {
-            id: inputId,
-            concepts: [
-              { "id":"train", "value": false },
-              { "id":"car", "value": true },
-              { "id":"car2", "value": false },
-              { "id":"car3", "value": false }
-            ]
-          }
-        ]).then(
-          function(inputs) {
-            expect(inputs).toBeDefined();
-            expect(inputs.length).toBe(1);
-            expect(inputs instanceof Inputs).toBe(true);
-            expect(inputs[0].concepts.length).toBe(4);
-            for (var i = 0; i < inputs[0].concepts; i++) {
-              switch (inputs[0].concepts[i].name) {
-                case "train":
-                  expect(inputs[0].concepts[i].value).toBe(0);
-                  break;
-                case "car":
-                  expect(inputs[0].concepts[i].value).toBe(1);
-                  break;
-                case "car2":
-                  expect(inputs[0].concepts[i].value).toBe(0);
-                  break;
-                case "car3":
-                  expect(inputs[0].concepts[i].value).toBe(0);
-                  break;
-              }
+    it('Adds an input with concepts', function(done) {
+      app.inputs.create([
+        {
+          url: sampleImage1,
+          allowDuplicateUrl: true,
+          concepts: [
+            {
+              id: 'train',
+              value: true
+            },
+            {
+              id: 'car',
+              value: false
+            },
+            {
+              id: '的な'
             }
-            done();
-          },
-          errorHandler.bind(done)
-        );
-      });
+          ]
+        }
+      ]).then(
+        function(inputs) {
+          expect(inputs).toBeDefined();
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs.length).toBe(1);
+          expect(inputs[0].createdAt).toBeDefined();
+          expect(inputs[0].id).toBeDefined();
+          expect(inputs[0].rawData).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
 
-      it('Updates an input by deleting concepts', function(done) {
-        app.inputs.deleteConcepts([
-          {
-            id: inputId,
-            concepts: [
-              { "id":"train" },
-              { "id":"car" },
-              { "id":"car2" },
-              { "id":"car3" }
-            ]
+    it('Adds input with metadata', function(done) {
+      app.inputs.create([
+        {
+          id: inputId1,
+          url: sampleImage4,
+          allowDuplicateUrl: true,
+          concepts: [{id: beerId}],
+          metadata: {foo: 'bar', baz: 'blah'}
+        },
+        {
+          id: inputId2,
+          url: sampleImage4,
+          allowDuplicateUrl: true,
+          concepts: [{id: beerId}],
+          metadata: {foo: 'baz', baz: 'blah'}
+        }
+      ]).then(
+        function(inputs) {
+          expect(inputs).toBeDefined();
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs.length).toBe(2);
+          expect(inputs[0].id).toBe(inputId1);
+          expect(inputs[1].id).toBe(inputId2);
+          expect(inputs[0].rawData.data.metadata.foo).toBe('bar');
+          expect(inputs[1].rawData.data.metadata.foo).toBe('baz');
+          pollStatus(function(interval) {
+            app.inputs.getStatus().then(
+              function(data) {
+                if (data['counts']['to_process'] == 0) {
+                  clearInterval(interval);
+                  if (data['errors'] > 0) {
+                    throw new Error('Error processing inputs', data);
+                  } else {
+                    done();
+                  }
+                }
+              },
+              errorHandler.bind(done)
+            );
+          });
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Adds input with geodata', function(done) {
+      app.inputs.create([
+        {
+          id: inputId3,
+          url: sampleImage1,
+          allowDuplicateUrl: true,
+          concepts: [{id: beerId}],
+          geo: {longitude: -30, latitude: 40}
+        },
+        {
+          id: inputId4,
+          url: sampleImage2,
+          allowDuplicateUrl: true,
+          concepts: [{id: beerId}],
+          geo: {longitude: -20, latitude: 42.05},
+          metadata: {test: [1, 2, 3, 4]}
+        },
+        {
+          id: inputId5,
+          url: sampleImage3,
+          allowDuplicateUrl: true,
+          concepts: [{id: beerId}],
+          geo: {longitude: -20, latitude: 42.05},
+          metadata: {test: [1, 2, 3, 4]}
+        }
+      ]).then(
+        function(inputs) {
+          expect(inputs).toBeDefined();
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs.length).toBe(3);
+          expect(inputs[0].id).toBe(inputId3);
+          expect(inputs[1].id).toBe(inputId4);
+          expect(inputs[0].geo.geoPoint.latitude).toBe(40);
+          expect(inputs[0].geo.geoPoint.longitude).toBe(-30);
+          expect(inputs[1].geo.geoPoint.latitude).toBe(42.05);
+          expect(inputs[1].geo.geoPoint.longitude).toBe(-20);
+          expect(inputs[1].rawData.data.metadata.test).toBeDefined();
+          expect(inputs[1].rawData.data.metadata.test[0]).toBe(1);
+          expect(inputs[1].rawData.data.metadata.test[1]).toBe(2);
+          expect(inputs[1].metadata.test).toBeDefined();
+          expect(inputs[1].metadata.test[2]).toBe(3);
+          expect(inputs[1].metadata.test[3]).toBe(4);
+          pollStatus(function(interval) {
+            app.inputs.getStatus().then(
+              function(data) {
+                if (data['counts']['to_process'] == 0) {
+                  clearInterval(interval);
+                  if (data['errors'] > 0) {
+                    throw new Error('Error processing inputs', data);
+                  } else {
+                    done();
+                  }
+                }
+              },
+              errorHandler.bind(done)
+            );
+          });
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Bulk adds inputs', function(done) {
+      app.inputs.create([
+        {
+          url: sampleImage1,
+          allowDuplicateUrl: true
+        },
+        {
+          url: sampleImage5,
+          allowDuplicateUrl: true
+        }
+      ]).then(
+        function(inputs) {
+          expect(inputs).toBeDefined();
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs.length).toBe(2);
+          expect(inputs[0].createdAt).toBeDefined();
+          expect(inputs[0].id).toBeDefined();
+          expect(inputs[0].rawData).toBeDefined();
+          pollStatus(function(interval) {
+            app.inputs.getStatus().then(
+              function(data) {
+                if (data['counts']['to_process'] == 0) {
+                  clearInterval(interval);
+                  if (data['errors'] > 0) {
+                    throw new Error('Error processing inputs', data);
+                  } else {
+                    done();
+                  }
+                }
+              },
+              errorHandler.bind(done)
+            );
+          });
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Bulk adds inputs with concepts', function(done) {
+      app.inputs.create([
+        {
+          url: sampleImage6,
+          allowDuplicateUrl: true,
+          concepts: [
+            {id: ferrariId},
+            {id: 'outdoors', value: false},
+            {id: langConceptId}
+          ]
+        },
+        {
+          url: sampleImage7,
+          allowDuplicateUrl: true,
+          concepts: [
+            {
+              id: ferrariId
+            },
+            {
+              id: 'outdoors',
+              value: false
+            }
+          ]
+        }
+      ]).then(
+        function(inputs) {
+          expect(inputs).toBeDefined();
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs.length).toBe(2);
+          expect(inputs[0].createdAt).toBeDefined();
+          expect(inputs[0].id).toBeDefined();
+          expect(inputs[0].rawData).toBeDefined();
+          pollStatus(function(interval) {
+            app.inputs.getStatus().then(
+              function(data) {
+                lastCount = data['counts']['processed'];
+                if (data['counts']['to_process'] == 0) {
+                  clearInterval(interval);
+                  if (data['errors'] > 0) {
+                    throw new Error('Error processing inputs', data);
+                  } else {
+                    done();
+                  }
+                }
+              },
+              errorHandler.bind(done)
+            );
+          });
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Gets all inputs', function(done) {
+      app.inputs.list({
+        page: 1,
+        perPage: 5
+      }).then(
+        function(inputs) {
+          expect(inputs).toBeDefined();
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs.length).toBe(5);
+          var input = inputs[0];
+          expect(input.id).toBeDefined();
+          expect(input.createdAt).toBeDefined();
+          expect(input.rawData).toBeDefined();
+          inputs.rawData.forEach(function(input) {
+            inputsIDs.push(input.id);
+          });
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Gets a single input by id', function(done) {
+      app.inputs.get(inputId).then(
+        function(input) {
+          expect(input).toBeDefined();
+          expect(input.id).toBe(inputId);
+          expect(input.createdAt).toBeDefined();
+          expect(input.rawData).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Gets inputs status', function(done) {
+      app.inputs.getStatus().then(
+        function(response) {
+          expect(response.counts).toBeDefined();
+          var counts = response.counts;
+          expect(counts.processed).toBeDefined();
+          expect(counts.to_process).toBeDefined();
+          expect(counts.errors).toBeDefined();
+          expect(counts.errors).toBe(0);
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Updates an input by merging concepts', function(done) {
+      app.inputs.mergeConcepts([
+        {
+          id: inputId,
+          concepts: [
+            {'id': 'train', 'value': true},
+            {'id': 'car', 'value': false}
+          ]
+        }
+      ]).then(
+        function(inputs) {
+          expect(inputs).toBeDefined();
+          expect(inputs.length).toBe(1);
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs[0].createdAt).toBeDefined();
+          expect(inputs[0].id).toBeDefined();
+          expect(inputs[0].rawData).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Updates an input by overwriting concepts', function(done) {
+      app.inputs.overwriteConcepts([
+        {
+          id: inputId,
+          concepts: [
+            {'id': 'train', 'value': false},
+            {'id': 'car', 'value': true},
+            {'id': 'car2', 'value': false},
+            {'id': 'car3', 'value': false}
+          ]
+        }
+      ]).then(
+        function(inputs) {
+          expect(inputs).toBeDefined();
+          expect(inputs.length).toBe(1);
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs[0].concepts.length).toBe(4);
+          for (var i = 0; i < inputs[0].concepts; i++) {
+            switch (inputs[0].concepts[i].name) {
+              case 'train':
+                expect(inputs[0].concepts[i].value).toBe(0);
+                break;
+              case 'car':
+                expect(inputs[0].concepts[i].value).toBe(1);
+                break;
+              case 'car2':
+                expect(inputs[0].concepts[i].value).toBe(0);
+                break;
+              case 'car3':
+                expect(inputs[0].concepts[i].value).toBe(0);
+                break;
+            }
           }
-        ]).then(
-          function(inputs) {
-            expect(inputs).toBeDefined();
-            expect(inputs.length).toBe(1);
-            expect(inputs instanceof Inputs).toBe(true);
-            expect(inputs[0].concepts.length).toBe(0);
-            done();
-          },
-          errorHandler.bind(done)
-        );
-      });
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Updates an input by deleting concepts', function(done) {
+      app.inputs.deleteConcepts([
+        {
+          id: inputId,
+          concepts: [
+            {'id': 'train'},
+            {'id': 'car'},
+            {'id': 'car2'},
+            {'id': 'car3'}
+          ]
+        }
+      ]).then(
+        function(inputs) {
+          expect(inputs).toBeDefined();
+          expect(inputs.length).toBe(1);
+          expect(inputs instanceof Inputs).toBe(true);
+          expect(inputs[0].concepts.length).toBe(0);
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
   });
 
 
@@ -590,7 +590,7 @@ describe('Clarifai JS SDK', function() {
     });
 
     it('Throws an error if no model id is given', function(done) {
-      expect(function(){
+      expect(function() {
         app.models.create({name: 'asdf'}, [{id: ferrariId}]);
       }).toThrow(new Error('The following param is required: Model ID'));
       done();
@@ -816,7 +816,9 @@ describe('Clarifai JS SDK', function() {
               expect(model.outputInfo).toBeDefined();
               expect(model.outputInfo.data.concepts.length).toBe(conceptsIds.length + testConcepts.length);
               conceptsCount = model.outputInfo.data.concepts.length;
-              var conceptsCopy = Array.from(model.outputInfo.data.concepts).map(function(el) { return el.id; });
+              var conceptsCopy = Array.from(model.outputInfo.data.concepts).map(function(el) {
+                return el.id;
+              });
               var totalFound = 0;
               for (var i = 0; i < testConcepts.length; i++) {
                 var pos = conceptsCopy.indexOf(testConcepts[i]);
@@ -903,7 +905,7 @@ describe('Clarifai JS SDK', function() {
   describe('Search', function() {
     it('Filter by images/inputs only', function(done) {
       app.inputs.search([
-        { input: { url: sampleImage1 } }
+        {input: {url: sampleImage1}}
       ]).then(
         function(response) {
           expect(response.hits[0].score).toBeDefined();
@@ -915,8 +917,8 @@ describe('Clarifai JS SDK', function() {
 
     it('Filter by concepts/inputs only', function(done) {
       app.inputs.search([
-        { input: { url: sampleImage1 } },
-        { input: { url: sampleImage5 } }
+        {input: {url: sampleImage1}},
+        {input: {url: sampleImage5}}
       ]).then(
         function(response) {
           expect(response.hits[0].score).toBeDefined();
@@ -928,8 +930,8 @@ describe('Clarifai JS SDK', function() {
 
     it('Filter by images and concepts', function(done) {
       app.inputs.search([
-        { input: { url: sampleImage1 } },
-        { concept: { name: ferrariId } }
+        {input: {url: sampleImage1}},
+        {concept: {name: ferrariId}}
       ]).then(
         function(response) {
           expect(response.hits[0].score).toBeDefined();
@@ -961,7 +963,7 @@ describe('Clarifai JS SDK', function() {
 
     it('Filter with metadata only', function(done) {
       app.inputs.search([
-        { input: { metadata: { baz: 'blah' }, type: 'input' } }
+        {input: {metadata: {baz: 'blah'}, type: 'input'}}
       ]).then(
         function(response) {
           expect(response.hits[0].score).toBeDefined();
@@ -1110,7 +1112,7 @@ describe('Clarifai JS SDK', function() {
     });
 
     it('Throws an error if model delete arguments list is incorrect', function(done) {
-      expect(function(){
+      expect(function() {
         app.models.delete(['model-1', 'model-2'], 'version-1');
       }).toThrow();
       done();
