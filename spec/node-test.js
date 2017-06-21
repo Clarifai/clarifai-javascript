@@ -657,7 +657,7 @@ describe('Clarifai JS SDK', function() {
       );
     });
     it('Call predict on video inputs', function(done) {
-      app.models.predict(Clarifai.GENERAL_MODEL, sampleVideo1, true).then(
+      app.models.predict(Clarifai.GENERAL_MODEL, sampleVideo1, {video: true}).then(
         function(response) {
           expect(response.outputs).toBeDefined();
           var outputs = response.outputs;
@@ -704,7 +704,7 @@ describe('Clarifai JS SDK', function() {
 
     it('Can predict on public models in a different language (simplified chinese)', function(done) {
       app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
-        generalModel.predict(sampleImage1, 'zh').then(
+        generalModel.predict(sampleImage1, {language: 'zh'}).then(
           function(response) {
             expect(response.outputs).toBeDefined();
             var concepts = response['outputs'][0]['data']['concepts']
@@ -721,7 +721,7 @@ describe('Clarifai JS SDK', function() {
 
     it('Can predict on public models in a different language (japanese)', function(done) {
       app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
-        generalModel.predict(sampleImage1, 'ja').then(
+        generalModel.predict(sampleImage1, {language: 'ja'}).then(
           function(response) {
             expect(response.outputs).toBeDefined();
             var concepts = response['outputs'][0]['data']['concepts']
@@ -735,10 +735,25 @@ describe('Clarifai JS SDK', function() {
         )
       });
     });
-
+    it('Can predict on public models using a string for language (simplified chinese)', function(done) {
+      app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
+        generalModel.predict(sampleImage1, 'zh').then(
+          function(response) {
+            expect(response.outputs).toBeDefined();
+            var concepts = response['outputs'][0]['data']['concepts']
+            expect(concepts[0]['id']).toBe('ai_HLmqFqBf');
+            expect(concepts[0]['name']).toBe('铁路列车');
+            expect(concepts[1]['id']).toBe('ai_fvlBqXZR')
+            expect(concepts[1]['name']).toBe('铁路')
+            done();
+          },
+          errorHandler.bind(done)
+        )
+      });
+    });
     it('Can predict on public models in a different language (russian)', function(done) {
       app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
-        generalModel.predict(sampleImage1, 'ru').then(
+        generalModel.predict(sampleImage1, {language: 'ru'}).then(
           function(response) {
             expect(response.outputs).toBeDefined();
             var concepts = response['outputs'][0]['data']['concepts']
@@ -752,7 +767,63 @@ describe('Clarifai JS SDK', function() {
         )
       });
     });
-
+    it('Can set a max number of concepts returned for a model', function(done) {
+      const MAX_CONCEPTS = 2;
+      app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
+        generalModel.predict(sampleImage1, {maxConcepts: MAX_CONCEPTS}).then(
+          function(response) {
+            expect(response.outputs).toBeDefined();
+            var concepts = response['outputs'][0]['data']['concepts'];
+            expect(concepts.length).toBe(MAX_CONCEPTS);
+            expect(concepts[0]['id']).toBe('ai_HLmqFqBf');
+            expect(concepts[0]['name']).toBe('train');
+            expect(concepts[1]['id']).toBe('ai_fvlBqXZR');
+            expect(concepts[1]['name']).toBe('railway');
+            done();
+          },
+          errorHandler.bind(done)
+        )
+      });
+    });
+    it('Can set a min value threshold for concepts', function(done) {
+      const MIN_VALUE = 0.95;
+      app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
+        generalModel.predict(sampleImage1, {minValue: MIN_VALUE}).then(
+          function(response) {
+            expect(response.outputs).toBeDefined();
+            var concepts = response['outputs'][0]['data']['concepts'];
+            concepts.forEach(c => expect(c.value).toBeGreaterThan(MIN_VALUE));
+            expect(concepts[0]['id']).toBe('ai_HLmqFqBf');
+            expect(concepts[0]['name']).toBe('train');
+            expect(concepts[1]['id']).toBe('ai_fvlBqXZR');
+            expect(concepts[1]['name']).toBe('railway');
+            done();
+          },
+          errorHandler.bind(done)
+        );
+      });
+    });
+    it('Can select concepts to return', function(done) {
+      app.models.initModel(Clarifai.GENERAL_MODEL).then(function(generalModel) {
+        const selectConcepts = [
+          {name: 'train'},
+          {id: 'ai_6kTjGfF6'}
+        ];
+        generalModel.predict(sampleImage1, {selectConcepts}).then(
+          function(response) {
+            expect(response.outputs).toBeDefined();
+            var concepts = response['outputs'][0]['data']['concepts'];
+            expect(concepts.length).toBe(selectConcepts.length);
+            expect(concepts[0]['id']).toBe('ai_HLmqFqBf');
+            expect(concepts[0]['name']).toBe('train');
+            expect(concepts[1]['id']).toBe('ai_6kTjGfF6');
+            expect(concepts[1]['name']).toBe('station');
+            done();
+          },
+          errorHandler.bind(done)
+        );
+      });
+    });
     it('Update model name and config', function(done) {
       app.models.update({
         id: testModel.id,
