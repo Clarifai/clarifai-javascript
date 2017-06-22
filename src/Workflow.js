@@ -1,6 +1,6 @@
 let axios = require('axios');
 let {API, replaceVars} = require('./constants');
-let {WORKFLOW_PATH} = API;
+let {WORKFLOW_PATH, CREATE_WORKFLOW_PATH} = API;
 let {wrapToken, formatInput} = require('./utils');
 let {checkType} = require('./helpers');
 
@@ -12,6 +12,37 @@ class Workflow {
   constructor(_config, rawData=[]) {
     this._config = _config;
     this.rawData = rawData;
+  }
+
+  create(name, config) {
+    const url = `${this._config.apiEndpoint}${CREATE_WORKFLOW_PATH}`;
+    const modelId = config.modelId;
+    const modelVersionId = config.modelVersionId;
+    const body = {
+      workflows: [{
+        id: name,
+        nodes: [{
+          id: 'concepts',
+          model: {
+            id: modelId,
+            model_version: {
+              id: modelVersionId
+            }
+          }
+        }]
+      }]
+    };
+
+    return wrapToken(this._config, (headers) => {
+      return new Promise((resolve, reject) => {
+        axios.post(url, body, {
+          headers
+        }).then(response => {
+          const workflowId = response.data.workflows[0].id;
+          resolve(workflowId);
+        }, reject);
+      });
+    });
   }
 
   /**
