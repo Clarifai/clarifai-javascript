@@ -31,6 +31,7 @@ var inputId4 = 'input-with-geodata-2';
 var inputId5 = 'input-with-geodata-3';
 var testModelId;
 var testModelVersionId;
+var testWorkflowId = process.env.WORKFLOW_ID || 'some_workflow';
 
 describe('Clarifai JS SDK', function() {
   beforeAll(function() {
@@ -1291,6 +1292,85 @@ describe('Clarifai JS SDK', function() {
           expect(response.status).toBeDefined();
           expect(response.status.code).toBe(10000);
           expect(response.status.description).toBe('Ok');
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+  });
+
+  describe('Workflow', function() {
+    it('Call given workflow id with one input', function(done) {
+      app.workflow.predict(testWorkflowId, sampleImage1).then(
+        function(response) {
+          expect(response.workflow).toBeDefined();
+          var result = response.results[0];
+          var input = result.input;
+          expect(input.id).toBeDefined();
+          expect(input.data).toBeDefined();
+          var outputs = result.outputs;
+          var output = outputs[0];
+          expect(output.id).toBeDefined();
+          expect(output.status).toBeDefined();
+          expect(output.created_at).toBeDefined();
+          expect(output.model).toBeDefined();
+          expect(output.model.model_version).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      )
+    });
+
+    it('Call given workflow id with multiple inputs with specified types', function(done) {
+      app.workflow.predict(testWorkflowId, [
+        {
+          url: sampleImage1,
+          allowDuplicateUrl: true
+        },
+        {
+          url: sampleImage2,
+          allowDuplicateUrl: true
+        }
+      ]).then(
+        function(response) {
+          expect(response.workflow).toBeDefined();
+          var results = response.results;
+          expect(results.length).toBe(2);
+          var result = results[0];
+          var input = result.input;
+          expect(input.id).toBeDefined();
+          expect(input.data).toBeDefined();
+          var output = result.outputs[0];
+          expect(output.id).toBeDefined();
+          expect(output.status).toBeDefined();
+          expect(output.created_at).toBeDefined();
+          expect(output.model).toBeDefined();
+          expect(output.model.model_version).toBeDefined();
+          done();
+        },
+        errorHandler.bind(done)
+      );
+    });
+
+    it('Call given workflow id with multiple inputs without specified types', function(done) {
+      app.workflow.predict(testWorkflowId, [
+        sampleImage8,
+        sampleImage9
+      ]).then(
+        function(response) {
+          expect(response.workflow).toBeDefined();
+          var results = response.results;
+          expect(results.length).toBe(2);
+          var result = results[0];
+          var input = result.input;
+          expect(input.id).toBeDefined();
+          expect(input.data).toBeDefined();
+          var output = result.outputs[0];
+          expect(output.id).toBeDefined();
+          expect(output.status).toBeDefined();
+          expect(output.created_at).toBeDefined();
+          expect(output.model).toBeDefined();
+          expect(output.model.model_version).toBeDefined();
           done();
         },
         errorHandler.bind(done)
