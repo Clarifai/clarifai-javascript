@@ -4,6 +4,7 @@ let {checkType} = require('./helpers');
 let Models = require('./Models');
 let Inputs = require('./Inputs');
 let Concepts = require('./Concepts');
+let Workflow = require('./Workflow');
 let {API, ERRORS} = require('./constants');
 let {TOKEN_PATH} = API;
 
@@ -94,6 +95,7 @@ class App {
     this.models = new Models(this._config);
     this.inputs = new Inputs(this._config);
     this.concepts = new Concepts(this._config);
+    this.workflow = new Workflow(this._config);
   }
 
   _getToken(resolve, reject) {
