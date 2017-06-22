@@ -907,8 +907,8 @@ describe('Clarifai JS SDK', function() {
                   },
                   'age_appearance': {
                     'concepts': [
-                      {'id': 24, 'value': true},
-                      {'id': 32, 'value': false}
+                      {'id': '24', 'value': true},
+                      {'id': '32', 'value': false}
                     ]
                   }
                 }
