@@ -1,0 +1,44 @@
+let axios = require('axios');
+let {API, replaceVars} = require('./constants');
+let {WORKFLOW_PATH} = API;
+let {wrapToken, formatInput} = require('./utils');
+let {checkType} = require('./helpers');
+
+/**
+ * class representing a workflow
+ * @class
+ */
+class Workflow {
+  constructor(_config, rawData=[]) {
+    this._config = _config;
+    this.rawData = rawData;
+  }
+
+  /**
+   * Returns workflow output according to inputs
+   * @param {string}                   workflowId    Workflow id
+   * @param {object[]|object|string}   inputs    An array of objects/object/string pointing to an image resource. A string can either be a url or base64 image bytes. Object keys explained below:
+   *    @param {object}                  inputs[].image     Object with keys explained below:
+   *       @param {string}                 inputs[].image.(url|base64)  Can be a publicly accessibly url or base64 string representing image bytes (required)
+   */
+  predict(workflowId, inputs) {
+    let url = `${this._config.apiEndpoint}${replaceVars(WORKFLOW_PATH, [workflowId])}`;
+    if (checkType(/(Object|String)/, inputs)) {
+      inputs = [inputs];
+    }
+    return wrapToken(this._config, (headers) => {
+      let params = {
+        inputs: inputs.map(formatInput)
+      };
+      return new Promise((resolve, reject) => {
+        axios.post(url, params, {headers})
+        .then((response) => {
+          let data = response.data;
+          resolve(data);
+        }, reject);
+      });
+    });
+  }
+}
+
+module.exports = Workflow;
