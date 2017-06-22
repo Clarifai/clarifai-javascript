@@ -139,14 +139,13 @@ class Model {
       });
     }
     this.getOutputInfo().then((model) => {
-        let modelStatusCode = model.modelVersion.status.code.toString();
-        if (modelStatusCode === MODEL_QUEUED_FOR_TRAINING || modelStatusCode === MODEL_TRAINING) {
-          this.pollTimeout = setTimeout(() => this._pollTrain(timeStart, resolve, reject), POLLTIME);
-        } else {
-          resolve(model);
-        }
-      },
-      reject)
+      let modelStatusCode = model.modelVersion.status.code.toString();
+      if (modelStatusCode === MODEL_QUEUED_FOR_TRAINING || modelStatusCode === MODEL_TRAINING) {
+        this.pollTimeout = setTimeout(() => this._pollTrain(timeStart, resolve, reject), POLLTIME);
+      } else {
+        resolve(model);
+      }
+    }, reject)
       .catch(reject);
   }
 
