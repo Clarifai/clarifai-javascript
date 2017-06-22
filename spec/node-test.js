@@ -31,7 +31,8 @@ var inputId4 = 'input-with-geodata-2';
 var inputId5 = 'input-with-geodata-3';
 var testModelId;
 var testModelVersionId;
-var testWorkflowId = process.env.WORKFLOW_ID || 'some_workflow';
+var testWorkflowId;
+var generalModelVersionId = 'aa9ca48295b37401f8af92ad1af0d91d';
 
 describe('Clarifai JS SDK', function() {
   beforeAll(function() {
@@ -1406,22 +1407,28 @@ describe('Clarifai JS SDK', function() {
 
   describe('Workflow', () => {
     it('Call given workflow id with one input', done => {
-      app.workflow.predict(testWorkflowId, sampleImage1)
-        .then(response => {
-          expect(response.workflow).toBeDefined();
-          const result = response.results[0];
-          const input = result.input;
-          expect(input.id).toBeDefined();
-          expect(input.data).toBeDefined();
-          const outputs = result.outputs;
-          const output = outputs[0];
-          expect(output.id).toBeDefined();
-          expect(output.status).toBeDefined();
-          expect(output.created_at).toBeDefined();
-          expect(output.model).toBeDefined();
-          expect(output.model.model_version).toBeDefined();
-          done();
-      }).catch(errorHandler.bind(done));
+      testWorkflowId = 'big-bang' + Date.now();
+      app.workflow.create(testWorkflowId, {
+        modelId: Clarifai.GENERAL_MODEL,
+        modelVersionId: generalModelVersionId
+      }).then(workflowId => {
+        app.workflow.predict(workflowId, sampleImage1)
+          .then(response => {
+            expect(response.workflow).toBeDefined();
+            const result = response.results[0];
+            const input = result.input;
+            expect(input.id).toBeDefined();
+            expect(input.data).toBeDefined();
+            const outputs = result.outputs;
+            const output = outputs[0];
+            expect(output.id).toBeDefined();
+            expect(output.status).toBeDefined();
+            expect(output.created_at).toBeDefined();
+            expect(output.model).toBeDefined();
+            expect(output.model.model_version).toBeDefined();
+            done();
+        }).catch(errorHandler.bind(done));
+      });
     });
 
     it('Call given workflow id with multiple inputs with specified types', done => {
