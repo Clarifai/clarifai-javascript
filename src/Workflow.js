@@ -22,18 +22,19 @@ class Workflow {
    *       @param {string}                 inputs[].image.(url|base64)  Can be a publicly accessibly url or base64 string representing image bytes (required)
    */
   predict(workflowId, inputs) {
-    let url = `${this._config.apiEndpoint}${replaceVars(WORKFLOW_PATH, [workflowId])}`;
+    const url = `${this._config.apiEndpoint}${replaceVars(WORKFLOW_PATH, [workflowId])}`;
     if (checkType(/(Object|String)/, inputs)) {
       inputs = [inputs];
     }
     return wrapToken(this._config, (headers) => {
-      let params = {
+      const params = {
         inputs: inputs.map(formatInput)
       };
       return new Promise((resolve, reject) => {
-        axios.post(url, params, {headers})
-        .then((response) => {
-          let data = response.data;
+        axios.post(url, params, {
+          headers
+        }).then((response) => {
+          const data = response.data;
           resolve(data);
         }, reject);
       });
