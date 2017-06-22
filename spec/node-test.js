@@ -820,7 +820,7 @@ describe('Clarifai JS SDK', function() {
     });
     it('Can provide feedback on regions', done => {
       const feedbackObject = {
-        id: 'xyz',
+        id: 'ea68cac87c304b28a8046557062f34a0',
         data: {
           'regions': [
             {
@@ -834,19 +834,19 @@ describe('Clarifai JS SDK', function() {
               },
               'data': {
                 'concepts': [
-                  {'id': 'mattid2', 'value': true},
-                  {'id': 'lambo', 'value': false}
+                  {'id': 'train', 'value': true},
+                  {'id': 'car', 'value': false}
                 ]
               }
             }
           ],
           'concepts': [
-            {'id': 'mattid2', 'value': true},
-            {'id': 'lambo', 'value': false}
+            {'id': 'train', 'value': true},
+            {'id': 'car', 'value': false}
           ]
         },
         info: {
-          'endUserId': '{{end_user_uid}}',
+          'endUserId': '{{end_user_id}}',
           'sessionId': '{{session_id}}',
           'outputId': '{{output_id}}'
         }
@@ -862,15 +862,15 @@ describe('Clarifai JS SDK', function() {
     });
     it('Can provide feedback on concepts', done => {
       const feedbackObject = {
-        id: 'xyz',
+        id: 'ea68cac87c304b28a8046557062f34a0',
         data: {
           concepts: [
-            {'id': 'mattid2', 'value': true},
-            {'id': 'lambo', 'value': false}
+            {'id': 'train', 'value': true},
+            {'id': 'car', 'value': false}
           ]
         },
         info: {
-          'endUserId': '{{end_user_uid}}',
+          'endUserId': '{{end_user_id}}',
           'sessionId': '{{session_id}}',
           'outputId': '{{output_id}}'
         }
@@ -885,7 +885,7 @@ describe('Clarifai JS SDK', function() {
     });
     it('Can provide feedback on faces', done => {
       const feedbackObject = {
-        id: 'xyz',
+        id: 'ea68cac87c304b28a8046557062f34a0',
         data: {
           'regions': [
             {
@@ -901,14 +901,14 @@ describe('Clarifai JS SDK', function() {
                 'face': {
                   'identity': {
                     'concepts': [
-                      {'id': 'mattid2', 'value': true},
-                      {'id': 'lambo', 'value': false}
+                      {'id': 'black or african american', 'value': true},
+                      {'id': 'white', 'value': false}
                     ]
                   },
                   'age_appearance': {
                     'concepts': [
-                      {'id': 'mattid2', 'value': true},
-                      {'id': 'lambo', 'value': false}
+                      {'id': 24, 'value': true},
+                      {'id': 32, 'value': false}
                     ]
                   }
                 }
