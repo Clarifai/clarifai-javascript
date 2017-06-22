@@ -1299,29 +1299,27 @@ describe('Clarifai JS SDK', function() {
     });
   });
 
-  describe('Workflow', function() {
-    it('Call given workflow id with one input', function(done) {
-      app.workflow.predict(testWorkflowId, sampleImage1).then(
-        function(response) {
+  describe('Workflow', () => {
+    it('Call given workflow id with one input', done => {
+      app.workflow.predict(testWorkflowId, sampleImage1)
+        .then(response => {
           expect(response.workflow).toBeDefined();
-          var result = response.results[0];
-          var input = result.input;
+          const result = response.results[0];
+          const input = result.input;
           expect(input.id).toBeDefined();
           expect(input.data).toBeDefined();
-          var outputs = result.outputs;
-          var output = outputs[0];
+          const outputs = result.outputs;
+          const output = outputs[0];
           expect(output.id).toBeDefined();
           expect(output.status).toBeDefined();
           expect(output.created_at).toBeDefined();
           expect(output.model).toBeDefined();
           expect(output.model.model_version).toBeDefined();
           done();
-        },
-        errorHandler.bind(done)
-      )
+      }).catch(errorHandler.bind(done));
     });
 
-    it('Call given workflow id with multiple inputs with specified types', function(done) {
+    it('Call given workflow id with multiple inputs with specified types', done => {
       app.workflow.predict(testWorkflowId, [
         {
           url: sampleImage1,
@@ -1331,50 +1329,44 @@ describe('Clarifai JS SDK', function() {
           url: sampleImage2,
           allowDuplicateUrl: true
         }
-      ]).then(
-        function(response) {
-          expect(response.workflow).toBeDefined();
-          var results = response.results;
-          expect(results.length).toBe(2);
-          var result = results[0];
-          var input = result.input;
-          expect(input.id).toBeDefined();
-          expect(input.data).toBeDefined();
-          var output = result.outputs[0];
-          expect(output.id).toBeDefined();
-          expect(output.status).toBeDefined();
-          expect(output.created_at).toBeDefined();
-          expect(output.model).toBeDefined();
-          expect(output.model.model_version).toBeDefined();
-          done();
-        },
-        errorHandler.bind(done)
-      );
+      ]).then(response => {
+        expect(response.workflow).toBeDefined();
+        const results = response.results;
+        expect(results.length).toBe(2);
+        const result = results[0];
+        const input = result.input;
+        expect(input.id).toBeDefined();
+        expect(input.data).toBeDefined();
+        const output = result.outputs[0];
+        expect(output.id).toBeDefined();
+        expect(output.status).toBeDefined();
+        expect(output.created_at).toBeDefined();
+        expect(output.model).toBeDefined();
+        expect(output.model.model_version).toBeDefined();
+        done();
+      }).catch(errorHandler.bind(done));
     });
 
-    it('Call given workflow id with multiple inputs without specified types', function(done) {
+    it('Call given workflow id with multiple inputs without specified types', done => {
       app.workflow.predict(testWorkflowId, [
         sampleImage8,
         sampleImage9
-      ]).then(
-        function(response) {
-          expect(response.workflow).toBeDefined();
-          var results = response.results;
-          expect(results.length).toBe(2);
-          var result = results[0];
-          var input = result.input;
-          expect(input.id).toBeDefined();
-          expect(input.data).toBeDefined();
-          var output = result.outputs[0];
-          expect(output.id).toBeDefined();
-          expect(output.status).toBeDefined();
-          expect(output.created_at).toBeDefined();
-          expect(output.model).toBeDefined();
-          expect(output.model.model_version).toBeDefined();
-          done();
-        },
-        errorHandler.bind(done)
-      );
+      ]).then(response => {
+        expect(response.workflow).toBeDefined();
+        const results = response.results;
+        expect(results.length).toBe(2);
+        const result = results[0];
+        const input = result.input;
+        expect(input.id).toBeDefined();
+        expect(input.data).toBeDefined();
+        const output = result.outputs[0];
+        expect(output.id).toBeDefined();
+        expect(output.status).toBeDefined();
+        expect(output.created_at).toBeDefined();
+        expect(output.model).toBeDefined();
+        expect(output.model.model_version).toBeDefined();
+        done();
+      }).catch(errorHandler.bind(done));
     });
   });
 });
@@ -1399,5 +1391,9 @@ function errorHandler(err) {
 };
 
 function log(obj) {
-  console.log('[ERROR]', JSON.stringify(obj));
+  try {
+    console.log('[ERROR]', JSON.stringify(obj));
+  } catch(e) {
+    console.log(e);
+  }
 };
