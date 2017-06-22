@@ -8,19 +8,6 @@ script:
 - npm run test
 - npm run build
 deploy:
-- provider: npm
-  email: jade@clarifai.com
-  api_key: ${NPM_TOKEN}
-  on:
-    tags: true
-    repo: Clarifai/clarifai-javascript
-- provider: releases
-  skip_cleanup: true
-  api_key: ${GITHUB_TOKEN}
-  file_glob: true
-  file: sdk/*
-  on:
-    tags: true
 - provider: s3
   access_key_id: ${AWS_ACCESS_KEY_ID}
   secret_access_key: ${AWS_SECRET_ACCESS_KEY}
@@ -45,5 +32,18 @@ deploy:
   on:
     tags: true
     repo: Clarifai/clarifai-javascript
+- provider: npm
+  email: jade@clarifai.com
+  api_key: ${NPM_TOKEN}
+  on:
+    tags: true
+    repo: Clarifai/clarifai-javascript
+- provider: releases
+  skip_cleanup: true
+  api_key: ${GITHUB_TOKEN}
+  file_glob: true
+  file: sdk/*
+  on:
+    tags: true
 
 after_deploy: cd examples && npm i clarifai@latest && CLARIFAI_API_KEY=${API_KEY} node index
