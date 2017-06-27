@@ -55,7 +55,7 @@ class Workflow {
           const data = response.data;
           resolve(data);
         }, reject);
-      })
+      });
     });
   }
 
