@@ -29,8 +29,9 @@ module.exports = {
     INPUT_PATH: '/v2/inputs/$0',
     INPUTS_STATUS_PATH: '/v2/inputs/status',
     SEARCH_PATH: '/v2/searches',
-    WORKFLOW_PATH: '/v2/workflows/$0/results',
-    CREATE_WORKFLOW_PATH: '/v2/workflows'
+    WORKFLOWS_PATH: '/v2/workflows',
+    WORKFLOW_PATH: '/v2/workflows/$0',
+    WORKFLOW_RESULTS_PATH: '/v2/workflows/$0/results'
   },
   ERRORS: {
     paramsRequired: (param) => {

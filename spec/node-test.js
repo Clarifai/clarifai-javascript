@@ -1477,7 +1477,9 @@ describe('Clarifai JS SDK', function() {
         expect(output.created_at).toBeDefined();
         expect(output.model).toBeDefined();
         expect(output.model.model_version).toBeDefined();
-        done();
+        app.workflow.delete(testWorkflowId).then(response => {
+          done();
+        }).catch(errorHandler.bind(done));
       }).catch(errorHandler.bind(done));
     });
   });
@@ -1498,7 +1500,11 @@ function responseHandler(response) {
 function errorHandler(err) {
   expect(err.status).toBe(true);
   expect(err.data).toBe(true);
-  log(err);
+  if (err.data) {
+    log(err.data);
+  } else {
+    log(err);
+  }
   this();
 }
 
