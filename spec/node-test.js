@@ -1500,7 +1500,11 @@ function responseHandler(response) {
 function errorHandler(err) {
   expect(err.status).toBe(true);
   expect(err.data).toBe(true);
-  log(err);
+  if (err.data) {
+    log(err.data);
+  } else {
+    log(err);
+  }
   this();
 }
 
