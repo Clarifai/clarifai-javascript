@@ -115,6 +115,9 @@ module.exports = {
     if (image.id) {
       input.input.id = image.id;
       input.input.data = {image: {}};
+      if(image.crop) {
+        input.input.data.image.crop = image.crop;
+      }
     }
     if (image.metadata !== undefined) {
       input.input.data.metadata = image.metadata;
