@@ -130,7 +130,10 @@ gulp.task(
 );
 
 gulp.task('test', function() {
-  return gulp.src('./spec/*.js')
+  const spec = gutil.env.spec;
+  const path = spec ? `./spec/${spec}-spec.js` : './spec/*.js';
+
+  return gulp.src(path)
     .pipe(jasmine({
       'includeStackTrace': true,
       'verbose': true,
@@ -142,7 +145,8 @@ gulp.task('test', function() {
       }
     }).on('end', function() {
       process.exit();
-    }).on('error', function() {
+    }).on('error', function(e) {
+      console.log(e);
       process.exit(1);
     }));
 });
