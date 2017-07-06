@@ -282,6 +282,8 @@ class Inputs {
         axios.post(url, data, {headers})
           .then((response) => {
             if (isSuccess(response)) {
+              response.data.search_id = response.data.id;
+              delete response.data.id;
               let data = clone(response.data);
               data.rawData = clone(response.data);
               resolve(data);
