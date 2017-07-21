@@ -1489,7 +1489,7 @@ describe('Clarifai JS SDK', function() {
 function pollStatus(fn) {
   var getStatus = setInterval(function() {
     fn(getStatus)
-  }, 100);
+  }, 1000);
 }
 
 function responseHandler(response) {
