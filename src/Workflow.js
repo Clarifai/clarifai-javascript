@@ -1,6 +1,6 @@
 let axios = require('axios');
 let {API, replaceVars} = require('./constants');
-let {WORKFLOWS_PATH, WORKFLOW_PATH, WORKFLOW_RESULTS_PATH} = API;
+let {WORKFLOW_PATH, CREATE_WORKFLOW_PATH} = API;
 let {wrapToken, formatInput} = require('./utils');
 let {checkType} = require('./helpers');
 
@@ -14,13 +14,13 @@ class Workflow {
     this.rawData = rawData;
   }
 
-  create(workflowId, config) {
-    const url = `${this._config.apiEndpoint}${WORKFLOWS_PATH}`;
+  create(name, config) {
+    const url = `${this._config.basePath}${CREATE_WORKFLOW_PATH}`;
     const modelId = config.modelId;
     const modelVersionId = config.modelVersionId;
     const body = {
       workflows: [{
-        id: workflowId,
+        id: name,
         nodes: [{
           id: 'concepts',
           model: {
@@ -45,20 +45,6 @@ class Workflow {
     });
   }
 
-  delete(workflowId, config) {
-    const url = `${this._config.apiEndpoint}${replaceVars(WORKFLOW_PATH, [workflowId])}`;
-    return wrapToken(this._config, (headers) => {
-      return new Promise((resolve, reject) => {
-        axios.delete(url, {
-          headers
-        }).then(response => {
-          const data = response.data;
-          resolve(data);
-        }, reject);
-      });
-    });
-  }
-
   /**
    * Returns workflow output according to inputs
    * @param {string}                   workflowId    Workflow id
@@ -67,7 +53,7 @@ class Workflow {
    *       @param {string}                 inputs[].image.(url|base64)  Can be a publicly accessibly url or base64 string representing image bytes (required)
    */
   predict(workflowId, inputs) {
-    const url = `${this._config.apiEndpoint}${replaceVars(WORKFLOW_RESULTS_PATH, [workflowId])}`;
+    const url = `${this._config.basePath}${replaceVars(WORKFLOW_PATH, [workflowId])}`;
     if (checkType(/(Object|String)/, inputs)) {
       inputs = [inputs];
     }

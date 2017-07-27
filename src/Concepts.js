@@ -27,7 +27,7 @@ class Concepts {
    * @return {Promise(Concepts, error)} A Promise that is fulfilled with a Concepts instance or rejected with an error
    */
   list(options = {page: 1, perPage: 20}) {
-    let url = `${this._config.apiEndpoint}${CONCEPTS_PATH}`;
+    let url = `${this._config.basePath}${CONCEPTS_PATH}`;
     return wrapToken(this._config, (headers) => {
       return new Promise((resolve, reject) => {
         axios.get(url, {
@@ -53,7 +53,7 @@ class Concepts {
    * @return {Promise(Concept, error)} A Promise that is fulfilled with a Concept instance or rejected with an error
    */
   get(id) {
-    let url = `${this._config.apiEndpoint}${replaceVars(CONCEPT_PATH, [id])}`;
+    let url = `${this._config.basePath}${replaceVars(CONCEPT_PATH, [id])}`;
     return wrapToken(this._config, (headers) => {
       return new Promise((resolve, reject) => {
         axios.get(url, {headers}).then((response) => {
@@ -82,7 +82,7 @@ class Concepts {
     let data = {
       'concepts': concepts.map(formatConcept)
     };
-    let url = `${this._config.apiEndpoint}${CONCEPTS_PATH}`;
+    let url = `${this._config.basePath}${CONCEPTS_PATH}`;
     return wrapToken(this._config, (headers) => {
       return new Promise((resolve, reject) => {
         axios.post(url, data, {headers})
@@ -103,7 +103,7 @@ class Concepts {
    * @return {Promise(Concepts, error)} A Promise that is fulfilled with a Concepts instance or rejected with an error
    */
   search(name, language = null) {
-    let url = `${this._config.apiEndpoint}${CONCEPT_SEARCH_PATH}`;
+    let url = `${this._config.basePath}${CONCEPT_SEARCH_PATH}`;
     return wrapToken(this._config, (headers) => {
       let params = {
         'concept_query': {name, language}
