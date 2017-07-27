@@ -202,7 +202,7 @@ class Models {
    * @return {Promise(Models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
    */
   list(options = {page: 1, perPage: 20}) {
-    let url = `${this._config.apiEndpoint}${MODELS_PATH}`;
+    let url = `${this._config.basePath}${MODELS_PATH}`;
     return wrapToken(this._config, (headers) => {
       return new Promise((resolve, reject) => {
         axios.get(url, {
@@ -247,7 +247,7 @@ class Models {
     if (modelObj.id === undefined) {
       throw ERRORS.paramsRequired('Model ID');
     }
-    let url = `${this._config.apiEndpoint}${MODELS_PATH}`;
+    let url = `${this._config.basePath}${MODELS_PATH}`;
     let data = {model: modelObj};
     data['model']['output_info'] = {
       'data': {
@@ -278,7 +278,7 @@ class Models {
    * @return {Promise(Model, error)} A Promise that is fulfilled with an instance of Model or rejected with an error
    */
   get(id) {
-    let url = `${this._config.apiEndpoint}${replaceVars(MODEL_PATH, [id])}`;
+    let url = `${this._config.basePath}${replaceVars(MODEL_PATH, [id])}`;
     return wrapToken(this._config, (headers) => {
       return new Promise((resolve, reject) => {
         axios.get(url, {headers}).then((response) => {
@@ -306,7 +306,7 @@ class Models {
    * @return {Promise(Models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
    */
   update(models) {
-    let url = `${this._config.apiEndpoint}${MODELS_PATH}`;
+    let url = `${this._config.basePath}${MODELS_PATH}`;
     let modelsList = Array.isArray(models) ? models : [models];
     let data = {models: modelsList.map(formatModel)};
     data['action'] = models.action || 'merge';
@@ -374,9 +374,9 @@ class Models {
 
     if (checkType(/String/, ids) || (checkType(/Array/, ids) && ids.length === 1 )) {
       if (versionId) {
-        url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSION_PATH, [id, versionId])}`;
+        url = `${this._config.basePath}${replaceVars(MODEL_VERSION_PATH, [id, versionId])}`;
       } else {
-        url = `${this._config.apiEndpoint}${replaceVars(MODEL_PATH, [id])}`;
+        url = `${this._config.basePath}${replaceVars(MODEL_PATH, [id])}`;
       }
       request = wrapToken(this._config, (headers) => {
         return new Promise((resolve, reject) => {
@@ -389,10 +389,10 @@ class Models {
       });
     } else {
       if (!ids && !versionId) {
-        url = `${this._config.apiEndpoint}${MODELS_PATH}`;
+        url = `${this._config.basePath}${MODELS_PATH}`;
         data = {'delete_all': true};
       } else if (!versionId && ids.length > 1) {
-        url = `${this._config.apiEndpoint}${MODELS_PATH}`;
+        url = `${this._config.basePath}${MODELS_PATH}`;
         data = {ids};
       } else {
         throw ERRORS.INVALID_DELETE_ARGS;
@@ -423,7 +423,7 @@ class Models {
    * @return {Promise(models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
    */
   search(name, type = null) {
-    let url = `${this._config.apiEndpoint}${MODEL_SEARCH_PATH}`;
+    let url = `${this._config.basePath}${MODEL_SEARCH_PATH}`;
     return wrapToken(this._config, (headers) => {
       let params = {
         'model_query': {
