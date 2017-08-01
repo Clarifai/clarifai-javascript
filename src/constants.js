@@ -7,33 +7,8 @@ const MODEL_TRAINING = '21101';
 const POLLTIME = 2000;
 
 module.exports = {
-  API_OLD: {
-    TOKEN_PATH: '/v2/token',
-    MODELS_PATH: '/v2/models',
-    MODEL_PATH: '/v2/models/$0',
-    MODEL_VERSIONS_PATH: '/v2/models/$0/versions',
-    MODEL_VERSION_PATH: '/v2/models/$0/versions/$1',
-    MODEL_PATCH_PATH: '/v2/models/$0/output_info/data/concepts',
-    MODEL_OUTPUT_PATH: '/v2/models/$0/output_info',
-    MODEL_SEARCH_PATH: '/v2/models/searches',
-    MODEL_FEEDBACK_PATH: '/v2/models/$0/feedback',
-    MODEL_VERSION_FEEDBACK_PATH: '/v2/models/$0/versions/$1/feedback',
-    PREDICT_PATH: '/v2/models/$0/outputs',
-    VERSION_PREDICT_PATH: '/v2/models/$0/versions/$1/outputs',
-    CONCEPTS_PATH: '/v2/concepts',
-    CONCEPT_PATH: '/v2/concepts/$0',
-    CONCEPT_SEARCH_PATH: '/v2/concepts/searches',
-    MODEL_INPUTS_PATH: '/v2/models/$0/inputs',
-    MODEL_VERSION_INPUTS_PATH: '/v2/models/$0/versions/$1/inputs',
-    INPUTS_PATH: '/v2/inputs',
-    INPUT_PATH: '/v2/inputs/$0',
-    INPUTS_STATUS_PATH: '/v2/inputs/status',
-    SEARCH_PATH: '/v2/searches',
-    WORKFLOW_PATH: '/v2/workflows/$0/results',
-    CREATE_WORKFLOW_PATH: '/v2/workflows'
-  },
   API: {
-    TOKEN_PATH: '/token',
+    TOKEN_PATH: '/v2/token',
     MODELS_PATH: '/models',
     MODEL_PATH: '/models/$0',
     MODEL_VERSIONS_PATH: '/models/$0/versions',

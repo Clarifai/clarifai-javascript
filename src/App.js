@@ -65,7 +65,6 @@ class App {
   }
 
   _validate({clientId, clientSecret, token, apiKey, sessionToken}) {
-    console.log('_validate');
     if ((!clientId || !clientSecret) && !token && !apiKey && !sessionToken) {
       throw ERRORS.paramsRequired(['Client ID', 'Client Secret']);
     }
@@ -116,7 +115,7 @@ class App {
   }
 
   _requestToken() {
-    let url = `${this._config.basePath}${TOKEN_PATH}`;
+    let url = `${this._config.apiEndpoint}${TOKEN_PATH}`;
     let clientId = this._config.clientId;
     let clientSecret = this._config.clientSecret;
     return axios({
