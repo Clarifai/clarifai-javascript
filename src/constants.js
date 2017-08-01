@@ -8,7 +8,7 @@ const POLLTIME = 2000;
 
 module.exports = {
   API: {
-    TOKEN_PATH: '/v2/token',
+    TOKEN_PATH: '/token',
     MODELS_PATH: '/models',
     MODEL_PATH: '/models/$0',
     MODEL_VERSIONS_PATH: '/models/$0/versions',
@@ -58,7 +58,10 @@ module.exports = {
     });
     return newPath;
   },
-  getBasePath: (apiEndpoint = 'https://api.clarifai.com', userId = '', appId = '') => {
+  getBasePath: (apiEndpoint = 'https://api.clarifai.com', userId, appId) => {
+    if(!userId || !appId) {
+      return `${apiEndpoint}/v2`;
+    }
     return `${apiEndpoint}/v2/users/${userId}/apps/${appId}`;
   },
   GEO_LIMIT_TYPES,
