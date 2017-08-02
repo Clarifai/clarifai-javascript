@@ -1,21 +1,37 @@
+const axios = require('axios');
 const Clarifai = require('./../src');
 const {errorHandler} = require('./helpers');
 const {sampleImages} = require('./test-data');
+const LOGIN_URL = `${process.env.API_ENDPOINT || 'https://api.clarifai.com'}/v2/login`;
+let sessionToken = null;
 
 describe('Session Token', () => {
+  beforeAll(done => {
+    let data = JSON.stringify({
+      email: process.env.USER_EMAIL,
+      password: process.env.USER_PASSWORD
+    });
+    axios.post(LOGIN_URL, data)
+      .then(results => {
+        sessionToken = results.data.session_token;
+        done();
+      })
+      .catch(errorHandler.bind(done));
+  });
+
   it('can initialize an app with a session token, app id and user id', done => {
     const anApp = new Clarifai.App({
-      sessionToken: process.env.SESSION_TOKEN,
+      sessionToken: sessionToken,
       appId: process.env.APP_ID,
       userId: process.env.USER_ID
     });
-    expect(anApp._config.sessionToken).toEqual(process.env.SESSION_TOKEN);
+    expect(anApp._config.sessionToken).toEqual(sessionToken);
     done();
   });
 
   it('can make calls with a session token', done => {
     const anApp = new Clarifai.App({
-      sessionToken: process.env.SESSION_TOKEN,
+      sessionToken: sessionToken,
       appId: process.env.APP_ID,
       userId: process.env.USER_ID
     });
