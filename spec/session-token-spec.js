@@ -13,7 +13,7 @@ describe('Session Token', () => {
     done();
   });
 
-  it('can make calls with an api key', done => {
+  it('can make calls with a session token', done => {
     const anApp = new Clarifai.App({
       sessionToken: process.env.SESSION_TOKEN,
       appId: process.env.APP_ID,
