@@ -4,7 +4,10 @@ node_js:
 cache:
   directories:
     - node_modules
+before_script:
+ - chmod +x token.sh
 script:
+- source token.sh
 - npm run test
 - npm run build
 deploy:
