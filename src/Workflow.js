@@ -15,7 +15,7 @@ class Workflow {
   }
 
   create(workflowId, config) {
-    const url = `${this._config.apiEndpoint}${WORKFLOWS_PATH}`;
+    const url = `${this._config.basePath}${WORKFLOWS_PATH}`;
     const modelId = config.modelId;
     const modelVersionId = config.modelVersionId;
     const body = {
@@ -46,7 +46,7 @@ class Workflow {
   }
 
   delete(workflowId, config) {
-    const url = `${this._config.apiEndpoint}${replaceVars(WORKFLOW_PATH, [workflowId])}`;
+    const url = `${this._config.basePath}${replaceVars(WORKFLOW_PATH, [workflowId])}`;
     return wrapToken(this._config, (headers) => {
       return new Promise((resolve, reject) => {
         axios.delete(url, {
@@ -67,7 +67,7 @@ class Workflow {
    *       @param {string}                 inputs[].image.(url|base64)  Can be a publicly accessibly url or base64 string representing image bytes (required)
    */
   predict(workflowId, inputs) {
-    const url = `${this._config.apiEndpoint}${replaceVars(WORKFLOW_RESULTS_PATH, [workflowId])}`;
+    const url = `${this._config.basePath}${replaceVars(WORKFLOW_RESULTS_PATH, [workflowId])}`;
     if (checkType(/(Object|String)/, inputs)) {
       inputs = [inputs];
     }

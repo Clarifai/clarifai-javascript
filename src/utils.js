@@ -13,6 +13,13 @@ module.exports = {
         };
         return requestFn(headers).then(resolve, reject);
       }
+      if (_config.sessionToken) {
+        let headers = {
+          'X-Clarifai-Session-Token': _config.sessionToken,
+          'X-Clarifai-Client': `js:${VERSION}`
+        };
+        return requestFn(headers).then(resolve, reject);
+      }
       _config.token().then((token) => {
         let headers = {
           Authorization: `Bearer ${token.accessToken}`,

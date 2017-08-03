@@ -87,7 +87,7 @@ class Model {
    * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
    */
   update(obj) {
-    let url = `${this._config.apiEndpoint}${MODELS_PATH}`;
+    let url = `${this._config.basePath}${MODELS_PATH}`;
     let modelData = [obj];
     let data = {models: modelData.map(m => formatModel(Object.assign(m, {id: this.id})))};
     if (Array.isArray(obj.concepts)) {
@@ -113,7 +113,7 @@ class Model {
    * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
    */
   train(sync) {
-    let url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSIONS_PATH, [this.id])}`;
+    let url = `${this._config.basePath}${replaceVars(MODEL_VERSIONS_PATH, [this.id])}`;
     return wrapToken(this._config, (headers) => {
       return new Promise((resolve, reject) => {
         axios.post(url, null, {headers}).then((response) => {
@@ -183,7 +183,7 @@ class Model {
     if (checkType(/(Object|String)/, inputs)) {
       inputs = [inputs];
     }
-    let url = `${this._config.apiEndpoint}${this.versionId ?
+    let url = `${this._config.basePath}${this.versionId ?
       replaceVars(VERSION_PREDICT_PATH, [this.id, this.versionId]) :
       replaceVars(PREDICT_PATH, [this.id])}`;
     return wrapToken(this._config, (headers) => {
@@ -211,7 +211,7 @@ class Model {
    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
    */
   getVersion(versionId) {
-    let url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSION_PATH, [this.id, versionId])}`;
+    let url = `${this._config.basePath}${replaceVars(MODEL_VERSION_PATH, [this.id, versionId])}`;
     return wrapToken(this._config, (headers) => {
       return new Promise((resolve, reject) => {
         axios.get(url, {headers}).then((response) => {
@@ -231,7 +231,7 @@ class Model {
    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
    */
   getVersions(options = {page: 1, perPage: 20}) {
-    let url = `${this._config.apiEndpoint}${replaceVars(MODEL_VERSIONS_PATH, [this.id])}`;
+    let url = `${this._config.basePath}${replaceVars(MODEL_VERSIONS_PATH, [this.id])}`;
     return wrapToken(this._config, (headers) => {
       let data = {
         headers,
@@ -252,7 +252,7 @@ class Model {
    * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
    */
   getOutputInfo() {
-    let url = `${this._config.apiEndpoint}${replaceVars(MODEL_OUTPUT_PATH, [this.id])}`;
+    let url = `${this._config.basePath}${replaceVars(MODEL_OUTPUT_PATH, [this.id])}`;
     return wrapToken(this._config, (headers) => {
       return new Promise((resolve, reject) => {
         axios.get(url, {headers}).then((response) => {
@@ -270,7 +270,7 @@ class Model {
    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
    */
   getInputs(options = {page: 1, perPage: 20}) {
-    let url = `${this._config.apiEndpoint}${this.versionId ?
+    let url = `${this._config.basePath}${this.versionId ?
       replaceVars(MODEL_VERSION_INPUTS_PATH, [this.id, this.versionId]) :
       replaceVars(MODEL_INPUTS_PATH, [this.id])}`;
     return wrapToken(this._config, (headers) => {
@@ -297,7 +297,7 @@ class Model {
    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
    */
   feedback(input, {id, data, info}) {
-    const url = `${this._config.apiEndpoint}${this.versionId ?
+    const url = `${this._config.basePath}${this.versionId ?
       replaceVars(MODEL_VERSION_FEEDBACK_PATH, [this.id, this.versionId]) :
       replaceVars(MODEL_FEEDBACK_PATH, [this.id])}`;
     const media = formatMediaPredict(input).data;

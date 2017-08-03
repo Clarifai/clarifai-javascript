@@ -62,7 +62,7 @@ class Input {
   }
 
   _update(action, concepts = [], metadata = null) {
-    let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
+    let url = `${this._config.basePath}${INPUTS_PATH}`;
     let inputData = {};
     if (concepts.length) {
       inputData.concepts = concepts;
