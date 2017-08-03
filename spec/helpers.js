@@ -1,4 +1,5 @@
-function errorHandler(err, done) {
+function errorHandler(err) {
+  console.log('here');
   expect(err.status).toBe(true);
   expect(err.data).toBe(true);
   if (err.data) {
@@ -6,20 +7,21 @@ function errorHandler(err, done) {
   } else {
     log(err);
   }
-  done();
+
+  this(err);
 }
 
 function log(obj) {
   try {
     console.log('[ERROR]', JSON.stringify(obj));
-  } catch(e) {
+  } catch (e) {
     console.log(e);
-  };
-};
+  }
+}
 
 function pollStatus(fn) {
   var getStatus = setInterval(() => {
-    fn(getStatus)
+    fn(getStatus);
   }, 1000);
 }
 

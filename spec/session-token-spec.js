@@ -1,4 +1,3 @@
-const axios = require('axios');
 const Clarifai = require('./../src');
 const {errorHandler} = require('./helpers');
 const {sampleImages} = require('./test-data');
@@ -18,7 +17,7 @@ describe('Session Token', () => {
   it('can make calls with a session token', done => {
     const anApp = new Clarifai.App({
       sessionToken: process.env.SESSION_TOKEN,
-      appId: process.env.APP_ID,
+      appId: process.env.CLARIFAI_USER_APP_ID,
       userId: process.env.USER_ID,
       apiEndpoint: process.env.API_ENDPOINT
     });
