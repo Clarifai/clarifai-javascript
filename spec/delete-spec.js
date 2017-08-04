@@ -65,6 +65,9 @@ describe('Delete Resources', () => {
         pollStatus(interval => {
           app.inputs.getStatus()
             .then(data => {
+              console.log('last count: ', lastCount);
+              console.log('processed: ', data['counts']['processed']);
+
               if (data['counts']['processed'] === lastCount - 1 || lastCount === 0) {
                 clearInterval(interval);
                 done();
