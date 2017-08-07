@@ -62,19 +62,7 @@ describe('Delete Resources', () => {
         expect(data.status).toBeDefined();
         expect(data.status.code).toBe(10000);
         expect(data.status.description).toBe('Ok');
-        pollStatus(interval => {
-          app.inputs.getStatus()
-            .then(data => {
-              console.log('last count: ', lastCount);
-              console.log('processed: ', data['counts']['processed']);
-
-              if (data['counts']['processed'] === lastCount - 1 || lastCount === 0) {
-                clearInterval(interval);
-                done();
-              }
-            })
-            .catch(errorHandler.bind(done));
-        });
+        done();
       })
       .catch(errorHandler.bind(done));
   });
