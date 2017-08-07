@@ -40,7 +40,7 @@ describe('Delete Resources', () => {
           app.inputs.getStatus()
             .then(data => {
               lastCount = data['counts']['processed'];
-              if (data['counts']['to_process'] == 0) {
+              if (data['counts']['to_process'] === 0) {
                 clearInterval(interval);
                 if (data['errors'] > 0) {
                   throw new Error('Error processing inputs', data);
@@ -65,7 +65,10 @@ describe('Delete Resources', () => {
         pollStatus(interval => {
           app.inputs.getStatus()
             .then(data => {
-              if (data['counts']['processed'] == lastCount - 1) {
+              console.log('last count: ', lastCount);
+              console.log('processed: ', data['counts']['processed']);
+
+              if (data['counts']['processed'] === lastCount - 1 || lastCount === 0) {
                 clearInterval(interval);
                 done();
               }
