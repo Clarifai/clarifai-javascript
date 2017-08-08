@@ -1,7 +1,7 @@
 const MAX_BATCH_SIZE = 128;
 const GEO_LIMIT_TYPES = ['withinMiles', 'withinKilometers', 'withinRadians', 'withinDegrees'];
 const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/i;
-const SYNC_TIMEOUT = 60000;
+const SYNC_TIMEOUT = 240000;
 const MODEL_QUEUED_FOR_TRAINING = '21103';
 const MODEL_TRAINING = '21101';
 const POLLTIME = 2000;
