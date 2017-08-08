@@ -89,46 +89,22 @@ describe('Inputs', () => {
   });
 
   it('Adds input with metadata', done => {
-    app.inputs.create([
-      {
-        id: inputId1,
-        url: sampleImages[1],
-        allowDuplicateUrl: true,
-        concepts: [{id: beerId}],
-        metadata: {foo: 'bar', baz: 'blah'}
-      },
-      {
-        id: inputId2,
-        url: sampleImages[1],
-        allowDuplicateUrl: true,
-        concepts: [{id: beerId}],
-        metadata: {foo: 'baz', baz: 'blah'}
-      }
-    ])
-      .then(inputs => {
-        expect(inputs).toBeDefined();
-        expect(inputs instanceof Inputs).toBe(true);
-        expect(inputs.length).toBe(2);
-        expect(inputs[0].id).toBe(inputId1);
-        expect(inputs[1].id).toBe(inputId2);
-        expect(inputs[0].rawData.data.metadata.foo).toBe('bar');
-        expect(inputs[1].rawData.data.metadata.foo).toBe('baz');
-        pollStatus(interval => {
-          app.inputs.getStatus()
-            .then(data => {
-              if (data['counts']['to_process'] == 0) {
-                clearInterval(interval);
-                if (data['errors'] > 0) {
-                  throw new Error('Error processing inputs', data);
-                } else {
-                  done();
-                }
-              }
-            })
-            .catch(errorHandler.bind(done));
-        })
-      })
-      .catch(errorHandler.bind(done));
+    app.inputs.create({
+      id: inputId1,
+      url: sampleImages[1],
+      allowDuplicateUrl: true,
+      concepts: [{id: beerId}],
+      metadata: {foo: 'bar', baz: 'blah'}
+    })
+    .then(inputs => {
+      expect(inputs).toBeDefined();
+      expect(inputs instanceof Inputs).toBe(true);
+      expect(inputs[0].id).toBe(inputId1);
+      expect(inputs[0].rawData.data.metadata.foo).toBe('bar');
+      expect(inputs[0].rawData.status.code === 30000);
+      done();
+    })
+    .catch(errorHandler.bind(done));
   });
 
   it('Adds input with geodata', done => {
@@ -408,39 +384,23 @@ describe('Inputs', () => {
 
 describe('Search', () => {
   beforeAll(done => {
-
-    app.inputs.create([
-      {
-        url: sampleImages[0],
-        allowDuplicateUrl: true,
-        concepts: [{id: ferrariId, value: true}]
-      }
-    ])
-      .then(response => {
-        return app.models.create(testModelId, [
-          { id: ferrariId }
-        ])
-      })
-      .then(() => {
-        return app.models.train(testModelId);
-      })
-      .then(response => {
-        pollStatus(interval => {
-          app.inputs.getStatus()
-            .then(data => {
-              if (data['counts']['to_process'] == 0) {
-                clearInterval(interval);
-                if (data['errors'] > 0) {
-                  throw new Error('Error processing inputs', data);
-                } else {
-                  done();
-                }
-              }
-            })
-            .catch(errorHandler.bind(done));
-        });
-      })
-      .catch(errorHandler.bind(done));
+    app.inputs.create({
+      url: sampleImages[0],
+      allowDuplicateUrl: true,
+      concepts: [{id: ferrariId, value: true}]
+    })
+    .then(response => {
+      return app.models.create(testModelId, [
+        { id: ferrariId }
+      ])
+    })
+    .then(testModel => {
+      return testModel.train(true);
+    })
+    .then(model => {
+      done();
+    })
+    .catch(errorHandler.bind(done));
   });
 
   it('Filter by images/inputs only', done => {
@@ -502,7 +462,7 @@ describe('Search', () => {
     ])
       .then(response => {
         expect(response.hits[0].score).toBeDefined();
-        expect(response.hits.length).toBe(2);
+        expect(response.hits.length).toBe(1);
         done();
       })
       .catch(errorHandler.bind(done));
