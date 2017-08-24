@@ -25,6 +25,7 @@ module.exports = {
     CONCEPT_SEARCH_PATH: '/concepts/searches',
     MODEL_INPUTS_PATH: '/models/$0/inputs',
     MODEL_VERSION_INPUTS_PATH: '/models/$0/versions/$1/inputs',
+    MODEL_VERSION_METRICS_PATH: '/models/$0/versions/$1/metrics',
     INPUTS_PATH: '/inputs',
     INPUT_PATH: '/inputs/$0',
     INPUTS_STATUS_PATH: '/inputs/status',

@@ -127,6 +127,19 @@ describe('Models', () => {
       .catch(errorHandler.bind(done));
   });
 
+  it('Starts a model eval job and returns the result of creating it', done => {
+    testModel.train(true)
+      .then(model => model.runModelEval())
+      .then(modelVersion => {
+        expect(modelVersion).toBeDefined();
+        expect(modelVersion.metrics).toBeDefined();
+        expect(modelVersion.metrics.status).toBeDefined();
+        expect(modelVersion.metrics.status.code).toBe(21303);
+        done();
+      })
+      .catch(errorHandler.bind(done));
+  });
+
   it('Call predict on models collection given a model id', done => {
     app.models.predict(Clarifai.GENERAL_MODEL, [
       {
