@@ -1,4 +1,5 @@
 let axios = require('axios');
+let ModelVersion = require('./ModelVersion');
 let {isSuccess, checkType, clone} = require('./helpers');
 let {
   API,
@@ -38,7 +39,9 @@ class Model {
       this.modelVersion = {};
       this.versionId = data.version;
     } else {
-      this.modelVersion = data.model_version || data.modelVersion || data.version;
+      if (data.model_version || data.modelVersion || data.version) {
+        this.modelVersion = new ModelVersion(this._config, data.model_version || data.modelVersion || data.version);
+      }
       this.versionId = (this.modelVersion || {}).id;
     }
     this.rawData = data;
