@@ -86,7 +86,7 @@ class Model {
     let url = `${this._config.basePath}${replaceVars(MODEL_VERSION_METRICS_PATH, [this.id, this.versionId])}`;
     return wrapToken(this._config, (headers) => {
       return new Promise((resolve, reject) => {
-        axios.post(url, null, {headers}).then((response) => {
+        axios.post(url, {}, {headers}).then((response) => {
           if (isSuccess(response)) {
             resolve(new ModelVersion(this._config, response.data.model_version));
           } else {
