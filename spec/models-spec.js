@@ -79,6 +79,36 @@ describe('Models', () => {
       .catch(errorHandler.bind(done));
   });
 
+  it('Adds inputs and trains the model', done => {
+    app.inputs.delete()
+      .then(() => {
+        return app.inputs.create([
+          {
+            url: sampleImages[5],
+            allowDuplicateUrl: true,
+            concepts: [{id: ferrariId, value: true}]
+          },
+          {
+            url: sampleImages[6],
+            allowDuplicateUrl: true,
+            concepts: [{id: langConceptId, value: true}]
+          }
+        ])
+      })
+      .then(() => testModel.train(true))
+      .then(model => {
+        expect(model).toBeDefined();
+        expect(model.modelVersion).toBeDefined();
+        expect(model.rawData).toBeDefined();
+        var version = model.modelVersion;
+        expect(version.id).toBeDefined();
+        expect(version.created_at).toBeDefined();
+        expect(version.status.code).toBe(21100);
+        done();
+      })
+      .catch(errorHandler.bind(done));
+  });
+
   it('Searches for a model', done => {
     app.models.search(testModelId)
       .then(models => {
@@ -92,6 +122,19 @@ describe('Models', () => {
         expect(model.outputInfo).toBeDefined();
         expect(model.modelVersion).toBeDefined();
         testModelVersionId = model.modelVersion.id;
+        done();
+      })
+      .catch(errorHandler.bind(done));
+  });
+
+  it('Starts a model eval job and returns the result of creating it', done => {
+    testModel.train(true)
+      .then(model => model.runModelEval())
+      .then(modelVersion => {
+        expect(modelVersion).toBeDefined();
+        expect(modelVersion.metrics).toBeDefined();
+        expect(modelVersion.metrics.status).toBeDefined();
+        expect(modelVersion.metrics.status.code).toBe(21303);
         done();
       })
       .catch(errorHandler.bind(done));

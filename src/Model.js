@@ -1,4 +1,5 @@
 let axios = require('axios');
+let ModelVersion = require('./ModelVersion');
 let {isSuccess, checkType, clone} = require('./helpers');
 let {
   API,
@@ -19,7 +20,8 @@ let {
   VERSION_PREDICT_PATH,
   MODEL_INPUTS_PATH,
   MODEL_OUTPUT_PATH,
-  MODEL_VERSION_INPUTS_PATH
+  MODEL_VERSION_INPUTS_PATH,
+  MODEL_VERSION_METRICS_PATH
 } = API;
 
 /**
@@ -38,7 +40,9 @@ class Model {
       this.modelVersion = {};
       this.versionId = data.version;
     } else {
-      this.modelVersion = data.model_version || data.modelVersion || data.version;
+      if (data.model_version || data.modelVersion || data.version) {
+        this.modelVersion = new ModelVersion(this._config, data.model_version || data.modelVersion || data.version);
+      }
       this.versionId = (this.modelVersion || {}).id;
     }
     this.rawData = data;
@@ -72,6 +76,25 @@ class Model {
   overwriteConcepts(concepts = []) {
     let conceptsArr = Array.isArray(concepts) ? concepts : [concepts];
     return this.update({action: 'overwrite', concepts: conceptsArr});
+  }
+
+  /**
+   * Start a model evaluation job
+   * @return {Promise(ModelVersion, error)} A Promise that is fulfilled with a ModelVersion instance or rejected with an error
+   */
+  runModelEval() {
+    let url = `${this._config.basePath}${replaceVars(MODEL_VERSION_METRICS_PATH, [this.id, this.versionId])}`;
+    return wrapToken(this._config, (headers) => {
+      return new Promise((resolve, reject) => {
+        axios.post(url, null, {headers}).then((response) => {
+          if (isSuccess(response)) {
+            resolve(new ModelVersion(this._config, response.data.model_version));
+          } else {
+            reject(response);
+          }
+        }, reject);
+      });
+    });
   }
 
   /**
