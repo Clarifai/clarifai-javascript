@@ -33,4 +33,6 @@ Dive right into code examples to get up and running as quickly as possible with 
 
 Learn the basics — predicting the contents of an image, searching across a collection and creating your own models with our [Guide](https://developer.clarifai.com/guide/).
 
+Check out the [JSDoc](https://sdk.clarifai.com/js/latest/index.html) for a deeper reference.
+
 Looking for a different client? We have many languages available with lots of documentation [Technical Reference](https://developer.clarifai.com/reference/)
