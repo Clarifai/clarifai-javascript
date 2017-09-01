@@ -36,7 +36,7 @@ deploy:
     tags: true
     repo: Clarifai/clarifai-javascript
 - provider: npm
-  email: jade@clarifai.com
+  email: eng+npm@clarifai.com
   api_key: ${NPM_TOKEN}
   on:
     tags: true
@@ -49,4 +49,4 @@ deploy:
   on:
     tags: true
 
-after_deploy: cd examples && npm i clarifai@latest && CLARIFAI_API_KEY=${API_KEY} node index
+after_deploy: cd examples && npm i clarifai@latest && CLARIFAI_API_KEY=${API_KEY} node index && cd ..
