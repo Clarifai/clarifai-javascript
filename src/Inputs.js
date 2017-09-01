@@ -31,7 +31,7 @@ class Inputs {
    * @return {Promise(Inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
    */
   list(options = {page: 1, perPage: 20}) {
-    let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
+    let url = `${this._config.basePath}${INPUTS_PATH}`;
     return wrapToken(this._config, (headers) => {
       return new Promise((resolve, reject) => {
         axios.get(url, {
@@ -72,7 +72,7 @@ class Inputs {
     if (checkType(/(String|Object)/, inputs)) {
       inputs = [inputs];
     }
-    let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
+    let url = `${this._config.basePath}${INPUTS_PATH}`;
     if (inputs.length > MAX_BATCH_SIZE) {
       throw ERRORS.MAX_INPUTS;
     }
@@ -99,7 +99,7 @@ class Inputs {
    * @return {Promise(Input, error)} A Promise that is fulfilled with an instance of Input or rejected with an error
    */
   get(id) {
-    let url = `${this._config.apiEndpoint}${replaceVars(INPUT_PATH, [id])}`;
+    let url = `${this._config.basePath}${replaceVars(INPUT_PATH, [id])}`;
     return wrapToken(this._config, (headers) => {
       return new Promise((resolve, reject) => {
         axios.get(url, {headers}).then((response) => {
@@ -122,7 +122,7 @@ class Inputs {
     let val;
     // delete an input
     if (checkType(/String/, id)) {
-      let url = `${this._config.apiEndpoint}${replaceVars(INPUT_PATH, [id])}`;
+      let url = `${this._config.basePath}${replaceVars(INPUT_PATH, [id])}`;
       val = wrapToken(this._config, (headers) => {
         return axios.delete(url, {headers});
       });
@@ -133,7 +133,7 @@ class Inputs {
   }
 
   _deleteInputs(id = null) {
-    let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
+    let url = `${this._config.basePath}${INPUTS_PATH}`;
     return wrapToken(this._config, (headers) => {
       let data = id === null ? {delete_all: true} :
         {ids: id};
@@ -209,7 +209,7 @@ class Inputs {
    * @return {Promise(Inputs, error)} A Promise that is fulfilled with an instance of Inputs or rejected with an error
    */
   update(inputs) {
-    let url = `${this._config.apiEndpoint}${INPUTS_PATH}`;
+    let url = `${this._config.basePath}${INPUTS_PATH}`;
     let inputsList = Array.isArray(inputs) ? inputs : [inputs];
     if (inputsList.length > MAX_BATCH_SIZE) {
       throw ERRORS.MAX_INPUTS;
@@ -253,7 +253,7 @@ class Inputs {
    */
   search(queries = [], options = {page: 1, perPage: 20}) {
     let formattedAnds = [];
-    let url = `${this._config.apiEndpoint}${SEARCH_PATH}`;
+    let url = `${this._config.basePath}${SEARCH_PATH}`;
     let data = {
       query: {
         ands: []
@@ -298,7 +298,7 @@ class Inputs {
    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
    */
   getStatus() {
-    let url = `${this._config.apiEndpoint}${INPUTS_STATUS_PATH}`;
+    let url = `${this._config.basePath}${INPUTS_STATUS_PATH}`;
     return wrapToken(this._config, (headers) => {
       return new Promise((resolve, reject) => {
         axios.get(url, {headers})

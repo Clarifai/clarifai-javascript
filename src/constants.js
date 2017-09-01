@@ -1,36 +1,38 @@
 const MAX_BATCH_SIZE = 128;
 const GEO_LIMIT_TYPES = ['withinMiles', 'withinKilometers', 'withinRadians', 'withinDegrees'];
 const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/i;
-const SYNC_TIMEOUT = 60000;
+const SYNC_TIMEOUT = 240000;
 const MODEL_QUEUED_FOR_TRAINING = '21103';
 const MODEL_TRAINING = '21101';
 const POLLTIME = 2000;
 
 module.exports = {
   API: {
-    TOKEN_PATH: '/v2/token',
-    MODELS_PATH: '/v2/models',
-    MODEL_PATH: '/v2/models/$0',
-    MODEL_VERSIONS_PATH: '/v2/models/$0/versions',
-    MODEL_VERSION_PATH: '/v2/models/$0/versions/$1',
-    MODEL_PATCH_PATH: '/v2/models/$0/output_info/data/concepts',
-    MODEL_OUTPUT_PATH: '/v2/models/$0/output_info',
-    MODEL_SEARCH_PATH: '/v2/models/searches',
-    MODEL_FEEDBACK_PATH: '/v2/models/$0/feedback',
-    MODEL_VERSION_FEEDBACK_PATH: '/v2/models/$0/versions/$1/feedback',
-    PREDICT_PATH: '/v2/models/$0/outputs',
-    VERSION_PREDICT_PATH: '/v2/models/$0/versions/$1/outputs',
-    CONCEPTS_PATH: '/v2/concepts',
-    CONCEPT_PATH: '/v2/concepts/$0',
-    CONCEPT_SEARCH_PATH: '/v2/concepts/searches',
-    MODEL_INPUTS_PATH: '/v2/models/$0/inputs',
-    MODEL_VERSION_INPUTS_PATH: '/v2/models/$0/versions/$1/inputs',
-    INPUTS_PATH: '/v2/inputs',
-    INPUT_PATH: '/v2/inputs/$0',
-    INPUTS_STATUS_PATH: '/v2/inputs/status',
-    SEARCH_PATH: '/v2/searches',
-    WORKFLOW_PATH: '/v2/workflows/$0/results',
-    CREATE_WORKFLOW_PATH: '/v2/workflows'
+    TOKEN_PATH: '/token',
+    MODELS_PATH: '/models',
+    MODEL_PATH: '/models/$0',
+    MODEL_VERSIONS_PATH: '/models/$0/versions',
+    MODEL_VERSION_PATH: '/models/$0/versions/$1',
+    MODEL_PATCH_PATH: '/models/$0/output_info/data/concepts',
+    MODEL_OUTPUT_PATH: '/models/$0/output_info',
+    MODEL_SEARCH_PATH: '/models/searches',
+    MODEL_FEEDBACK_PATH: '/models/$0/feedback',
+    MODEL_VERSION_FEEDBACK_PATH: '/models/$0/versions/$1/feedback',
+    PREDICT_PATH: '/models/$0/outputs',
+    VERSION_PREDICT_PATH: '/models/$0/versions/$1/outputs',
+    CONCEPTS_PATH: '/concepts',
+    CONCEPT_PATH: '/concepts/$0',
+    CONCEPT_SEARCH_PATH: '/concepts/searches',
+    MODEL_INPUTS_PATH: '/models/$0/inputs',
+    MODEL_VERSION_INPUTS_PATH: '/models/$0/versions/$1/inputs',
+    MODEL_VERSION_METRICS_PATH: '/models/$0/versions/$1/metrics',
+    INPUTS_PATH: '/inputs',
+    INPUT_PATH: '/inputs/$0',
+    INPUTS_STATUS_PATH: '/inputs/status',
+    SEARCH_PATH: '/searches',
+    WORKFLOWS_PATH: '/workflows',
+    WORKFLOW_PATH: '/workflows/$0',
+    WORKFLOW_RESULTS_PATH: '/workflows/$0/results'
   },
   ERRORS: {
     paramsRequired: (param) => {
@@ -56,6 +58,12 @@ module.exports = {
       newPath = newPath.replace(new RegExp(`\\$${index}`, 'g'), val);
     });
     return newPath;
+  },
+  getBasePath: (apiEndpoint = 'https://api.clarifai.com', userId, appId) => {
+    if(!userId || !appId) {
+      return `${apiEndpoint}/v2`;
+    }
+    return `${apiEndpoint}/v2/users/${userId}/apps/${appId}`;
   },
   GEO_LIMIT_TYPES,
   MAX_BATCH_SIZE,

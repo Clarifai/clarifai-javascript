@@ -5,7 +5,7 @@ let Models = require('./Models');
 let Inputs = require('./Inputs');
 let Concepts = require('./Concepts');
 let Workflow = require('./Workflow');
-let {API, ERRORS} = require('./constants');
+let {API, ERRORS, getBasePath} = require('./constants');
 let {TOKEN_PATH} = API;
 
 
@@ -64,20 +64,22 @@ class App {
     return false;
   }
 
-  _validate({clientId, clientSecret, token, apiKey}) {
-    if ((!clientId || !clientSecret) && !token && !apiKey) {
+  _validate({clientId, clientSecret, token, apiKey, sessionToken}) {
+    if ((!clientId || !clientSecret) && !token && !apiKey && !sessionToken) {
       throw ERRORS.paramsRequired(['Client ID', 'Client Secret']);
     }
   }
 
   _init(options) {
+    let apiEndpoint = options.apiEndpoint ||
+      (process && process.env && process.env.API_ENDPOINT) || 'https://api.clarifai.com';
     this._config = {
-      apiEndpoint: options.apiEndpoint ||
-      (process && process.env && process.env.API_ENDPOINT) ||
-      'https://api.clarifai.com',
+      apiEndpoint,
       clientId: options.clientId,
       clientSecret: options.clientSecret,
       apiKey: options.apiKey,
+      sessionToken: options.sessionToken,
+      basePath: getBasePath(apiEndpoint, options.userId, options.appId),
       token: () => {
         return new Promise((resolve, reject) => {
           let now = new Date().getTime();
@@ -113,7 +115,7 @@ class App {
   }
 
   _requestToken() {
-    let url = `${this._config.apiEndpoint}${TOKEN_PATH}`;
+    let url = `${this._config.basePath}${TOKEN_PATH}`;
     let clientId = this._config.clientId;
     let clientSecret = this._config.clientSecret;
     return axios({
