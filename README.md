@@ -14,7 +14,7 @@ To start, install the SDK via NPM: `npm install clarifai` and initialize with yo
 ```js
 const Clarifai = require('clarifai');
 const app = new Clarifai.App({
- apiKey: '{apiKey}'
+ apiKey: 'YOUR_API_KEY'
 });
 
 ```
