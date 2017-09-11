@@ -84,9 +84,9 @@ module.exports = {
     return formatted;
   },
   formatMediaPredict: (data, type = 'image') => {
-    let media = data;
+    let media;
     if (checkType(/String/, data)) {
-      if (URL_REGEX.test(media) === true) {
+      if (URL_REGEX.test(data) === true) {
         media = {
           url: data
         };
@@ -95,12 +95,28 @@ module.exports = {
           base64: data
         };
       }
+    } else {
+      media = Object.assign({}, data);
     }
-    return {
+
+    // Users can specify their own id to distinguish batch results
+    let id;
+    if (media.id) {
+      id = media.id;
+      delete media.id;
+    }
+
+    let object = {
       data: {
         [type]: media
       }
     };
+
+    if (id) {
+      object.id = id;
+    }
+
+    return object;
   },
   formatImagesSearch: (image) => {
     let imageQuery;

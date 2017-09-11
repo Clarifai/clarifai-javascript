@@ -165,6 +165,26 @@ describe('Models', () => {
       .catch(errorHandler.bind(done));
   });
 
+  it('Call predict with a declared input id', done => {
+    app.models.predict(Clarifai.GENERAL_MODEL, [
+      {
+        id: 'test-id-1',
+        url: sampleImages[7]
+      },
+      {
+        id: 'test-id-2',
+        url: sampleImages[8]
+      }
+    ])
+      .then(response => {
+        expect(response.outputs).toBeDefined();
+        expect(response.outputs[0].input.id).toBe('test-id-1');
+        expect(response.outputs[1].input.id).toBe('test-id-2');
+        done();
+      })
+      .catch(errorHandler.bind(done));
+  });
+
   it('Call predict on video inputs', done => {
     app.models.predict(Clarifai.GENERAL_MODEL, sampleVideos[0], {video: true})
       .then(response => {
