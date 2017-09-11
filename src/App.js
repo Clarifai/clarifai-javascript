@@ -1,5 +1,4 @@
 let axios = require('axios');
-let Promise = require('promise');
 let {checkType} = require('./helpers');
 let Models = require('./Models');
 let Inputs = require('./Inputs');
@@ -8,6 +7,13 @@ let Workflow = require('./Workflow');
 let {API, ERRORS, getBasePath} = require('./constants');
 let {TOKEN_PATH} = API;
 
+if (typeof window !== 'undefined' && !('Promise' in window)) {
+  window.Promise = require('promise');
+}
+
+if (typeof global !== 'undefined' && !('Promise' in global)) {
+  global.Promise = require('promise');
+}
 
 /**
  * top-level class that allows access to models, inputs and concepts
