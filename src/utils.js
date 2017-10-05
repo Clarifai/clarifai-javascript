@@ -1,5 +1,6 @@
 let Promise = require('promise');
-let {URL_REGEX, GEO_LIMIT_TYPES, ERRORS} = require('./constants');
+let validUrl = require('valid-url');
+let {GEO_LIMIT_TYPES, ERRORS} = require('./constants');
 let {checkType, clone} = require('./helpers');
 let {version: VERSION} = require('./../package.json');
 
@@ -86,7 +87,7 @@ module.exports = {
   formatMediaPredict: (data, type = 'image') => {
     let media;
     if (checkType(/String/, data)) {
-      if (URL_REGEX.test(data) === true) {
+      if (validUrl.isWebUri(data)) {
         media = {
           url: data
         };
