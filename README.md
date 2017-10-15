@@ -17,6 +17,8 @@ const app = new Clarifai.App({
  apiKey: 'YOUR_API_KEY'
 });
 
+process.nextTick = setImmediate; // Fixes nextTick error
+
 ```
 
 You can also use the SDK by adding this script to your HTML:
