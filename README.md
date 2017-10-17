@@ -13,21 +13,23 @@ To start, install the SDK via NPM: `npm install clarifai` and initialize with yo
 
 ```js
 const Clarifai = require('clarifai');
+
 const app = new Clarifai.App({
  apiKey: 'YOUR_API_KEY'
 });
-
-process.nextTick = setImmediate; // Fixes nextTick error
-
 ```
 
 You can also use the SDK by adding this script to your HTML:
 
 ```html
-
 <script type="text/javascript" src="https://sdk.clarifai.com/js/clarifai-latest.js"></script>
-
 ```
+
+## React Native
+
+You'll most likely encounter the error `process.nextTick is not a function` while using this library with React Native.
+
+To solve this, add `process.nextTick = setImmediate;` as close to the top of your entrypoint as you can. See [#20](https://github.com/Clarifai/clarifai-javascript/issues/20) for more info.
 
 ## Docs
 
