@@ -24,14 +24,10 @@ describe('Models', () => {
   var testModel;
 
   beforeAll(() => {
-    app = new Clarifai.App(
-      process.env.CLIENT_ID,
-      process.env.CLIENT_SECRET,
-      {
-        apiEndpoint: process.env.API_ENDPOINT,
-        token: process.env.CLIENT_TOKEN
-      }
-    );
+    app = new Clarifai.App({
+      apiKey: process.env.CLARIFAI_API_KEY,
+      apiEndpoint: process.env.API_ENDPOINT
+    });
   });
 
   it('Creates a new model', done => {

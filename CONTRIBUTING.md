@@ -17,12 +17,7 @@ This will create three folders:
 * `npm run watch` - this will do an initial build, then build on any changes to *src*
 * `npm run test` - test JS files in the */spec* folder
   * tests require the following environment variables to be set:
-    * `API_KEY`
-    * `CLIENT_ID`
-    * `CLIENT_SECRET`
-    * `APP_ID`
-    * `USER_ID`
-    * `SESSION_TOKEN`
+    * `CLARIFAI_API_KEY`
 * `npm run clean` - empty and remove the folders created on build
 
 #### Command line optional params

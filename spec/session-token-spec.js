@@ -5,6 +5,15 @@ const {sampleImages} = require('./test-data');
 describe('Session Token', () => {
 
   it('can initialize an app with a session token, app id and user id', done => {
+    // Skip test if these aren't defined
+    if (
+      !process.env.SESSION_TOKEN ||
+      !process.env.APP_ID ||
+      !process.env.USER_ID
+    ) {
+      return pending('SESSION_TOKEN, APP_ID, or USER_ID not defined');
+    }
+
     const anApp = new Clarifai.App({
       sessionToken: process.env.SESSION_TOKEN,
       appId: process.env.APP_ID,
@@ -15,6 +24,15 @@ describe('Session Token', () => {
   });
 
   it('can make calls with a session token', done => {
+    // Skip test if these aren't defined
+    if (
+      !process.env.SESSION_TOKEN ||
+      !process.env.CLARIFAI_USER_APP_ID ||
+      !process.env.USER_ID
+    ) {
+      return pending('SESSION_TOKEN, CLARIFAI_USER_APP_ID, or USER_ID not defined');
+    }
+
     const anApp = new Clarifai.App({
       sessionToken: process.env.SESSION_TOKEN,
       appId: process.env.CLARIFAI_USER_APP_ID,

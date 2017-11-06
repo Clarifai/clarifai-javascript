@@ -4,13 +4,14 @@ const {sampleImages} = require('./test-data');
 
 describe('API key', () => {
   it('can initialize an app with an api key', done => {
-    const anApp = new Clarifai.App({apiKey: process.env.API_KEY});
-    expect(anApp._config.apiKey).toEqual(process.env.API_KEY);
+    expect(process.env.CLARIFAI_API_KEY).toBeDefined();
+    const anApp = new Clarifai.App({apiKey: process.env.CLARIFAI_API_KEY});
+    expect(anApp._config.apiKey).toEqual(process.env.CLARIFAI_API_KEY);
     done();
   });
 
   it('can make calls with an api key', done => {
-    const anApp = new Clarifai.App({apiKey: process.env.API_KEY});
+    const anApp = new Clarifai.App({apiKey: process.env.CLARIFAI_API_KEY});
     anApp.models.predict(Clarifai.GENERAL_MODEL, [
       {
         'url': sampleImages[0]

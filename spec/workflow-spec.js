@@ -8,15 +8,11 @@ let testWorkflowId;
 
 describe('Workflow', () => {
   beforeAll(function() {
-    app = new Clarifai.App(
-      process.env.CLIENT_ID,
-      process.env.CLIENT_SECRET,
-      {
-        apiEndpoint: process.env.API_ENDPOINT,
-        token: process.env.CLIENT_TOKEN
-      }
-    );
-  })
+    app = new Clarifai.App({
+      apiKey: process.env.CLARIFAI_API_KEY,
+      apiEndpoint: process.env.API_ENDPOINT
+    });
+  });
 
   it('Call given workflow id with one input', done => {
     testWorkflowId = 'big-bang' + Date.now();
