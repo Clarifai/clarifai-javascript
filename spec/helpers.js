@@ -1,3 +1,5 @@
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 360000; // 6 minutes
+
 function errorHandler(err) {
   expect(err.status).toBe(true);
   expect(err.data).toBe(true);

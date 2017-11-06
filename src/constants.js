@@ -1,6 +1,6 @@
 const MAX_BATCH_SIZE = 128;
 const GEO_LIMIT_TYPES = ['withinMiles', 'withinKilometers', 'withinRadians', 'withinDegrees'];
-const SYNC_TIMEOUT = 240000;
+const SYNC_TIMEOUT = 360000; // 6 minutes
 const MODEL_QUEUED_FOR_TRAINING = '21103';
 const MODEL_TRAINING = '21101';
 const POLLTIME = 2000;
