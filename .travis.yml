@@ -4,6 +4,7 @@ node_js:
 branches:
   only:
     - master
+    - /^\d+\.\d+\.\d+$/
 cache:
   directories:
     - node_modules
@@ -52,5 +53,6 @@ deploy:
   file: sdk/*
   on:
     tags: true
+    repo: Clarifai/clarifai-javascript
 
 after_deploy: cd examples && npm i clarifai@latest && CLARIFAI_API_KEY=${API_KEY} node index && cd ..
