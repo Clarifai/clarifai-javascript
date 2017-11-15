@@ -68,4 +68,17 @@ describe('Concepts', () => {
       })
       .catch(errorHandler.bind(done));
   });
+
+  it('updates a concept name', done => {
+    const originalName = conceptsIds[0];
+    const newName = `${originalName}-newName`;
+
+    app.concepts.update({ id: originalName, name: newName })
+      .then(concepts => {
+        expect(concepts[0].id).toBe(originalName);
+        expect(concepts[0].name).toBe(newName);
+        done();
+      })
+      .catch(errorHandler.bind(done));
+  });
 });

@@ -119,7 +119,38 @@ class Concepts {
       });
     });
   }
-}
-;
+
+  /**
+   * Update a concepts
+   * @param {object|object[]}   concepts       Can be a single concept object or an array of concept objects
+   *   @param  {object}           concepts[].concept         A concept object with the following attributes
+   *     @param  {object}           concepts[].concept.id      The concept's id (Required)
+   *     @param  {object}           concepts[].concept.name    The concept's new name
+   * @param {string}            [action=overwrite]  The action to use for the PATCH
+   * @return {Promise(Concepts, error)}             A Promise that is fulfilled with a Concepts instance or rejected with an error
+   */
+  update(concepts = [], action = 'overwrite') {
+    if (!checkType(/Array/, concepts)) {
+      concepts = [concepts];
+    }
+    const data = {
+      concepts,
+      action
+    };
+    const url = `${this._config.basePath}${CONCEPTS_PATH}`;
+    return wrapToken(this._config, headers => {
+      return new Promise((resolve, reject) => {
+        axios.patch(url, data, { headers })
+          .then((response) => {
+            if (isSuccess(response)) {
+              resolve(new Concepts(this._config, response.data.concepts));
+            } else {
+              reject(response);
+            }
+          }, reject);
+      });
+    });
+  }
+};
 
 module.exports = Concepts;
