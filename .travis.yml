@@ -1,6 +1,7 @@
 language: node_js
 node_js:
-- '6'
+  - '6'
+  - '8'
 branches:
   only:
     - master
@@ -9,50 +10,54 @@ cache:
   directories:
     - node_modules
 before_script:
- - chmod +x token.sh
+  - chmod +x token.sh
 script:
-- source token.sh
-- npm run test
-- npm run build
+  - source token.sh
+  - npm run test
+  - npm run build
 deploy:
-- provider: s3
-  access_key_id: ${AWS_ACCESS_KEY_ID}
-  secret_access_key: ${AWS_SECRET_ACCESS_KEY}
-  bucket: ${AWS_BUCKET}
-  skip_cleanup: true
-  acl: public_read
-  upload-dir: js
-  cache_control: "max-age=21600, no-transform, public"
-  local_dir: sdk
-  on:
-    tags: true
-    repo: Clarifai/clarifai-javascript
-- provider: s3
-  access_key_id: ${AWS_ACCESS_KEY_ID}
-  secret_access_key: ${AWS_SECRET_ACCESS_KEY}
-  bucket: ${AWS_BUCKET}
-  skip_cleanup: true
-  acl: public_read
-  upload-dir: js
-  cache_control: "max-age=21600, no-transform, public"
-  local_dir: docs
-  on:
-    tags: true
-    repo: Clarifai/clarifai-javascript
-- provider: npm
-  email: eng+npm@clarifai.com
-  api_key: ${NPM_TOKEN}
-  skip_cleanup: true
-  on:
-    tags: true
-    repo: Clarifai/clarifai-javascript
-- provider: releases
-  skip_cleanup: true
-  api_key: ${GITHUB_TOKEN}
-  file_glob: true
-  file: sdk/*
-  on:
-    tags: true
-    repo: Clarifai/clarifai-javascript
+  - provider: s3
+    access_key_id: ${AWS_ACCESS_KEY_ID}
+    secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+    bucket: ${AWS_BUCKET}
+    skip_cleanup: true
+    acl: public_read
+    upload-dir: js
+    cache_control: "max-age=21600, no-transform, public"
+    local_dir: sdk
+    on:
+      node_js: '8'
+      tags: true
+      repo: Clarifai/clarifai-javascript
+  - provider: s3
+    access_key_id: ${AWS_ACCESS_KEY_ID}
+    secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+    bucket: ${AWS_BUCKET}
+    skip_cleanup: true
+    acl: public_read
+    upload-dir: js
+    cache_control: "max-age=21600, no-transform, public"
+    local_dir: docs
+    on:
+      node_js: '8'
+      tags: true
+      repo: Clarifai/clarifai-javascript
+  - provider: npm
+    email: eng+npm@clarifai.com
+    api_key: ${NPM_TOKEN}
+    skip_cleanup: true
+    on:
+      node_js: '8'
+      tags: true
+      repo: Clarifai/clarifai-javascript
+  - provider: releases
+    skip_cleanup: true
+    api_key: ${GITHUB_TOKEN}
+    file_glob: true
+    file: sdk/*
+    on:
+      node_js: '8'
+      tags: true
+      repo: Clarifai/clarifai-javascript
 
 after_deploy: cd examples && npm i clarifai@latest && CLARIFAI_API_KEY=${API_KEY} node index && cd ..
