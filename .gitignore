@@ -10,3 +10,4 @@ docs
 .idea
 sdk
 dist
+package-lock.json
