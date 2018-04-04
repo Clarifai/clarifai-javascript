@@ -195,7 +195,7 @@ class Inputs {
   }
 
   /**
-   * @param {object[]}         inputs    List of concepts to update (max of 128 inputs/call; passing > 128 will throw an exception)
+   * @param {object[]}         inputs    List of inputs to update (max of 128 inputs/call; passing > 128 will throw an exception)
    *   @param {object}           inputs[].input
    *     @param {string}           inputs[].input.id                           The id of the input to update
    *     @param {object}           inputs[].input.metadata                     Object with key values to attach to the input (optional)

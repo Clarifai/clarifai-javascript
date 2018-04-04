@@ -28,7 +28,7 @@
     "del": "^2.0.2",
     "envify": "^3.4.0",
     "git-branch": "^0.3.0",
-    "gulp": "^3.9.0",
+    "gulp": "^3.9.1",
     "gulp-awspublish": "^3.0.1",
     "gulp-babel": "^6.1.2",
     "gulp-browserify": "^0.5.1",
