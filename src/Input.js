@@ -14,9 +14,7 @@ class Input {
     this.createdAt = data.created_at || data.createdAt;
     this.imageUrl = data.data.image.url;
     this.concepts = new Concepts(_config, data.data.concepts);
-    if (data.data.regions) {
-      this.regions = new Regions(_config, data.data.regions);
-    }
+    this.regions = new Regions(_config, data.data.regions || []);
     this.score = data.score;
     this.metadata = data.data.metadata;
     if (data.data.geo && data.data.geo['geo_point']) {
