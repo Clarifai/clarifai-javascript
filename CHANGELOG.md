@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [[2.7.0]](https://github.com/Clarifai/clarifai-javascript/releases/tag/2.7.0) - [npm](https://www.npmjs.com/package/clarifai) - 2018-04-09
+
+### Added
+- Support for custom face recognition https://github.com/Clarifai/clarifai-javascript/commit/ddee3667df0dfc648568bfc0c71d55600e223f1a
+
 ## [[2.6.0]](https://github.com/Clarifai/clarifai-javascript/releases/tag/2.6.0) - [npm](https://www.npmjs.com/package/clarifai) - 2018-01-17
 
 ### Added
