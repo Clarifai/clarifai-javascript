@@ -72,6 +72,9 @@ module.exports = {
     if (input.geo) {
       formatted.data.geo = {geo_point: input.geo};
     }
+    if (input.regions) {
+      formatted.data.regions = input.regions;
+    }
     if (includeImage !== false) {
       formatted.data.image = {
         url: input.url,
