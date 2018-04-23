@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [[2.7.1]](https://github.com/Clarifai/clarifai-javascript/releases/tag/2.7.1) - [npm](https://www.npmjs.com/package/clarifai) - 2018-04-23
+
+### Fixed
+- Added missing input region serialization
+
 ## [[2.7.0]](https://github.com/Clarifai/clarifai-javascript/releases/tag/2.7.0) - [npm](https://www.npmjs.com/package/clarifai) - 2018-04-09
 
 ### Added
