@@ -101,6 +101,23 @@ describe('Inputs', () => {
       done();
     })
     .catch(errorHandler.bind(done));
+
+    app.inputs.create({
+      id: inputId2,
+      url: sampleImages[2],
+      allowDuplicateUrl: true,
+      concepts: [{id: beerId}],
+      metadata: {foo: 'bar', baz2: 'blah2'}
+    })
+    .then(inputs => {
+      expect(inputs).toBeDefined();
+      expect(inputs instanceof Inputs).toBe(true);
+      expect(inputs[0].id).toBe(inputId2);
+      expect(inputs[0].rawData.data.metadata.foo).toBe('bar');
+      expect(inputs[0].rawData.status.code === 30000);
+      done();
+    })
+    .catch(errorHandler.bind(done));
   });
 
   it('Adds input with geodata', done => {
@@ -399,12 +416,31 @@ describe('Search', () => {
     .catch(errorHandler.bind(done));
   });
 
-  it('Filter by images/inputs only', done => {
-    app.inputs.search([
-      { input: { url: sampleImages[0] } }
-    ])
+  it('Filter by image url only', done => {
+    app.inputs.search(
+      {
+        input:
+        {
+          type: 'input',
+          url: sampleImages[0]
+        }
+      })
       .then(response => {
+        expect(response.hits.length).not.toBeLessThan(1);
         expect(response.hits[0].score).toBeDefined();
+        done();
+      })
+      .catch(errorHandler.bind(done));
+
+    app.inputs.search(
+      {
+        input: {
+          type: 'input',
+          url: sampleImages[3]
+        }
+      })
+      .then(response => {
+        expect(response.hits.length).toBe(0);
         done();
       })
       .catch(errorHandler.bind(done));
@@ -434,9 +470,17 @@ describe('Search', () => {
       .catch(errorHandler.bind(done));
   });
 
-  it('Filter by image id', done => {
-    app.inputs.search({input: {id: inputId1}})
+  it('Filter by image id only', done => {
+    app.inputs.search(
+      {
+        input:
+        {
+          type: 'input',
+          id: inputId1
+        }
+      })
       .then(response => {
+        expect(response.hits.length).toBe(1);
         expect(response.hits[0].score).toBeDefined();
         done();
       })
@@ -444,8 +488,21 @@ describe('Search', () => {
   });
 
   it('Filter by image id and url', done => {
-    app.inputs.search({input: {id: inputId1, url: sampleImages[0]}})
+    app.inputs.search(
+      [{
+        input: {
+          type: 'input',
+          id: inputId3,
+        }
+      },
+      {
+        input: {
+          type: 'input',
+          url: sampleImages[0]
+        }
+      }])
       .then(response => {
+        expect(response.hits.length).toBe(1);
         expect(response.hits[0].score).toBeDefined();
         done();
       })
@@ -527,17 +584,22 @@ describe('Search', () => {
   });
 
   it('Filter with metadata and image url', done => {
-    app.inputs.search({
+    app.inputs.search([
+    {
       input: {
-        url: sampleImages[3],
+        type: 'input',
+        url: sampleImages[3]
+      }
+    },
+    {
+      input: {
         metadata: {
           foo: 'bar'
         }
-      }
-    })
+      },
+    }])
       .then(response => {
-        expect(response.hits.length).toBe(1);
-        expect(response.hits[0].score).toBeDefined();
+        expect(response.hits.length).toBe(0);
         done();
       })
       .catch(errorHandler.bind(done));
