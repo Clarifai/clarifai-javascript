@@ -12,8 +12,14 @@ class Workflow {
   constructor(_config, rawData=[]) {
     this._config = _config;
     this.rawData = rawData;
+    this.id = rawData.id;
+    this.createdAt = rawData.created_at || rawData.createdAt;
+    this.appId = rawData.app_id || rawData.appId;
   }
 
+  /**
+   * @deprecated
+   */
   create(workflowId, config) {
     const url = `${this._config.basePath}${WORKFLOWS_PATH}`;
     const modelId = config.modelId;
@@ -45,6 +51,9 @@ class Workflow {
     });
   }
 
+  /**
+   * @deprecated
+   */
   delete(workflowId, config) {
     const url = `${this._config.basePath}${replaceVars(WORKFLOW_PATH, [workflowId])}`;
     return wrapToken(this._config, (headers) => {

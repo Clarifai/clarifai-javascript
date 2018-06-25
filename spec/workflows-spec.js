@@ -2,6 +2,7 @@ const Clarifai = require('./../src');
 const {errorHandler} = require('./helpers');
 const {sampleImages} = require('./test-data');
 const generalModelVersionId = 'aa9ca48295b37401f8af92ad1af0d91d';
+const Workflows = require('./../src/Workflows');
 
 let app;
 let testWorkflowId;
@@ -14,9 +15,30 @@ describe('Workflow', () => {
     });
   });
 
+  it('Gets all workflows', done => {
+    app.workflows.list({
+      page: 1,
+      perPage: 5
+    })
+      .then(workflows => {
+        expect(workflows).toBeDefined();
+        expect(workflows instanceof Workflows).toBe(true);
+
+        for (let i = 0; i < workflows.length; i++) {
+          let workflow = workflows[i];
+          expect(workflow.id).toBeDefined();
+          expect(workflow.appId).toBeDefined();
+          expect(workflow.createdAt).toBeDefined();
+        }
+
+        done();
+      })
+      .catch(errorHandler.bind(done));
+  });
+
   it('Call given workflow id with one input', done => {
     testWorkflowId = 'big-bang' + Date.now();
-    app.workflow.create(testWorkflowId, {
+    app.workflows.create(testWorkflowId, {
       modelId: Clarifai.GENERAL_MODEL,
       modelVersionId: generalModelVersionId
     })
@@ -36,22 +58,32 @@ describe('Workflow', () => {
         expect(output.created_at).toBeDefined();
         expect(output.model).toBeDefined();
         expect(output.model.model_version).toBeDefined();
+      })
+      .then(() => {
+        app.workflows.delete(testWorkflowId);
         done();
       })
       .catch(errorHandler.bind(done));
   });
 
   it('Call given workflow id with multiple inputs with specified types', done => {
-    app.workflow.predict(testWorkflowId, [
-      {
-        url: sampleImages[0],
-        allowDuplicateUrl: true
-      },
-      {
-        url: sampleImages[1],
-        allowDuplicateUrl: true
-      }
-    ])
+    testWorkflowId = 'big-bang' + Date.now();
+    app.workflows.create(testWorkflowId, {
+      modelId: Clarifai.GENERAL_MODEL,
+      modelVersionId: generalModelVersionId
+    })
+      .then(() => {
+        return app.workflow.predict(testWorkflowId, [
+          {
+            url: sampleImages[0],
+            allowDuplicateUrl: true
+          },
+          {
+            url: sampleImages[1],
+            allowDuplicateUrl: true
+          }
+        ]);
+      })
       .then(response => {
         expect(response.workflow).toBeDefined();
         const results = response.results;
@@ -66,16 +98,25 @@ describe('Workflow', () => {
         expect(output.created_at).toBeDefined();
         expect(output.model).toBeDefined();
         expect(output.model.model_version).toBeDefined();
+      })
+      .then(() => {
+        app.workflows.delete(testWorkflowId);
         done();
       })
       .catch(errorHandler.bind(done));
   });
 
   it('Call given workflow id with multiple inputs without specified types', done => {
-    app.workflow.predict(testWorkflowId, [
-      sampleImages[2],
-      sampleImages[3]
-    ])
+    testWorkflowId = 'big-bang' + Date.now();
+    app.workflows.create(testWorkflowId, {
+      modelId: Clarifai.GENERAL_MODEL,
+      modelVersionId: generalModelVersionId
+    })
+      .then(() => {
+        return app.workflow.predict(testWorkflowId, [
+          sampleImages[2], sampleImages[3]
+        ]);
+      })
       .then(response => {
         expect(response.workflow).toBeDefined();
         const results = response.results;
@@ -92,7 +133,8 @@ describe('Workflow', () => {
         expect(output.model.model_version).toBeDefined();
         return app.workflow.delete(testWorkflowId);
       })
-      .then(response => {
+      .then(() => {
+        app.workflows.delete(testWorkflowId);
         done();
       })
       .catch(errorHandler.bind(done));
