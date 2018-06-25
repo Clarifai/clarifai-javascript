@@ -40,3 +40,7 @@ Learn the basics — predicting the contents of an image, searching across a col
 Check out the [JSDoc](https://sdk.clarifai.com/js/latest/index.html) for a deeper reference.
 
 Looking for a different client? We have many languages available with lots of documentation [Technical Reference](https://clarifai.com/developer/reference)
+
+## License
+
+This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.
