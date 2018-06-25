@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [[2.8.0]](https://github.com/Clarifai/clarifai-javascript/releases/tag/2.8.0) - [npm](https://www.npmjs.com/package/clarifai) - 2018-06-25
+
+### Added
+- Ability to list workflows using the new `Workflows` object
+
+### Fixed
+- Moved `create` and `delete` to `Workflows`, made them deprecated in `Workflow`
+
 ## [[2.7.1]](https://github.com/Clarifai/clarifai-javascript/releases/tag/2.7.1) - [npm](https://www.npmjs.com/package/clarifai) - 2018-04-23
 
 ### Fixed

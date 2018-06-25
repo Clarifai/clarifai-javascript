@@ -1,6 +1,6 @@
 {
   "name": "clarifai",
-  "version": "2.7.1",
+  "version": "2.8.0",
   "description": "Official Clarifai Javascript SDK",
   "main": "dist/index.js",
   "repository": "https://github.com/Clarifai/clarifai-javascript",
