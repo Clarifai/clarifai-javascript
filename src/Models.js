@@ -168,7 +168,7 @@ class Models {
   getVersions(model, options = {page: 1, perPage: 20}) {
     return new Promise((resolve, reject) => {
       this.initModel(model).then((model) => {
-        model.getVersions()
+        model.getVersions(options)
           .then(resolve, reject)
           .catch(reject);
       }, reject);
