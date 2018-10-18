@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [[2.9.0]](https://github.com/Clarifai/clarifai-javascript/releases/tag/2.9.0) - [npm](https://www.npmjs.com/package/clarifai/v/2.9.0) - 2018-10-18
+
+### Added
+- The moderation solution
+
 ## [[2.8.1]](https://github.com/Clarifai/clarifai-javascript/releases/tag/2.8.1) - [npm](https://www.npmjs.com/package/clarifai/v/2.8.1) - 2018-08-17
 
 ### Fixed
