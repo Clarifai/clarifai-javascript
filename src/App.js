@@ -5,6 +5,7 @@ let Inputs = require('./Inputs');
 let Concepts = require('./Concepts');
 let Workflow = require('./Workflow');
 let Workflows = require('./Workflows');
+let Solutions = require('./solutions/Solutions');
 let {API, ERRORS, getBasePath} = require('./constants');
 let {TOKEN_PATH} = API;
 
@@ -106,6 +107,7 @@ class App {
     this.concepts = new Concepts(this._config);
     this.workflow = new Workflow(this._config);
     this.workflows = new Workflows(this._config);
+    this.solutions = new Solutions(this._config);
   }
 
   _getToken(resolve, reject) {
@@ -136,6 +138,5 @@ class App {
     });
   }
 }
-;
 
 module.exports = App;
