@@ -199,6 +199,32 @@ describe('Models', () => {
       .catch(errorHandler.bind(done));
   });
 
+  it('Call predict on video input with sample MS', done => {
+    app.models.predict(Clarifai.GENERAL_MODEL, "https://s3.amazonaws.com/samples.clarifai.com/beer.mp4", {video: true, sampleMs: 2000})
+      .then(response => {
+        expect(response.outputs).toBeDefined();
+        var outputs = response.outputs;
+        expect(outputs.length).toBe(1);
+        var output = outputs[0];
+        expect(output.id).toBeDefined();
+        expect(output.status).toBeDefined();
+        expect(output.input).toBeDefined();
+        expect(output.model).toBeDefined();
+        expect(output.created_at).toBeDefined();
+        expect(output.data).toBeDefined();
+
+        for (let i = 0; i < output.data.frames.length; i++) {
+          let frame = output.data.frames[i];
+
+          expect(frame.frame_info.index).toBeDefined();
+          expect(frame.frame_info.time).toBeDefined();
+        }
+
+        done();
+      })
+      .catch(errorHandler.bind(done));
+  });
+
   it('Attaches model outputs', done => {
     app.models.initModel(Clarifai.GENERAL_MODEL)
       .then(generalModel => {
