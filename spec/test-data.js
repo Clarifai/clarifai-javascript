@@ -11,5 +11,6 @@ export const sampleImages = [
 ];
 
 export const sampleVideos = [
-  'https://samples.clarifai.com/3o6gb3kkXfLvdKEZs4.gif'
+  'https://samples.clarifai.com/3o6gb3kkXfLvdKEZs4.gif',
+  'https://samples.clarifai.com/beer.mp4'
 ];

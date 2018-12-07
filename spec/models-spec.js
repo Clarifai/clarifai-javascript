@@ -199,8 +199,8 @@ describe('Models', () => {
       .catch(errorHandler.bind(done));
   });
 
-  it('Call predict on video input with sample MS', done => {
-    app.models.predict(Clarifai.GENERAL_MODEL, "https://s3.amazonaws.com/samples.clarifai.com/beer.mp4", {video: true, sampleMs: 2000})
+  it('Call predict on URL video with sample MS', done => {
+    app.models.predict(Clarifai.GENERAL_MODEL, sampleVideos[1], {video: true, sampleMs: 2000})
       .then(response => {
         expect(response.outputs).toBeDefined();
         var outputs = response.outputs;
@@ -218,6 +218,8 @@ describe('Models', () => {
 
           expect(frame.frame_info.index).toBeDefined();
           expect(frame.frame_info.time).toBeDefined();
+
+          expect(frame.frame_info.time % 2000).toEqual(0);
         }
 
         done();
