@@ -131,7 +131,7 @@ gulp.task(
 
 gulp.task('test', function() {
   const spec = gutil.env.spec;
-  const path = spec ? `./spec/${spec}-spec.js` : './spec/*.js';
+  const path = spec ? `./spec/integration/${spec}-spec.js` : './spec/integration/*.js';
 
   return gulp.src(path)
     .pipe(jasmine({

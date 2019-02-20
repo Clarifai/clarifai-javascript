@@ -1,4 +1,4 @@
-const Clarifai = require('./../src');
+const Clarifai = require('./../../src');
 const {errorHandler} = require('./helpers');
 const langConceptId = '的な' + Date.now();
 const beerId = 'beer' + Date.now();

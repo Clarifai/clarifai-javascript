@@ -1,8 +1,8 @@
-const Clarifai = require('./../src');
+const Clarifai = require('./../../src');
 const {errorHandler} = require('./helpers');
 const {sampleImages} = require('./test-data');
 const generalModelVersionId = 'aa9ca48295b37401f8af92ad1af0d91d';
-const Workflows = require('./../src/Workflows');
+const Workflows = require('./../../src/Workflows');
 
 let app;
 let testWorkflowId;

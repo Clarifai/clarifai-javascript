@@ -1,8 +1,8 @@
 var fs = require('fs');
-var Clarifai = require('./../src/index');
-var Models = require('./../src/Models');
-var Model = require('./../src/Model');
-var Inputs = require('./../src/Inputs');
+var Clarifai = require('./../../src/index');
+var Models = require('./../../src/Models');
+var Model = require('./../../src/Model');
+var Inputs = require('./../../src/Inputs');
 
 var sampleImage1 = 'https://s3.amazonaws.com/samples.clarifai.com/metro-north.jpg';
 var sampleImage2 = 'https://s3.amazonaws.com/samples.clarifai.com/wedding.jpg';

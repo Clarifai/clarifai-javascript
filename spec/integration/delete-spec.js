@@ -1,5 +1,5 @@
-const Clarifai = require('./../src');
-const Model = require('./../src/Model');
+const Clarifai = require('./../../src');
+const Model = require('./../../src/Model');
 const {errorHandler, pollStatus} = require('./helpers');
 const {sampleImages} = require('./test-data');
 

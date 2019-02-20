@@ -1,4 +1,4 @@
-const Clarifai = require('./../src');
+const Clarifai = require('./../../src');
 
 describe('Options', () => {
   it('can initialize an app with just the options object', done => {

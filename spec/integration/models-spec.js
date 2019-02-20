@@ -1,4 +1,4 @@
-const Clarifai = require('./../src');
+const Clarifai = require('./../../src');
 const {sampleImages, sampleVideos} = require('./test-data');
 const {errorHandler} = require('./helpers');
 const d = Date.now();
