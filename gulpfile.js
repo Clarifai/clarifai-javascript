@@ -12,6 +12,8 @@ const jasmine = require('gulp-jasmine');
 const del = require('del');
 const VERSION = require('./package.json').version;
 
+// TODO(Rok) MEDIUM: Make `gulp test` to run both integration and unit tests.
+
 const buildVars = {
   dev: {
     'stage': 'dev',
@@ -20,8 +22,8 @@ const buildVars = {
     'lintFailOnError': false,
     'browserifyFailOnError': false
   },
-  inttest: {
-    'stage': 'inttest',
+  test: {
+    'stage': 'test',
     'browserifyDebug': true,
     'uglify': false,
     'lintFailOnError': true,
@@ -136,7 +138,7 @@ gulp.task(
   watchFiles
 );
 
-gulp.task('inttest', function() {
+gulp.task('test', function() {
   const spec = gutil.env.spec;
   const path = spec ? `./spec/integration/${spec}-spec.js` : './spec/integration/*.js';
 

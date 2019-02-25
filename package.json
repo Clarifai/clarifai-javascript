@@ -8,7 +8,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "jsdoc": "jsdoc src/* -t node_modules/minami -d docs/$npm_package_version && jsdoc src/* -t node_modules/minami -d docs/latest",
-    "inttest": "gulp inttest",
+    "test": "gulp test",
     "unittest": "gulp unittest",
     "watch": "gulp watch",
     "build": "npm run clean && gulp build && npm run jsdoc",
@@ -48,6 +48,7 @@
     "minami": "^1.1.1",
     "release-it": "^2.9.0",
     "require-dir": "^0.3.0",
+    "run-sequence": "^2.2.1",
     "serve-static": "^1.10.0"
   }
 }
