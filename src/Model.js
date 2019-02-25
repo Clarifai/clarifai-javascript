@@ -234,6 +234,8 @@ class Model {
    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
    */
   getVersion(versionId) {
+    // TODO(Rok) MEDIUM: The version ID isn't URI encoded, as opposed to the model ID. This should probably be
+    //  consistent - i.e. the same in both cases.
     let url = `${this._config.basePath}${replaceVars(MODEL_VERSION_PATH, [this.id, versionId])}`;
     return wrapToken(this._config, (headers) => {
       return new Promise((resolve, reject) => {
