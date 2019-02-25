@@ -58,6 +58,7 @@ class Inputs {
    *     @param {string}                 inputs[].input.(url|base64)           Can be a publicly accessibly url or base64 string representing image bytes (required)
    *     @param {string}                 inputs[].input.id                     ID of input (optional)
    *     @param {number[]}               inputs[].input.crop                   An array containing the percent to be cropped from top, left, bottom and right (optional)
+   *     @param {boolean}               inputs[].input.allowDuplicateUrl       Whether to allow duplicate URL
    *     @param {object[]}               inputs[].input.metadata               Object with key and values pair (value can be string, array or other objects) to attach to the input (optional)
    *     @param {object}                 inputs[].input.geo                    Object with latitude and longitude coordinates to associate with an input. Can be used in search query as the proximity of an input to a reference point (optional)
    *       @param {number}                 inputs[].input.geo.latitude           +/- latitude val of geodata
