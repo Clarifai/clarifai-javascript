@@ -20,8 +20,15 @@ const buildVars = {
     'lintFailOnError': false,
     'browserifyFailOnError': false
   },
-  test: {
-    'stage': 'test',
+  inttest: {
+    'stage': 'inttest',
+    'browserifyDebug': true,
+    'uglify': false,
+    'lintFailOnError': true,
+    'browserifyFailOnError': true
+  },
+  unittest: {
+    'stage': 'unittest',
     'browserifyDebug': true,
     'uglify': false,
     'lintFailOnError': true,
@@ -129,9 +136,31 @@ gulp.task(
   watchFiles
 );
 
-gulp.task('test', function() {
+gulp.task('inttest', function() {
   const spec = gutil.env.spec;
   const path = spec ? `./spec/integration/${spec}-spec.js` : './spec/integration/*.js';
+
+  return gulp.src(path)
+    .pipe(jasmine({
+      'includeStackTrace': true,
+      'verbose': true,
+      'timeout': 60000,
+      'config': {
+        'helpers': [
+          './node_modules/babel-register/lib/node.js'
+        ]
+      }
+    }).on('end', function() {
+      process.exit();
+    }).on('error', function(e) {
+      console.log(e);
+      process.exit(1);
+    }));
+});
+
+gulp.task('unittest', function() {
+  const spec = gutil.env.spec;
+  const path = spec ? `./spec/unit/${spec}-spec.js` : './spec/unit/*.js';
 
   return gulp.src(path)
     .pipe(jasmine({

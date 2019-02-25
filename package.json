@@ -8,7 +8,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "jsdoc": "jsdoc src/* -t node_modules/minami -d docs/$npm_package_version && jsdoc src/* -t node_modules/minami -d docs/latest",
-    "test": "gulp test",
+    "inttest": "gulp inttest",
+    "unittest": "gulp unittest",
     "watch": "gulp watch",
     "build": "npm run clean && gulp build && npm run jsdoc",
     "release": "release-it",
@@ -21,6 +22,7 @@
     "valid-url": "^1.0.9"
   },
   "devDependencies": {
+    "axios-mock-adapter": "^1.16.0",
     "babel-eslint": "^6.1.2",
     "babel-preset-es2015": "^6.14.0",
     "babel-register": "^6.14.0",
