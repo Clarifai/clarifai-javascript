@@ -146,7 +146,7 @@ gulp.task(
 );
 
 gulp.task('test', function() {
-  return gulp.src('./spec/*/*.js')
+  return gulp.src('./tests/*/*.js')
     .pipe(jasmine({
       'includeStackTrace': true,
       'verbose': true,
@@ -165,7 +165,7 @@ gulp.task('test', function() {
 });
 
 gulp.task('unittest', function() {
-  return gulp.src('./spec/unit/*.js')
+  return gulp.src('./tests/unit/*.js')
     .pipe(jasmine({
       'includeStackTrace': true,
       'verbose': true,
