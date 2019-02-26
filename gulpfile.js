@@ -29,6 +29,13 @@ const buildVars = {
     'lintFailOnError': true,
     'browserifyFailOnError': true
   },
+  inttest: {
+    'stage': 'inttest',
+    'browserifyDebug': true,
+    'uglify': false,
+    'lintFailOnError': true,
+    'browserifyFailOnError': true
+  },
   unittest: {
     'stage': 'unittest',
     'browserifyDebug': true,
@@ -139,10 +146,7 @@ gulp.task(
 );
 
 gulp.task('test', function() {
-  const spec = gutil.env.spec;
-  const path = spec ? `./spec/integration/${spec}-spec.js` : './spec/integration/*.js';
-
-  return gulp.src(path)
+  return gulp.src('./spec/*/*.js')
     .pipe(jasmine({
       'includeStackTrace': true,
       'verbose': true,
@@ -161,10 +165,7 @@ gulp.task('test', function() {
 });
 
 gulp.task('unittest', function() {
-  const spec = gutil.env.spec;
-  const path = spec ? `./spec/unit/${spec}-spec.js` : './spec/unit/*.js';
-
-  return gulp.src(path)
+  return gulp.src('./spec/unit/*.js')
     .pipe(jasmine({
       'includeStackTrace': true,
       'verbose': true,

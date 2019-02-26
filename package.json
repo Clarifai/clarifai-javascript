@@ -48,7 +48,6 @@
     "minami": "^1.1.1",
     "release-it": "^2.9.0",
     "require-dir": "^0.3.0",
-    "run-sequence": "^2.2.1",
     "serve-static": "^1.10.0"
   }
 }

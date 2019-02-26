@@ -16,7 +16,7 @@ This will create three folders:
 
 * `npm run watch` - this will do an initial build, then build on any changes to *src*
 * `npm run unittest` - test JS files in the */spec/unit* folder
-* `npm run inttest` - test JS files in the */spec/integration* folder
+* `npm run test` - test JS files in the */spec/integration* AND */spec/unit* folders
   * tests require the following environment variables to be set:
     * `CLARIFAI_API_KEY`
 * `npm run clean` - empty and remove the folders created on build

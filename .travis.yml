@@ -14,8 +14,7 @@ before_script:
   - chmod +x token.sh
 script:
   - source token.sh
-  - npm run unittest
-  - npm run inttest
+  - npm run test
   - npm run build
 deploy:
   - provider: s3
