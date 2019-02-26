@@ -17,7 +17,7 @@ let app;
 let inputId;
 let lastCount;
 
-describe('Integration Tests - Inputs & Search', () => {
+describe('Integration Tests - Inputs', () => {
 
   beforeAll(done => {
     app = new Clarifai.App({
@@ -395,7 +395,7 @@ describe('Integration Tests - Inputs & Search', () => {
 });
 
 
-describe('Search', () => {
+describe('Integration Tests - Inputs', () => {
   beforeAll(done => {
     app.inputs.create({
       url: sampleImages[0],
