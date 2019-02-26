@@ -6,7 +6,7 @@ const ferrariId = 'ferrari' + Date.now();
 
 let app;
 
-describe('Concepts', () => {
+describe('Integration Tests - Concepts', () => {
   const conceptsIds = [
     'porsche' + Date.now(),
     'rolls royce' + Date.now(),

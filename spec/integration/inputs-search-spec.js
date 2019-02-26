@@ -17,7 +17,7 @@ let app;
 let inputId;
 let lastCount;
 
-describe('Inputs & Search', () => {
+describe('Integration Tests - Inputs & Search', () => {
 
   beforeAll(done => {
     app = new Clarifai.App({

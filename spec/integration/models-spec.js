@@ -20,7 +20,7 @@ const conceptsIds = [
   ferrariId
 ];
 
-describe('Models', () => {
+describe('Integration Tests - Models', () => {
   var testModel;
 
   beforeAll(() => {

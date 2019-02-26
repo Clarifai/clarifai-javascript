@@ -2,7 +2,7 @@ const Clarifai = require('./../../src');
 const {errorHandler} = require('./helpers');
 const {sampleImages} = require('./test-data');
 
-describe('API key', () => {
+describe('Integration Tests - API key', () => {
   it('can initialize an app with an api key', done => {
     expect(process.env.CLARIFAI_API_KEY).toBeDefined();
     const anApp = new Clarifai.App({apiKey: process.env.CLARIFAI_API_KEY});

@@ -10,7 +10,7 @@ let inputsIDs = [];
 let d = Date.now();
 let testModelId = 'vroom-vroom' + d;
 
-describe('Delete Resources', () => {
+describe('Integration Tests - Delete Resources', () => {
 
   beforeAll(done => {
     app = new Clarifai.App({

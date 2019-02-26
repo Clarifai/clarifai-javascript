@@ -9,7 +9,7 @@ let mock;
 
 const BASE_URL = 'https://api.clarifai.com';
 
-describe('Input Search', () => {
+describe('Unit Tests - Input Search', () => {
   beforeAll(() => {
     app = new Clarifai.App({
       apiKey: process.env.CLARIFAI_API_KEY,

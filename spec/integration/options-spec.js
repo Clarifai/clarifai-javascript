@@ -1,6 +1,6 @@
 const Clarifai = require('./../../src');
 
-describe('Options', () => {
+describe('Integration Tests - Options', () => {
   it('can initialize an app with just the options object', done => {
     // Skip test if these aren't defined
     if (

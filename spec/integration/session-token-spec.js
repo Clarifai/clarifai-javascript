@@ -2,7 +2,7 @@ const Clarifai = require('./../../src');
 const {errorHandler} = require('./helpers');
 const {sampleImages} = require('./test-data');
 
-describe('Session Token', () => {
+describe('Integration Tests - Session Token', () => {
 
   it('can initialize an app with a session token, app id and user id', done => {
     // Skip test if these aren't defined

@@ -7,7 +7,7 @@ const Workflows = require('./../../src/Workflows');
 let app;
 let testWorkflowId;
 
-describe('Workflow', () => {
+describe('Integration Tests - Workflows', () => {
   beforeAll(function() {
     app = new Clarifai.App({
       apiKey: process.env.CLARIFAI_API_KEY,
