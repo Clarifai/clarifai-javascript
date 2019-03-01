@@ -85,7 +85,6 @@ describe('Unit Tests - Model Versions', () => {
 }
     `));
 
-
     app.models.getVersions('@modelID')
       .then(response => {
         expect(mock.history.get.length).toBe(1);
@@ -98,4 +97,22 @@ describe('Unit Tests - Model Versions', () => {
       .catch(errorHandler.bind(done));
   });
 
+  it('Delete model version', done => {
+    mock.onDelete(BASE_URL + '/v2/models/%40modelID/versions/@versionID').reply(200, JSON.parse(`
+{
+  "status": {
+    "code": 10000,
+    "description": "Ok"
+  }
+}
+    `));
+
+    app.models.delete('@modelID', '@versionID').then(response => {
+      expect(mock.history.delete.length).toBe(1);
+
+      expect(response.status.code).toEqual(10000);
+
+      done();
+    }).catch(errorHandler.bind(done));
+  });
 });
