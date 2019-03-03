@@ -132,4 +132,39 @@ describe('Unit Tests - Concepts', () => {
       })
       .catch(errorHandler.bind(done));
   });
+
+  it('Searches feedback', done => {
+    mock.onPost(BASE_URL + '/v2/searches/feedback').reply(200, JSON.parse(`
+{
+  "status": {
+    "code": 10000,
+    "description": "Ok"
+  }
+}
+    `));
+
+    app.inputs.searchFeedback("@inputID", "@searchID", "@endUserID", "@sessionID")
+      .then(response => {
+        expect(mock.history.post.length).toBe(1);
+
+        expect(JSON.parse(mock.history.post[0].data)).toEqual(JSON.parse(`
+{
+  "input": {
+    "id": "@inputID",
+    "feedback_info": {
+      "event_type":   "search_click",
+      "search_id":    "@searchID",
+      "end_user_id":  "@endUserID",
+      "session_id":   "@sessionID"
+    }
+  }
+}
+        `));
+
+        expect(response.status.code).toBe(10000);
+
+        done();
+      })
+      .catch(errorHandler.bind(done));
+  });
 });

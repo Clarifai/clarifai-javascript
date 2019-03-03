@@ -29,6 +29,7 @@ module.exports = {
     INPUT_PATH: '/inputs/$0',
     INPUTS_STATUS_PATH: '/inputs/status',
     SEARCH_PATH: '/searches',
+    SEARCH_FEEDBACK_PATH: '/searches/feedback',
     WORKFLOWS_PATH: '/workflows',
     WORKFLOW_PATH: '/workflows/$0',
     WORKFLOW_RESULTS_PATH: '/workflows/$0/results'
