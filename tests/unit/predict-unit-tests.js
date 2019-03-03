@@ -182,7 +182,7 @@ describe('Unit Tests - Predictions', () => {
     `));
 
 
-    app.models.predict('@modelID', 'https://some-image-url', {language: 'de', max_concepts: 3, min_value: 0.98})
+    app.models.predict('@modelID', 'https://some-image-url', {language: 'de', maxConcepts: 3, minValue: 0.98})
       .then(response => {
         expect(mock.history.post.length).toBe(1);
         expect(JSON.parse(mock.history.post[0].data)).toEqual(JSON.parse(`
@@ -488,7 +488,7 @@ describe('Unit Tests - Predictions', () => {
     `));
 
     app.models.predict('@modelID', ['https://some-image-url1', 'https://some-image-url2'],
-        {language: 'de', max_concepts: 2, min_value: 0.98})
+        {language: 'de', maxConcepts: 2, minValue: 0.98})
       .then(response => {
         expect(mock.history.post.length).toBe(1);
         expect(JSON.parse(mock.history.post[0].data)).toEqual(JSON.parse(`
