@@ -12,8 +12,6 @@ const jasmine = require('gulp-jasmine');
 const del = require('del');
 const VERSION = require('./package.json').version;
 
-// TODO(Rok) MEDIUM: Make `gulp test` to run both integration and unit tests.
-
 const buildVars = {
   dev: {
     'stage': 'dev',
@@ -24,13 +22,6 @@ const buildVars = {
   },
   test: {
     'stage': 'test',
-    'browserifyDebug': true,
-    'uglify': false,
-    'lintFailOnError': true,
-    'browserifyFailOnError': true
-  },
-  inttest: {
-    'stage': 'inttest',
     'browserifyDebug': true,
     'uglify': false,
     'lintFailOnError': true,
