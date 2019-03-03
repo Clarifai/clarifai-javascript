@@ -300,10 +300,10 @@ class Inputs {
       input: {
         id: inputID,
         feedback_info: {
-            event_type: 'search_click',
-            search_id: searchID,
-            end_user_id: endUserID,
-            session_id: sessionID
+          event_type: 'search_click',
+          search_id: searchID,
+          end_user_id: endUserID,
+          session_id: sessionID
         }
       }
     };

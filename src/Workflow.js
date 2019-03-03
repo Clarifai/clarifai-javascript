@@ -1,4 +1,4 @@
-import {formatObjectForSnakeCase} from "./utils";
+import {formatObjectForSnakeCase} from './utils';
 
 let axios = require('axios');
 let {API, replaceVars} = require('./constants');

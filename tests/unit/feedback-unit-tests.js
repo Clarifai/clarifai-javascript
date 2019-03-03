@@ -143,7 +143,7 @@ describe('Unit Tests - Concepts', () => {
 }
     `));
 
-    app.inputs.searchFeedback("@inputID", "@searchID", "@endUserID", "@sessionID")
+    app.inputs.searchFeedback('@inputID', '@searchID', '@endUserID', '@sessionID')
       .then(response => {
         expect(mock.history.post.length).toBe(1);
 
