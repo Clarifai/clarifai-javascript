@@ -393,8 +393,11 @@ describe('Unit Tests - Workflows', () => {
     `));
 
 
-    app.workflow.predict("@workflowID", ["https://some-image-url1", "https://some-image-url2"])
-      .then(response => {
+    app.workflow.predict(
+        "@workflowID",
+        ["https://some-image-url1", "https://some-image-url2"],
+        {minValue: 0.98, maxConcepts: 3}
+      ).then(response => {
         expect(mock.history.post.length).toBe(1);
         expect(JSON.parse(mock.history.post[0].data)).toEqual(JSON.parse(`
 {
@@ -415,7 +418,11 @@ describe('Unit Tests - Workflows', () => {
         }
       }
     }
-  ]
+  ],
+  "output_config": {
+    "max_concepts": 3,
+    "min_value": 0.98
+  }
 }
         `));
 

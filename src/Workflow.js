@@ -1,3 +1,5 @@
+import {formatObjectForSnakeCase} from "./utils";
+
 let axios = require('axios');
 let {API, replaceVars} = require('./constants');
 let {WORKFLOWS_PATH, WORKFLOW_PATH, WORKFLOW_RESULTS_PATH} = API;
@@ -74,8 +76,11 @@ class Workflow {
    * @param {object[]|object|string}   inputs    An array of objects/object/string pointing to an image resource. A string can either be a url or base64 image bytes. Object keys explained below:
    *    @param {object}                  inputs[].image     Object with keys explained below:
    *       @param {string}                 inputs[].image.(url|base64)  Can be a publicly accessibly url or base64 string representing image bytes (required)
+   * @param {object} config An object with keys explained below.
+   *   @param {float} config.minValue The minimum confidence threshold that a result must meet. From 0.0 to 1.0
+   *   @param {number} config.maxConcepts The maximum number of concepts to return
    */
-  predict(workflowId, inputs) {
+  predict(workflowId, inputs, config = {}) {
     const url = `${this._config.basePath}${replaceVars(WORKFLOW_RESULTS_PATH, [workflowId])}`;
     if (checkType(/(Object|String)/, inputs)) {
       inputs = [inputs];
@@ -84,6 +89,9 @@ class Workflow {
       const params = {
         inputs: inputs.map(formatInput)
       };
+      if (config && Object.getOwnPropertyNames(config).length > 0) {
+        params['output_config'] = formatObjectForSnakeCase(config);
+      }
       return new Promise((resolve, reject) => {
         axios.post(url, params, {
           headers
