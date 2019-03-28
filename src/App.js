@@ -37,6 +37,8 @@ class App {
   /**
    * Gets a token from the API using client credentials
    * @return {Promise(token, error)} A Promise that is fulfilled with the token string or rejected with an error
+   *
+   * @deprecated Please switch to using the API key.
    */
   getToken() {
     return this._config.token();
@@ -46,6 +48,8 @@ class App {
    * Sets the token to use for the API
    * @param {String}         _token    The token you are setting
    * @return {Boolean}                 true if token has valid fields, false if not
+   *
+   * @deprecated Please switch to using the API key.
    */
   setToken(_token) {
     let token = _token;
@@ -73,8 +77,12 @@ class App {
   }
 
   _validate({clientId, clientSecret, token, apiKey, sessionToken}) {
+    if (clientId || clientSecret) {
+      console.warn('Client ID/secret has been deprecated. Please switch to using the API key. See here how to do ' +
+        'the switch: https://blog.clarifai.com/introducing-api-keys-a-safer-way-to-authenticate-your-applications');
+    }
     if ((!clientId || !clientSecret) && !token && !apiKey && !sessionToken) {
-      throw ERRORS.paramsRequired(['Client ID', 'Client Secret']);
+      throw ERRORS.paramsRequired(['apiKey']);
     }
   }
 
@@ -110,6 +118,9 @@ class App {
     this.solutions = new Solutions(this._config);
   }
 
+  /**
+   * @deprecated Please switch to using the API key.
+   */
   _getToken(resolve, reject) {
     this._requestToken().then(
       (response) => {
@@ -124,6 +135,9 @@ class App {
     );
   }
 
+  /**
+   * @deprecated Please switch to using the API key.
+   */
   _requestToken() {
     let url = `${this._config.basePath}${TOKEN_PATH}`;
     let clientId = this._config.clientId;
