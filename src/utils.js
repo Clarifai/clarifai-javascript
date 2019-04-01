@@ -107,7 +107,7 @@ module.exports = {
       const bitmap = fs.readFileSync(media['file']);
       media = {
         base64: new Buffer(bitmap).toString('base64')
-      }
+      };
     }
 
     // Users can specify their own id to distinguish batch results
