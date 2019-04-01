@@ -20,6 +20,8 @@ const conceptsIds = [
   ferrariId
 ];
 
+const TINY_IMAGE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg==';
+
 describe('Integration Tests - Models', () => {
   // TODO: The tests below that depend on testModel are required to be run after
   //       'Creates a new model' since it initializes testModel. Refactor the tests
@@ -187,6 +189,51 @@ describe('Integration Tests - Models', () => {
       })
       .catch(errorHandler.bind(done));
   });
+
+  it('Call predict on base64', done => {
+    app.models.predict(Clarifai.GENERAL_MODEL, [
+      {
+        base64: TINY_IMAGE_BASE64
+      }
+    ])
+      .then(response => {
+        expect(response.outputs).toBeDefined();
+        var outputs = response.outputs;
+        expect(outputs.length).toBe(1);
+        var output = outputs[0];
+        expect(output.id).toBeDefined();
+        expect(output.status).toBeDefined();
+        expect(output.input).toBeDefined();
+        expect(output.model).toBeDefined();
+        expect(output.created_at).toBeDefined();
+        expect(output.data).toBeDefined();
+        done();
+      })
+      .catch(errorHandler.bind(done));
+  });
+
+  it('Call predict on file path', done => {
+    app.models.predict(Clarifai.GENERAL_MODEL, [
+      {
+        file: 'tests/assets/tiny-image.png'
+      }
+    ])
+      .then(response => {
+        expect(response.outputs).toBeDefined();
+        var outputs = response.outputs;
+        expect(outputs.length).toBe(1);
+        var output = outputs[0];
+        expect(output.id).toBeDefined();
+        expect(output.status).toBeDefined();
+        expect(output.input).toBeDefined();
+        expect(output.model).toBeDefined();
+        expect(output.created_at).toBeDefined();
+        expect(output.data).toBeDefined();
+        done();
+      })
+      .catch(errorHandler.bind(done));
+  });
+
 
   it('Call predict on video inputs', done => {
     app.models.predict(Clarifai.GENERAL_MODEL, sampleVideos[0], {video: true})

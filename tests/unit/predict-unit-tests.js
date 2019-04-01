@@ -8,6 +8,8 @@ let app;
 
 let mock;
 
+const TINY_IMAGE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg==';
+
 describe('Unit Tests - Predictions', () => {
   beforeAll(() => {
     app = new Clarifai.App({
@@ -20,7 +22,7 @@ describe('Unit Tests - Predictions', () => {
     mock = new MockAdapter(axios);
   });
 
-  it('Predicts', done => {
+  it('Predicts url', done => {
     mock.onPost(BASE_URL + '/v2/models/%40modelID/outputs').reply(200, JSON.parse(`
 {
   "status": {
@@ -204,6 +206,184 @@ describe('Unit Tests - Predictions', () => {
       }
     }
   }
+}
+        `));
+
+        let output = response.outputs[0];
+
+        expect(output.id).toEqual('@outputID');
+        expect(output.input.id).toEqual('@inputID');
+        expect(output.data.concepts[0].id).toEqual('@conceptID1');
+        expect(output.model.id).toEqual('@modelID');
+
+        done();
+      })
+      .catch(errorHandler.bind(done));
+  });
+
+  it('Predicts base64', done => {
+    mock.onPost(BASE_URL + '/v2/models/%40modelID/outputs').reply(200, JSON.parse(`
+{
+  "status": {
+    "code": 10000,
+    "description": "Ok"
+  },
+  "outputs": [{
+    "id": "@outputID",
+    "status": {
+      "code": 10000,
+      "description": "Ok"
+    },
+    "created_at": "2017-11-17T19:32:58.760477937Z",
+    "model": {
+      "id": "@modelID",
+      "name": "@modelName",
+      "created_at": "2016-03-09T17:11:39.608845Z",
+      "app_id": "main",
+      "output_info": {
+        "message": "Show output_info with: GET /models/{model_id}/output_info",
+        "type": "concept",
+        "type_ext": "concept"
+      },
+      "model_version": {
+        "id": "@modelVersionID",
+        "created_at": "2016-07-13T01:19:12.147644Z",
+        "status": {
+          "code": 21100,
+          "description": "Model trained successfully"
+        }
+      },
+      "display_name": "@modelDisplayName"
+    },
+    "input": {
+      "id": "@inputID",
+      "data": {
+        "image": {
+          "url": "https://some-image-url"
+        }
+      }
+    },
+    "data": {
+      "concepts": [{
+        "id": "@conceptID1",
+        "name": "@conceptName1",
+        "value": 0.99,
+        "app_id": "main"
+      }, {
+        "id": "@conceptID2",
+        "name": "@conceptName2",
+        "value": 0.98,
+        "app_id": "main"
+      }]
+    }
+  }]
+}
+    `));
+
+
+    app.models.predict('@modelID', {base64: TINY_IMAGE_BASE64})
+      .then(response => {
+        expect(mock.history.post.length).toBe(1);
+        expect(JSON.parse(mock.history.post[0].data)).toEqual(JSON.parse(`
+{
+  "inputs": [
+    {
+      "data": {
+        "image": {
+          "base64": "` + TINY_IMAGE_BASE64 + `"
+        }
+      }
+    }
+  ]
+}
+        `));
+
+        let output = response.outputs[0];
+
+        expect(output.id).toEqual('@outputID');
+        expect(output.input.id).toEqual('@inputID');
+        expect(output.data.concepts[0].id).toEqual('@conceptID1');
+        expect(output.model.id).toEqual('@modelID');
+
+        done();
+      })
+      .catch(errorHandler.bind(done));
+  });
+
+  it('Predicts file', done => {
+    mock.onPost(BASE_URL + '/v2/models/%40modelID/outputs').reply(200, JSON.parse(`
+{
+  "status": {
+    "code": 10000,
+    "description": "Ok"
+  },
+  "outputs": [{
+    "id": "@outputID",
+    "status": {
+      "code": 10000,
+      "description": "Ok"
+    },
+    "created_at": "2017-11-17T19:32:58.760477937Z",
+    "model": {
+      "id": "@modelID",
+      "name": "@modelName",
+      "created_at": "2016-03-09T17:11:39.608845Z",
+      "app_id": "main",
+      "output_info": {
+        "message": "Show output_info with: GET /models/{model_id}/output_info",
+        "type": "concept",
+        "type_ext": "concept"
+      },
+      "model_version": {
+        "id": "@modelVersionID",
+        "created_at": "2016-07-13T01:19:12.147644Z",
+        "status": {
+          "code": 21100,
+          "description": "Model trained successfully"
+        }
+      },
+      "display_name": "@modelDisplayName"
+    },
+    "input": {
+      "id": "@inputID",
+      "data": {
+        "image": {
+          "url": "https://some-image-url"
+        }
+      }
+    },
+    "data": {
+      "concepts": [{
+        "id": "@conceptID1",
+        "name": "@conceptName1",
+        "value": 0.99,
+        "app_id": "main"
+      }, {
+        "id": "@conceptID2",
+        "name": "@conceptName2",
+        "value": 0.98,
+        "app_id": "main"
+      }]
+    }
+  }]
+}
+    `));
+
+
+    app.models.predict('@modelID', {file: 'tests/assets/tiny-image.png'})
+      .then(response => {
+        expect(mock.history.post.length).toBe(1);
+        expect(JSON.parse(mock.history.post[0].data)).toEqual(JSON.parse(`
+{
+  "inputs": [
+    {
+      "data": {
+        "image": {
+          "base64": "` + TINY_IMAGE_BASE64 + `"
+        }
+      }
+    }
+  ]
 }
         `));
 

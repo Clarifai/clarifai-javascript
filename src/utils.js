@@ -1,3 +1,4 @@
+let fs = require('fs');
 let Promise = require('promise');
 let validUrl = require('valid-url');
 let {GEO_LIMIT_TYPES, ERRORS} = require('./constants');
@@ -100,6 +101,13 @@ module.exports = {
       }
     } else {
       media = Object.assign({}, data);
+    }
+
+    if (media.hasOwnProperty('file')) {
+      const bitmap = fs.readFileSync(media['file']);
+      media = {
+        base64: new Buffer(bitmap).toString('base64')
+      }
     }
 
     // Users can specify their own id to distinguish batch results
