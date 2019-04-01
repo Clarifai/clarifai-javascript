@@ -3,12 +3,11 @@ const {BASE_URL, SAMPLE_API_KEY} = require('./helpers');
 const axios = require('axios');
 const MockAdapter = require('axios-mock-adapter');
 const {errorHandler} = require('../integration/helpers');
+const {TINY_IMAGE_BASE64} = require('../assets/test-data');
 
 let app;
 
 let mock;
-
-const TINY_IMAGE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg==';
 
 describe('Unit Tests - Predictions', () => {
   beforeAll(() => {

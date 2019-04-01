@@ -1,7 +1,7 @@
 const Clarifai = require('./../../src');
 const Model = require('./../../src/Model');
 const {errorHandler, pollStatus} = require('./helpers');
-const {sampleImages} = require('./test-data');
+const {sampleImages} = require('../assets/test-data');
 
 let app;
 let lastCount;

@@ -1,3 +1,5 @@
+export const TINY_IMAGE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg==';
+
 export const sampleImages = [
   'https://s3.amazonaws.com/samples.clarifai.com/metro-north.jpg',
   'https://s3.amazonaws.com/samples.clarifai.com/wedding.jpg',

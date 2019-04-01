@@ -1,6 +1,6 @@
 const Clarifai = require('./../../src');
 const {errorHandler} = require('./helpers');
-const {sampleImages} = require('./test-data');
+const {sampleImages} = require('../assets/test-data');
 
 describe('Integration Tests - API key', () => {
   it('can initialize an app with an api key', done => {

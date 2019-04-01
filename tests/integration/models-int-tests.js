@@ -1,5 +1,5 @@
 const Clarifai = require('./../../src');
-const {sampleImages, sampleVideos} = require('./test-data');
+const {sampleImages, sampleVideos, TINY_IMAGE_BASE64} = require('../assets/test-data');
 const {errorHandler, waitForInputsUpload} = require('./helpers');
 const d = Date.now();
 const ferrariId = 'ferrari' + d;
@@ -19,8 +19,6 @@ const conceptsIds = [
   beerId,
   ferrariId
 ];
-
-const TINY_IMAGE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg==';
 
 describe('Integration Tests - Models', () => {
   // TODO: The tests below that depend on testModel are required to be run after

@@ -1,5 +1,5 @@
 const Clarifai = require('./../../src');
-const {sampleImages} = require('./test-data');
+const {sampleImages} = require('../assets/test-data');
 const {errorHandler, pollStatus, waitForInputsUpload} = require('./helpers');
 const Inputs = require('./../../src/Inputs');
 const d = Date.now();
