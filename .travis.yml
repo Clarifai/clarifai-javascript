@@ -1,21 +1,32 @@
 language: node_js
+
 node_js:
-  - '6'
   - '8'
+  - '10'
   - 'node'
+
 branches:
   only:
     - master
     - /^\d+\.\d+\.\d+$/
+
 cache:
   directories:
     - node_modules
+
 before_script:
-  - chmod +x token.sh
+  - export PYTHONPATH=.
+  - export CLARIFAI_APP_ID="$(python scripts/app_and_key_for_tests.py --create-app javascript-travis)"
+  - export CLARIFAI_API_KEY="$(python scripts/app_and_key_for_tests.py --create-key ${CLARIFAI_APP_ID})"
+
 script:
-  - source token.sh
   - npm run test
   - npm run build
+
+after_script:
+  - export PYTHONPATH=.
+  - python scripts/app_and_key_for_tests.py --delete-app $CLARIFAI_APP_ID
+
 deploy:
   - provider: s3
     access_key_id: ${AWS_ACCESS_KEY_ID}

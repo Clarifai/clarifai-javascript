@@ -35,30 +35,4 @@ describe('Integration Tests - API key', () => {
       })
       .catch(errorHandler.bind(done));
   });
-
-  it('Sets a token with an object', done => {
-    const token = {
-      access_token: 'foo',
-      token_type: 'Bearer',
-      expires_in: 100000,
-      scope: 'api_access_write api_access api_access_read'
-    };
-    const anApp = new Clarifai.App(null, null, {token: token});
-    anApp._config.token()
-      .then(response => {
-        expect(response.accessToken).toEqual('foo');
-        done();
-      })
-      .catch(errorHandler.bind(done));
-  });
-
-  it('Sets a token with a string', done => {
-    const anApp = new Clarifai.App(null, null, {token: 'bar'});
-    anApp._config.token()
-      .then(response => {
-        expect(response.accessToken).toEqual('bar');
-        done();
-      })
-      .catch(errorHandler.bind(done));
-  });
 });
