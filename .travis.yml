@@ -3,7 +3,9 @@ language: node_js
 node_js:
   - '8'
   - '10'
-  - 'node'
+# At the time of this writing, Travis replaces the 'node' version with the Node version 12, which is not compatible
+# anymore with gulp <4.0.0.
+#  - 'node'
 
 branches:
   only:
