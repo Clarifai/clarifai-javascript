@@ -145,7 +145,8 @@ gulp.task('test', function() {
       'config': {
         'helpers': [
           './node_modules/babel-register/lib/node.js'
-        ]
+        ],
+        'random': false,
       }
     }).on('end', function() {
       process.exit();
