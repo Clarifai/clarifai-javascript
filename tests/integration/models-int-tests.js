@@ -607,4 +607,23 @@ describe('Integration Tests - Models', () => {
       })
       .catch(errorHandler.bind(done));
   });
+
+  it('Gets output info', done => {
+    app.models.getOutputInfo(Clarifai.GENERAL_MODEL)
+      .then(model => {
+        expect(model.id).toEqual(Clarifai.GENERAL_MODEL);
+        done();
+      })
+      .catch(errorHandler.bind(done));
+  });
+
+  it('Gets output info when specifying model version', done => {
+    let olderGeneralModelVersionID = 'aa9ca48295b37401f8af92ad1af0d91d';
+    app.models.getOutputInfo({id: Clarifai.GENERAL_MODEL, version: olderGeneralModelVersionID})
+      .then(model => {
+        expect(model.modelVersion.id).toEqual(olderGeneralModelVersionID);
+        done();
+      })
+      .catch(errorHandler.bind(done));
+  });
 });

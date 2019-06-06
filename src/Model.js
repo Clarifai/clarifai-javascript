@@ -19,6 +19,7 @@ let {
   PREDICT_PATH,
   VERSION_PREDICT_PATH,
   MODEL_INPUTS_PATH,
+  MODEL_VERSION_OUTPUT_PATH,
   MODEL_OUTPUT_PATH,
   MODEL_VERSION_INPUTS_PATH,
   MODEL_VERSION_METRICS_PATH
@@ -277,7 +278,9 @@ class Model {
    * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
    */
   getOutputInfo() {
-    let url = `${this._config.basePath}${replaceVars(MODEL_OUTPUT_PATH, [this.id])}`;
+    let url = `${this._config.basePath}${this.versionId ?
+      replaceVars(MODEL_VERSION_OUTPUT_PATH, [this.id, this.versionId]) :
+      replaceVars(MODEL_OUTPUT_PATH, [this.id])}`;
     return wrapToken(this._config, (headers) => {
       return new Promise((resolve, reject) => {
         axios.get(url, {headers}).then((response) => {
