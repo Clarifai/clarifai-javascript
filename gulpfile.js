@@ -117,25 +117,6 @@ function failOnError() {
     }));
 }
 
-// will do an initial build, then build on any changes to src
-function watchFiles() {
-  gulp.watch('./src/**', ['jslint', 'browserify']);
-}
-
-const tasks = [
-  'jslint',
-  'browserify',
-  'dist'
-];
-
-gulp.task('build', tasks);
-
-gulp.task(
-  'watch',
-  tasks,
-  watchFiles
-);
-
 gulp.task('test', function() {
   return gulp.src('./tests/*/*.js')
     .pipe(jasmine({
@@ -156,7 +137,7 @@ gulp.task('test', function() {
     }));
 });
 
-gulp.task('unittest', function() {
+gulp.task('unittest', (done, error) => {
   return gulp.src('./tests/unit/*.js')
     .pipe(jasmine({
       'includeStackTrace': true,
@@ -167,12 +148,18 @@ gulp.task('unittest', function() {
           './node_modules/babel-register/lib/node.js'
         ]
       }
-    }).on('end', function() {
-      process.exit();
-    }).on('error', function(e) {
-      console.log(e);
-      process.exit(1);
-    }));
+    })
+    //   .on('end', function() {
+    //   // process.exit();
+    //   done();
+    // }).on('error', function(e) {
+    //   console.log(e);
+    //   // process.exit(1);
+    //   // console.log("error:");
+    //   // console.log(error);
+    //   // error(1);
+    // })
+    );
 });
 
 gulp.task('jslint', function() {
@@ -194,7 +181,7 @@ gulp.task('cleanbuild', function() {
 });
 
 // browserify src/js to dist/browser/js
-gulp.task('browserify', ['cleanbuild'], function() {
+gulp.task('browserify', gulp.series('cleanbuild'), function() {
   const buildVars = getBuildVars();
   const replacePatterns = [
     {
@@ -247,11 +234,23 @@ gulp.task('browserify', ['cleanbuild'], function() {
     .pipe(gulp.dest('./sdk'));
 });
 
-gulp.task('dist', ['browserify'], function() {
+gulp.task('dist', gulp.series('browserify'), function() {
   return gulp.src('./src/**/*.js')
     .pipe(babel({
-      presets: ['es2015']
+      presets: ['@babel/preset-env']
     }))
     .pipe(gulp.dest('./dist'));
 });
 
+const tasks = [
+  'jslint',
+  'browserify',
+  'dist'
+];
+
+gulp.task('build', gulp.series(tasks));
+
+// will do an initial build, then build on any changes to src
+gulp.task('watch', gulp.series(tasks), function () {
+  gulp.watch('./src/**', ['jslint', 'browserify']);
+});

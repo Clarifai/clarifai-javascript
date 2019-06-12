@@ -9,9 +9,9 @@ module.exports = {
       if (obj[key] === null ||
         obj[key] === undefined ||
         strict === true && (
-        obj[key] === '' ||
-        obj[key].length === 0 ||
-        Object.keys(obj[key]).length === 0)) {
+          obj[key] === '' ||
+          obj[key].length === 0 ||
+          Object.keys(obj[key]).length === 0)) {
         delete obj[key];
       }
     });
