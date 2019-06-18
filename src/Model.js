@@ -140,14 +140,12 @@ class Model {
       return new Promise((resolve, reject) => {
         axios.post(url, null, {headers}).then((response) => {
           if (isSuccess(response)) {
-            // Training produces a new model version ID.
-            this.versionId = response.data.model.model_version.id;
-
+            let model = new Model(this._config, response.data.model);
             if (sync) {
               let timeStart = Date.now();
-              this._pollTrain.bind(this)(timeStart, resolve, reject);
+              model._pollTrain.bind(model)(timeStart, resolve, reject);
             } else {
-              resolve(new Model(this._config, response.data.model));
+              resolve(model);
             }
           } else {
             reject(response);
@@ -168,7 +166,7 @@ class Model {
     this.getOutputInfo().then((model) => {
       let modelStatusCode = model.modelVersion.status.code.toString();
       if (modelStatusCode === MODEL_QUEUED_FOR_TRAINING || modelStatusCode === MODEL_TRAINING) {
-        this.pollTimeout = setTimeout(() => this._pollTrain(timeStart, resolve, reject), POLLTIME);
+        model.pollTimeout = setTimeout(() => model._pollTrain(timeStart, resolve, reject), POLLTIME);
       } else {
         resolve(model);
       }
