@@ -1,6 +1,6 @@
-export const TINY_IMAGE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg==';
+const TINY_IMAGE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg==';
 
-export const sampleImages = [
+const sampleImages = [
   'https://s3.amazonaws.com/samples.clarifai.com/metro-north.jpg',
   'https://s3.amazonaws.com/samples.clarifai.com/wedding.jpg',
   'https://s3.amazonaws.com/samples.clarifai.com/cookies.jpeg',
@@ -12,7 +12,9 @@ export const sampleImages = [
   'https://s3.amazonaws.com/samples.clarifai.com/black-car.jpg'
 ];
 
-export const sampleVideos = [
+const sampleVideos = [
   'https://samples.clarifai.com/3o6gb3kkXfLvdKEZs4.gif',
   'https://samples.clarifai.com/beer.mp4'
 ];
+
+module.exports = {sampleImages, sampleVideos, TINY_IMAGE_BASE64};
