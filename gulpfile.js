@@ -129,11 +129,6 @@ gulp.task('test', function() {
         ],
         'random': false,
       }
-    }).on('end', function() {
-      process.exit();
-    }).on('error', function(e) {
-      console.log(e);
-      process.exit(1);
     }));
 });
 
@@ -148,18 +143,7 @@ gulp.task('unittest', (done, error) => {
           './node_modules/babel-register/lib/node.js'
         ]
       }
-    })
-    //   .on('end', function() {
-    //   // process.exit();
-    //   done();
-    // }).on('error', function(e) {
-    //   console.log(e);
-    //   // process.exit(1);
-    //   // console.log("error:");
-    //   // console.log(error);
-    //   // error(1);
-    // })
-    );
+    }));
 });
 
 gulp.task('jslint', function() {
