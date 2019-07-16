@@ -69,7 +69,7 @@ describe('Integration Tests - Models', () => {
         var version = model.modelVersion;
         expect(version.id).toBeDefined();
         expect(version.created_at).toBeDefined();
-        expect(version.status.code).toBe(21111);
+        expect(version.status.code).toBe(21100);
         done();
       })
       .catch(errorHandler.bind(done));
