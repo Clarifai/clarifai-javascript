@@ -218,5 +218,4 @@ describe('Unit Tests - Input Search', () => {
       })
       .catch(errorHandler.bind(done));
   });
-
 });

@@ -130,7 +130,7 @@ describe('Unit Tests - Inputs', () => {
       .catch(errorHandler.bind(done));
   });
 
-  it('Updates input', done => {
+  it('Updates inputs', done => {
     mock.onPatch(BASE_URL + '/v2/inputs').reply(200, JSON.parse(`
 {
   "status": {
@@ -173,7 +173,7 @@ describe('Unit Tests - Inputs', () => {
   }]
 }
     `));
-
+    
     app.inputs.update(
       {
         id: '@inputID',

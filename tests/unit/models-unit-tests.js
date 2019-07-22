@@ -225,46 +225,107 @@ describe('Unit Tests - Models', () => {
       .catch(errorHandler.bind(done));
   });
 
-  it('Gets model inputs', done => {
-    mock.onGet(BASE_URL + '/v2/models/%40modelID/inputs').reply(200, JSON.parse(`
+  it('Get model outputinfo', done => {
+    mock.onGet(BASE_URL + '/v2/models/%40modelID/output_info').reply(200, JSON.parse(`
+    {
+      "status": {
+        "code": 10000,
+        "description": "Ok"
+      },
+      "model": {
+        "id": "@modelID",
+        "name": "@modelName",
+        "created_at": "2017-05-16T19:20:38.733764Z",
+        "app_id": "main",
+        "output_info": {
+          "data": {
+            "concepts": [{
+              "id": "@conceptID11",
+              "name": "safe",
+              "created_at": "2017-05-16T19:20:38.450157Z",
+              "language": "en",
+              "app_id": "main"
+            }]
+          },
+          "type": "concept",
+          "type_ext": "concept"
+        },
+        "model_version": {
+          "id": "@modelVersionID",
+          "created_at": "2017-05-16T19:20:38.733764Z",
+          "status": {
+            "code": 21100,
+            "description": "Model trained successfully"
+          },
+          "active_concept_count": 5
+        },
+        "display_name": "Moderation"
+      }
+    }
+        `));
+
+        app.models.getOutputInfo('@modelID')
+        .then(outputinfo => {
+          expect(mock.history.get.length).toBe(1);
+
+          expect(outputinfo.id).toBe("@modelID");
+          expect(outputinfo.name).toBe("@modelName");
+          expect(outputinfo.modelVersion.id).toBe("@modelVersionID");
+          expect(outputinfo.outputInfo.type).toBe("concept");
+          done();
+        })
+        .catch(errorHandler.bind(done));
+      });
+
+  it('Gets model', done => {
+    mock.onGet(BASE_URL + '/v2/models/%40modelID').reply(200, JSON.parse(`
 {
   "status": {
     "code": 10000,
     "description": "Ok"
   },
-  "inputs": [{
-    "id": "@inputID",
-    "data": {
-      "image": {
-        "url": "@imageURL"
+  "model": {
+    "id": "@modelID",
+    "name": "@modelName",
+    "created_at": "2017-05-16T19:20:38.733764Z",
+    "app_id": "main",
+    "output_info": {
+      "data": {
+        "concepts": [{
+          "id": "@conceptID11",
+          "name": "safe",
+          "created_at": "2017-05-16T19:20:38.450157Z",
+          "language": "en",
+          "app_id": "main"
+        }]
       },
-      "concepts": [{
-        "id": "@conceptID",
-        "name": "@conceptName",
-        "value": 1,
-        "app_id": "@conceptAppID"
-      }]
+      "type": "concept",
+      "type_ext": "concept"
     },
-    "created_at": "2017-10-15T16:30:52.964888Z",
-    "status": {
-      "code": 30000,
-      "description": "Download complete"
-    }
-  }]
+    "model_version": {
+      "id": "@modelVersionID",
+      "created_at": "2017-05-16T19:20:38.733764Z",
+      "status": {
+        "code": 21100,
+        "description": "Model trained successfully"
+      },
+      "active_concept_count": 5
+    },
+    "display_name": "Moderation"
+  }
 }
     `));
 
-    app.models.initModel('@modelID').then(model => {
-      return model.getInputs();
-    }).then(inputsResponse => {
-      expect(mock.history.get.length).toBe(1);
-
-      const input = inputsResponse['inputs'][0];
-      expect(input.id).toBe('@inputID');
-      expect(input.data.concepts[0].id).toBe('@conceptID');
-
-      done();
-    }).catch(errorHandler.bind(done));
+    app.models.get('@modelID').then(model => {
+        expect(mock.history.get.length).toBe(1);
+  
+        expect(model.id).toBe('@modelID');
+        expect(model.name).toBe('@modelName');
+        expect(model.modelVersion.id).toBe('@modelVersionID');
+        expect(model.outputInfo.data.concepts[0].id).toBe('@conceptID11');
+        done();
+      })
+      .catch(errorHandler.bind(done));
   });
 
   it('Modifies models', done => {

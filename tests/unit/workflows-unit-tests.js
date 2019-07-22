@@ -21,6 +21,297 @@ describe('Unit Tests - Workflows', () => {
     mock = new MockAdapter(axios);
   });
 
+  it('Lists workflows', done => {
+    mock.onGet(BASE_URL + '/v2/workflows').reply(200, JSON.parse(`
+{
+  "status": {
+    "code": 10000,
+    "description": "Ok"
+  },
+  "workflows": [{
+    "id": "@workflowID1",
+    "app_id": "@appID1",
+    "created_at": "2017-07-10T01:45:05.672880Z"
+  },
+  {
+    "id": "@workflowID2",
+    "app_id": "@appID2",
+    "created_at": "2017-08-10T01:45:05.672880Z"
+  }],
+  "results": [
+    {
+      "status": {
+        "code": 10000,
+        "description": "Ok"
+      },
+      "input": {
+        "id": "@inputID",
+        "data": {
+          "image": {
+            "url": "@inputURL"
+          }
+        }
+      },
+      "outputs": [
+        {
+          "id": "@outputID1",
+          "status": {
+            "code": 10000,
+            "description": "Ok"
+          },
+          "created_at": "2017-07-10T12:01:44.929928529Z",
+          "model": {
+            "id": "d16f390eb32cad478c7ae150069bd2c6",
+            "name": "moderation",
+            "created_at": "2017-05-12T21:28:00.471607Z",
+            "app_id": "main",
+            "output_info": {
+              "message": "Show output_info with: GET /models/{model_id}/output_info",
+              "type": "concept",
+              "type_ext": "concept"
+            },
+            "model_version": {
+              "id": "b42ac907ac93483484483a0040a386be",
+              "created_at": "2017-05-12T21:28:00.471607Z",
+              "status": {
+                "code": 21100,
+                "description": "Model trained successfully"
+              }
+            }
+          },
+          "data": {
+            "concepts": [
+              {
+                "id": "@conceptID11",
+                "name": "safe",
+                "value": 0.99999714,
+                "app_id": "main"
+              }
+            ]
+          }
+        },
+        {
+          "id": "@outputID2",
+          "status": {
+            "code": 10000,
+            "description": "Ok"
+          },
+          "created_at": "2017-07-10T12:01:44.929941126Z",
+          "model": {
+            "id": "aaa03c23b3724a16a56b629203edc62c",
+            "name": "general-v1.3",
+            "created_at": "2016-02-26T23:38:40.086101Z",
+            "app_id": "main",
+            "output_info": {
+              "type": "concept",
+              "type_ext": "concept"
+            },
+            "model_version": {
+              "id": "aa9ca48295b37401f8af92ad1af0d91d",
+              "created_at": "2016-07-13T00:58:55.915745Z",
+              "status": {
+                "code": 21100,
+                "description": "Model trained successfully"
+              }
+            }
+          },
+          "data": {
+            "concepts": [
+              {
+                "id": "@conceptID21"
+              },
+              {
+                "id": "@conceptID22"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+    `));
+
+      app.workflows.list().then(workflows => {
+        expect(mock.history.get.length).toBe(1);
+
+        const workflow1 = workflows[0];
+        expect(workflow1.id).toBe('@workflowID1');
+        expect(workflow1.appId).toBe('@appID1');
+        expect(workflow1.createdAt).toBe("2017-07-10T01:45:05.672880Z");
+
+        const workflow2 = workflows[1];
+        expect(workflow2.id).toBe('@workflowID2');
+        expect(workflow2.appId).toBe('@appID2');
+        expect(workflow2.createdAt).toBe("2017-08-10T01:45:05.672880Z");
+
+        done();
+      })
+        .catch(errorHandler.bind(done));
+  });
+
+  it('Creates workflows', done => {
+    mock.onPost(BASE_URL + '/v2/workflows').reply(200, JSON.parse(`
+    {
+      "status": {
+        "code": 10000,
+        "description": "Ok"
+      },
+      "workflows": [{
+        "id": "@workflowID1",
+        "app_id": "@appID1",
+        "created_at": "2017-07-10T01:45:05.672880Z"
+      },
+      {
+        "id": "@workflowID2",
+        "app_id": "@appID2",
+        "created_at": "2017-08-10T01:45:05.672880Z"
+      }],
+      "results": [
+        {
+          "status": {
+            "code": 10000,
+            "description": "Ok"
+          },
+          "input": {
+            "id": "@inputID",
+            "data": {
+              "image": {
+                "url": "@inputURL"
+              }
+            }
+          },
+          "outputs": [
+            {
+              "id": "@outputID1",
+              "status": {
+                "code": 10000,
+                "description": "Ok"
+              },
+              "created_at": "2017-07-10T12:01:44.929928529Z",
+              "model": {
+                "id": "d16f390eb32cad478c7ae150069bd2c6",
+                "name": "moderation",
+                "created_at": "2017-05-12T21:28:00.471607Z",
+                "app_id": "main",
+                "output_info": {
+                  "message": "Show output_info with: GET /models/{model_id}/output_info",
+                  "type": "concept",
+                  "type_ext": "concept"
+                },
+                "model_version": {
+                  "id": "b42ac907ac93483484483a0040a386be",
+                  "created_at": "2017-05-12T21:28:00.471607Z",
+                  "status": {
+                    "code": 21100,
+                    "description": "Model trained successfully"
+                  }
+                }
+              },
+              "data": {
+                "concepts": [
+                  {
+                    "id": "@conceptID11",
+                    "name": "safe",
+                    "value": 0.99999714,
+                    "app_id": "main"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "@outputID2",
+              "status": {
+                "code": 10000,
+                "description": "Ok"
+              },
+              "created_at": "2017-07-10T12:01:44.929941126Z",
+              "model": {
+                "id": "aaa03c23b3724a16a56b629203edc62c",
+                "name": "general-v1.3",
+                "created_at": "2016-02-26T23:38:40.086101Z",
+                "app_id": "main",
+                "output_info": {
+                  "type": "concept",
+                  "type_ext": "concept"
+                },
+                "model_version": {
+                  "id": "aa9ca48295b37401f8af92ad1af0d91d",
+                  "created_at": "2016-07-13T00:58:55.915745Z",
+                  "status": {
+                    "code": 21100,
+                    "description": "Model trained successfully"
+                  }
+                }
+              },
+              "data": {
+                "concepts": [
+                  {
+                    "id": "@conceptID21"
+                  },
+                  {
+                    "id": "@conceptID22"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+    `));
+
+      app.workflows.create("@workflowID", 
+      {
+        "modelId": "@modelID",
+        "modelVersionId": "@modelVersionID"
+      }
+      ).then(workflowid => {
+        expect(mock.history.post.length).toBe(1);
+        expect(JSON.parse(mock.history.post[0].data)).toEqual(JSON.parse(`
+{
+  "workflows": [{
+    "id": "@workflowID",
+    "nodes": [{
+      "id": "concepts",
+      "model": {
+      "id": "@modelID",
+      "model_version": {
+        "id": "@modelVersionID"
+      }
+    }
+  }]
+}]
+      }
+        `));
+        expect(workflowid).toBe("@workflowID1");
+        done();
+      })
+        .catch(errorHandler.bind(done));
+  });
+  
+  it('Deletes workflows', done => {
+    mock.onDelete(BASE_URL + '/v2/workflows/%40workflowID').reply(200, JSON.parse(`
+{
+  "status": {
+    "code": 10000,
+    "description": "Ok"
+  }
+}
+    `));
+
+      app.workflows.delete('@workflowID').then(response => {
+        expect(mock.history.delete.length).toBe(1);
+        expect(response.status.code).toEqual(10000);
+
+        done();
+      })
+        .catch(errorHandler.bind(done));
+
+
+  });
+  
+
   it('Workflow predicts', done => {
     mock.onPost(BASE_URL + '/v2/workflows/%40workflowID/results').reply(200, JSON.parse(`
 {
