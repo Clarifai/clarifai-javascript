@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "axios": "^0.11.1",
-    "form-data": "^0.2.0",
     "promise": "^7.1.1",
     "valid-url": "^1.0.9"
   },
@@ -29,14 +28,10 @@
     "babelify": "^7.3.0",
     "del": "^2.0.2",
     "envify": "^3.4.0",
-    "git-branch": "^0.3.0",
     "gulp": "^3.9.1",
-    "gulp-awspublish": "^3.0.1",
     "gulp-babel": "^6.1.2",
     "gulp-browserify": "^0.5.1",
-    "gulp-concat": "^2.6.0",
     "gulp-eslint": "^2.0.0",
-    "gulp-if": "^2.0.0",
     "gulp-insert": "^0.5.0",
     "gulp-jasmine": "^4.0.0",
     "gulp-notify": "2.2.0",
@@ -46,8 +41,6 @@
     "gulp-util": "^3.0.6",
     "jsdoc": "^3.4.1",
     "minami": "^1.1.1",
-    "release-it": "^2.9.0",
-    "require-dir": "^0.3.0",
-    "serve-static": "^1.10.0"
+    "release-it": "^2.9.0"
   }
 }
