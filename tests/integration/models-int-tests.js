@@ -21,6 +21,9 @@ const conceptsIds = [
 ];
 
 describe('Integration Tests - Models', () => {
+  // TODO: The tests below that depend on testModel are required to be run after
+  //       'Creates a new model' since it initializes testModel. Refactor the tests
+  //       so each one creates their own resources.
   var testModel;
 
   beforeAll(() => {
@@ -61,6 +64,7 @@ describe('Integration Tests - Models', () => {
   });
 
   it('Creates a new model version and returns after it has finished', done => {
+    testModel.versionId = null;
     testModel.train(true)
       .then(model => {
         expect(model).toBeDefined();
