@@ -17,6 +17,7 @@ cache:
     - node_modules
 
 before_script:
+  - npm list --depth=0  # Prints the installed dependency versions.
   - export PYTHONPATH=.
   - export CLARIFAI_APP_ID="$(python scripts/app_and_key_for_tests.py --create-app javascript-travis)"
   - export CLARIFAI_API_KEY="$(python scripts/app_and_key_for_tests.py --create-key ${CLARIFAI_APP_ID})"
