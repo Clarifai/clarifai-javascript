@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [[2.9.1]](https://github.com/Clarifai/clarifai-javascript/releases/tag/2.9.1) - [npm](https://www.npmjs.com/package/clarifai/v/2.9.1) - 2019-08-14
+
+### Added
+- Added the hard-coded CELEBRITY model ID
+- Added the config parameter to workflow predict
+
+### Changed
+- Made model version ID be applied in getOutputInfo
+- Relaxed the required axios dependency version range
+- Deprecated client ID/secret
+
 ## [[2.9.0]](https://github.com/Clarifai/clarifai-javascript/releases/tag/2.9.0) - [npm](https://www.npmjs.com/package/clarifai/v/2.9.0) - 2018-10-18
 
 ### Added
