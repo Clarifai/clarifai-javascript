@@ -142,6 +142,9 @@ class Model {
       return new Promise((resolve, reject) => {
         axios.post(url, null, {headers}).then((response) => {
           if (isSuccess(response)) {
+            // Training produces a new model version ID.
+            this.versionId = response.data.model.model_version.id;
+
             if (sync) {
               let timeStart = Date.now();
               this._pollTrain.bind(this)(timeStart, resolve, reject);
