@@ -41,7 +41,7 @@ deploy:
     cache_control: "max-age=21600, no-transform, public"
     local_dir: sdk
     on:
-      node_js: 'node'
+      node_js: 10
       tags: true
       repo: Clarifai/clarifai-javascript
   - provider: s3
@@ -54,7 +54,7 @@ deploy:
     cache_control: "max-age=21600, no-transform, public"
     local_dir: docs
     on:
-      node_js: 'node'
+      node_js: 10
       tags: true
       repo: Clarifai/clarifai-javascript
   - provider: npm
@@ -62,7 +62,7 @@ deploy:
     api_key: ${NPM_TOKEN}
     skip_cleanup: true
     on:
-      node_js: 'node'
+      node_js: 10
       tags: true
       repo: Clarifai/clarifai-javascript
   - provider: releases
@@ -71,7 +71,7 @@ deploy:
     file_glob: true
     file: sdk/*
     on:
-      node_js: 'node'
+      node_js: 10
       tags: true
       repo: Clarifai/clarifai-javascript
 
