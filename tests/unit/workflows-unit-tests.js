@@ -13,7 +13,7 @@ describe('Unit Tests - Workflows', () => {
   beforeAll(() => {
     app = new Clarifai.App({
       apiKey: process.env.CLARIFAI_API_KEY,
-      apiEndpoint: process.env.API_ENDPOINT
+      apiEndpoint: BASE_URL
     });
   });
 
@@ -261,7 +261,7 @@ describe('Unit Tests - Workflows', () => {
     }
     `));
 
-      app.workflows.create("@workflowID", 
+      app.workflows.create("@workflowID",
       {
         "modelId": "@modelID",
         "modelVersionId": "@modelVersionID"
@@ -289,7 +289,7 @@ describe('Unit Tests - Workflows', () => {
       })
         .catch(errorHandler.bind(done));
   });
-  
+
   it('Deletes workflows', done => {
     mock.onDelete(BASE_URL + '/v2/workflows/%40workflowID').reply(200, JSON.parse(`
 {
@@ -310,7 +310,7 @@ describe('Unit Tests - Workflows', () => {
 
 
   });
-  
+
 
   it('Workflow predicts', done => {
     mock.onPost(BASE_URL + '/v2/workflows/%40workflowID/results').reply(200, JSON.parse(`

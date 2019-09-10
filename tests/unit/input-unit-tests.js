@@ -13,7 +13,7 @@ describe('Unit Tests - Inputs', () => {
   beforeAll(() => {
     app = new Clarifai.App({
       apiKey: process.env.CLARIFAI_API_KEY,
-      apiEndpoint: process.env.API_ENDPOINT
+      apiEndpoint: BASE_URL
     });
   });
 
@@ -173,7 +173,7 @@ describe('Unit Tests - Inputs', () => {
   }]
 }
     `));
-    
+
     app.inputs.update(
       {
         id: '@inputID',

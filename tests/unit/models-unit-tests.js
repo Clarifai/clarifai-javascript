@@ -13,7 +13,7 @@ describe('Unit Tests - Models', () => {
   beforeAll(() => {
     app = new Clarifai.App({
       apiKey: process.env.CLARIFAI_API_KEY,
-      apiEndpoint: process.env.API_ENDPOINT
+      apiEndpoint: BASE_URL
     });
   });
 
@@ -318,7 +318,7 @@ describe('Unit Tests - Models', () => {
 
     app.models.get('@modelID').then(model => {
         expect(mock.history.get.length).toBe(1);
-  
+
         expect(model.id).toBe('@modelID');
         expect(model.name).toBe('@modelName');
         expect(model.modelVersion.id).toBe('@modelVersionID');

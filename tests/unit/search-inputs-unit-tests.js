@@ -13,7 +13,7 @@ describe('Unit Tests - Input Search', () => {
   beforeAll(() => {
     app = new Clarifai.App({
       apiKey: process.env.CLARIFAI_API_KEY,
-      apiEndpoint: process.env.API_ENDPOINT
+      apiEndpoint: BASE_URL
     });
   });
 
