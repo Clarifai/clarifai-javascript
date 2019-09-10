@@ -395,7 +395,7 @@ describe('Integration Tests - Inputs', () => {
 });
 
 
-describe('Integration Tests - Inputs', () => {
+describe('Integration Tests - Inputs Search', () => {
   beforeAll(done => {
     app.inputs.create({
       url: sampleImages[0],
