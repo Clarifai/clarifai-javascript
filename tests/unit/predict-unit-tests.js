@@ -1,5 +1,5 @@
 const Clarifai = require('./../../src');
-const BASE_URL = require('./helpers');
+const {BASE_URL, SAMPLE_API_KEY} = require('./helpers');
 const axios = require('axios');
 const MockAdapter = require('axios-mock-adapter');
 const {errorHandler} = require('../integration/helpers');
@@ -11,7 +11,7 @@ let mock;
 describe('Unit Tests - Predictions', () => {
   beforeAll(() => {
     app = new Clarifai.App({
-      apiKey: process.env.CLARIFAI_API_KEY,
+      apiKey: SAMPLE_API_KEY,
       apiEndpoint: BASE_URL
     });
   });
