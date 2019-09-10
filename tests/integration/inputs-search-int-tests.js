@@ -1,6 +1,6 @@
 const Clarifai = require('./../../src');
 const {sampleImages} = require('./test-data');
-const {errorHandler, pollStatus} = require('./helpers');
+const {errorHandler, pollStatus, waitForInputsUpload} = require('./helpers');
 const Inputs = require('./../../src/Inputs');
 const d = Date.now();
 const ferrariId = 'ferrari' + d;
@@ -402,7 +402,10 @@ describe('Integration Tests - Inputs Search', () => {
       allowDuplicateUrl: true,
       concepts: [{id: ferrariId, value: true}]
     })
-    .then(response => {
+    .then(_ => {
+      return waitForInputsUpload(app);
+    })
+    .then(_ => {
       return app.models.create(testModelId, [
         { id: ferrariId }
       ])

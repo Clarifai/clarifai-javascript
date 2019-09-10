@@ -24,7 +24,27 @@ function pollStatus(fn) {
   }, 1000);
 }
 
+function waitForInputsUpload(app) {
+  return new Promise((resolve, reject) => {
+    app.inputs.getStatus()
+      .then(response => {
+        if (response.counts.to_process === 0) {
+          resolve();
+        } else {
+          setTimeout(
+            () => {
+              waitForInputsUpload(resolve, reject);
+            },
+            1000
+          );
+        }
+      })
+      .catch(reject);
+  });
+}
+
 module.exports = {
   errorHandler,
-  pollStatus
+  pollStatus,
+  waitForInputsUpload
 };
