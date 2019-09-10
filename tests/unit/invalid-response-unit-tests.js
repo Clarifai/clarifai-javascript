@@ -1,4 +1,5 @@
 const Clarifai = require('./../../src');
+const BASE_URL = require('./helpers');
 const axios = require('axios');
 const MockAdapter = require('axios-mock-adapter');
 const {errorHandler} = require('../integration/helpers');
@@ -6,8 +7,6 @@ const {errorHandler} = require('../integration/helpers');
 let app;
 
 let mock;
-
-const BASE_URL = 'https://api.clarifai.com';
 
 describe('Unit Tests - Invalid Response', () => {
   beforeAll(() => {
