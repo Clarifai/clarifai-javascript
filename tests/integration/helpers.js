@@ -35,7 +35,9 @@ function waitForInputsUpload(app) {
         } else {
           setTimeout(
             () => {
-              waitForInputsUpload(resolve, reject);
+              waitForInputsUpload(app)
+                .then(resolve)
+                .catch(reject);
             },
             1000
           );
