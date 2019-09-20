@@ -1,6 +1,6 @@
 const Clarifai = require('./../../src');
 const {sampleImages, sampleVideos} = require('./test-data');
-const {errorHandler} = require('./helpers');
+const {errorHandler, waitForInputsUpload} = require('./helpers');
 const d = Date.now();
 const ferrariId = 'ferrari' + d;
 const langConceptId = '的な' + d;
@@ -94,6 +94,9 @@ describe('Integration Tests - Models', () => {
             concepts: [{id: langConceptId, value: true}]
           }
         ])
+      })
+      .then(() => {
+        return waitForInputsUpload(app);
       })
       .then(() => testModel.train(true))
       .then(model => {
