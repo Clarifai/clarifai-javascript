@@ -28,7 +28,9 @@ function waitForInputsUpload(app) {
   return new Promise((resolve, reject) => {
     app.inputs.getStatus()
       .then(response => {
-        if (response.counts.to_process === 0) {
+        if (response.counts.errors !== 0) {
+          throw new Error('Error processing inputs', response);
+        } else if (response.counts.to_process === 0) {
           resolve();
         } else {
           setTimeout(
