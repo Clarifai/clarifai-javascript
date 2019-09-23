@@ -1,21 +1,15 @@
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 360000; // 6 minutes
 
 function errorHandler(err) {
-  if (err.data) {
-    log(err.data);
+  console.log("Received an error response from the API:");
+  if (err.response) {
+    console.log(err.response.status + " " + err.response.statusText);
+    console.log(err.response.data)
   } else {
-    log(err);
+    console.log(err);
   }
 
   this(err);
-}
-
-function log(obj) {
-  try {
-    console.log('[ERROR]', JSON.stringify(obj));
-  } catch (e) {
-    console.log(e);
-  }
 }
 
 function pollStatus(fn) {
