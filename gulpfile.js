@@ -139,7 +139,7 @@ gulp.task(
 gulp.task('test', function() {
   return gulp.src('./tests/*/*.js')
     .pipe(jasmine({
-      'includeStackTrace': true,
+      'includeStackTrace': false,
       'verbose': true,
       'timeout': 60000,
       'config': {
