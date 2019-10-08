@@ -4,7 +4,21 @@ function errorHandler(err) {
   console.log("Received an error response from the API:");
   if (err.response) {
     console.log(err.response.status + " " + err.response.statusText);
-    console.log(err.response.data)
+
+    try {
+      console.log(JSON.stringify(err.response.data, null, 2));
+    } catch (e) {
+      console.log(err.response.data);
+    }
+
+    console.log("where the request was: " + err.response.config.method.toUpperCase() + " " + err.response.config.url);
+    if (err.response.config.method.toUpperCase() !== "GET") {
+      try {
+        console.log(JSON.stringify(JSON.parse(err.response.config.data), null, 2));
+      } catch (e) {
+        console.log(err.response.config.data);
+      }
+    }
   } else {
     console.log(err);
   }
