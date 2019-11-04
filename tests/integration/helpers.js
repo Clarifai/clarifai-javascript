@@ -38,7 +38,7 @@ function waitForInputsUpload(app) {
       .then(response => {
         if (response.counts.errors !== 0) {
           throw new Error('Error processing inputs', response);
-        } else if (response.counts.to_process === 0) {
+        } else if (response.counts.to_process === 0 && response.counts.processing === 0) {
           resolve();
         } else {
           setTimeout(

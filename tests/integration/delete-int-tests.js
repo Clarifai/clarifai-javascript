@@ -36,9 +36,9 @@ describe('Integration Tests - Delete Resources', () => {
           app.inputs.getStatus()
             .then(data => {
               lastCount = data['counts']['processed'];
-              if (data['counts']['to_process'] === 0) {
+              if (data['counts']['to_process'] === 0 && data['counts']['processing'] === 0) {
                 clearInterval(interval);
-                if (data['errors'] > 0) {
+                if (data['counts']['errors'] > 0) {
                   throw new Error('Error processing inputs', data);
                 } else {
                   done();
