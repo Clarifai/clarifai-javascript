@@ -1,7 +1,7 @@
 let axios = require('axios');
 let Input = require('./Input');
 let {API, ERRORS, MAX_BATCH_SIZE, replaceVars} = require('./constants');
-let {INPUT_PATH, INPUTS_PATH, INPUTS_STATUS_PATH, SEARCH_PATH, SEARCH_FEEDBACK_PATH} = API;
+let {INPUT_PATH, INPUTS_PATH, INPUTS_STATUS_PATH, SEARCH_PATH} = API;
 let {wrapToken, formatInput, formatImagesSearch, formatConceptsSearch} = require('./utils');
 let {isSuccess, checkType, clone} = require('./helpers');
 
@@ -290,32 +290,6 @@ class Inputs {
               reject(response);
             }
           }, reject);
-      });
-    });
-  }
-
-  searchFeedback(inputID, searchID, endUserID, sessionID) {
-    let url = `${this._config.basePath}${SEARCH_FEEDBACK_PATH}`;
-    const body = {
-      input: {
-        id: inputID,
-        feedback_info: {
-          event_type: 'search_click',
-          search_id: searchID,
-          end_user_id: endUserID,
-          session_id: sessionID
-        }
-      }
-    };
-    return wrapToken(this._config, headers => {
-      return new Promise((resolve, reject) => {
-        axios.post(url, body, {
-          headers
-        }).then(({data}) => {
-          const d = clone(data);
-          d.rawData = clone(data);
-          resolve(d);
-        }, reject);
       });
     });
   }
