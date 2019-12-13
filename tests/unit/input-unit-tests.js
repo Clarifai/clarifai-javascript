@@ -239,47 +239,6 @@ describe('Unit Tests - Inputs', () => {
       .catch(errorHandler.bind(done));
   });
 
-  it('Updates input with region', done => {
-    mock.onPatch(BASE_URL + '/v2/inputs').reply(200, JSON.parse(`
-{
-  "status": {
-    "code": 10000,
-    "description": "Ok"
-  },
-  "inputs": [
-    {
-      "id": "@inputID",
-      "data": {
-        "image": {
-          "url": "@imageURL"
-        },
-        "concepts": [
-          {
-            "id": "@concept1",
-            "name": "@concept1",
-            "value": 1,
-            "app_id": "@appID"
-          },
-          {
-            "id": "@concept2",
-            "name": "@concept2",
-            "value": 0,
-            "app_id": "@appID"
-          }
-        ]
-      },
-      "created_at": "2019-01-29T15:23:21.188492Z",
-      "modified_at": "2019-01-29T15:23:21.575667Z",
-      "status": {
-        "code": 30200,
-        "description": "Input image modification success"
-      }
-    }
-  ]
-}
-    `));
-
-
   it('Updates input with metadata', done => {
     mock.onPatch(BASE_URL + '/v2/inputs').reply(200, JSON.parse(`
 {
