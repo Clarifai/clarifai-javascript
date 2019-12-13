@@ -173,7 +173,7 @@ describe('Unit Tests - Inputs', () => {
   }]
 }
     `));
-    
+
     app.inputs.update(
       {
         id: '@inputID',
@@ -280,111 +280,6 @@ describe('Unit Tests - Inputs', () => {
 }
     `));
 
-    app.inputs.update(
-      {
-        id: '@inputID',
-        regions: [
-          {
-            id: "@regionID",
-            region_info: {
-              bounding_box: {
-                top_row: 0.1,
-                left_col: 0.2,
-                bottom_row: 0.3,
-                right_col: 0.4
-              },
-              feedback: "misplaced"
-            },
-            data: {
-              concepts: [
-                {
-                  id: "@concept1"
-                },
-                {
-                  id: "@concept2",
-                  value: 0
-                }
-              ],
-              face: {
-                identity: {
-                  concepts: [
-                    {
-                      id: "@faceConcept1"
-                    },
-                    {
-                      id: "@faceConcept2",
-                      value: 0
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        ],
-        action: 'overwrite'
-      }
-    )
-      .then(inputs => {
-        expect(mock.history.patch.length).toBe(1);
-
-        expect(JSON.parse(mock.history.patch[0].data)).toEqual(JSON.parse(`
-{
-  "inputs": [
-    {
-      "id": "@inputID",
-      "data": {
-        "regions": [
-          {
-            "id": "@regionID",
-            "region_info": {
-              "bounding_box": {
-                "top_row": 0.1,
-                "left_col": 0.2,
-                "bottom_row": 0.3,
-                "right_col": 0.4
-              },
-              "feedback": "misplaced"
-            },
-            "data": {
-              "concepts": [
-                {
-                  "id": "@concept1"
-                },
-                {
-                  "id": "@concept2",
-                  "value": 0
-                }
-              ],
-              "face": {
-                "identity": {
-                  "concepts": [
-                    {
-                      "id": "@faceConcept1"
-                    },
-                    {
-                      "id": "@faceConcept2",
-                      "value": 0
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        ]
-      }
-    }
-  ],
-  "action": "overwrite"
-}
-        `));
-
-        expect(inputs[0].id).toEqual('@inputID');
-        expect(inputs[0].imageUrl).toEqual('@imageURL');
-
-        done();
-      })
-      .catch(errorHandler.bind(done));
-  });
 
   it('Updates input with metadata', done => {
     mock.onPatch(BASE_URL + '/v2/inputs').reply(200, JSON.parse(`

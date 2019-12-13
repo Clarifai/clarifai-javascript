@@ -110,30 +110,6 @@ class Models {
   }
 
   /**
-   *
-   * @param {string|object}            model       If string, it is assumed to be model id. Otherwise, if object is given, it can have any of the following keys:
-   *   @param {string}                   model.id          Model id
-   *   @param {string}                   model.name        Model name
-   *   @param {string}                   model.version     Model version
-   *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
-   * @param {string} input A string pointing to an image resource. A string must be a url
-   * @param {object} config A configuration object consisting of the following required keys
-   *   @param {string} config.id The id of the feedback request
-   *   @param {object} config.data The feedback data to be sent
-   *   @param {object} config.info Meta data related to the feedback request
-   */
-  feedback(model, input, config) {
-    return new Promise((resolve, reject) => {
-      this.initModel(model)
-        .then(model => {
-          return model.feedback(input, config);
-        })
-        .then(d => resolve(d))
-        .catch(e => reject(e));
-    });
-  }
-
-  /**
    * Returns a version of the model specified by its id
    * @param {string|object}            model       If string, it is assumed to be model id. Otherwise, if object is given, it can have any of the following keys:
    *   @param {string}                   model.id          Model id

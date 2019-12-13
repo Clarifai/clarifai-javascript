@@ -14,8 +14,6 @@ let {
   MODEL_VERSIONS_PATH,
   MODEL_VERSION_PATH,
   MODELS_PATH,
-  MODEL_FEEDBACK_PATH,
-  MODEL_VERSION_FEEDBACK_PATH,
   PREDICT_PATH,
   VERSION_PREDICT_PATH,
   MODEL_INPUTS_PATH,
@@ -318,40 +316,6 @@ class Model {
     });
   }
 
-  /**
-   *
-   * @param {string} input A string pointing to an image resource. A string must be a url
-   * @param {object} config A configuration object consisting of the following required keys
-   *   @param {string} config.id The id of the feedback request
-   *   @param {object} config.data The feedback data to be sent
-   *   @param {object} config.info Meta data related to the feedback request
-   * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
-   */
-  feedback(input, {id, data, info}) {
-    const url = `${this._config.basePath}${this.versionId ?
-      replaceVars(MODEL_VERSION_FEEDBACK_PATH, [this.id, this.versionId]) :
-      replaceVars(MODEL_FEEDBACK_PATH, [this.id])}`;
-    const media = formatMediaPredict(input).data;
-    info.eventType = 'annotation';
-    const body = {
-      input: {
-        id,
-        data: Object.assign(media, data),
-        'feedback_info': formatObjectForSnakeCase(info)
-      }
-    };
-    return wrapToken(this._config, headers => {
-      return new Promise((resolve, reject) => {
-        axios.post(url, body, {
-          headers
-        }).then(({data}) => {
-          const d = clone(data);
-          d.rawData = clone(data);
-          resolve(d);
-        }, reject);
-      });
-    });
-  }
 }
 
 module
