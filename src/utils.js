@@ -78,8 +78,7 @@ module.exports = {
     if (includeImage !== false) {
       formatted.data.image = {
         url: input.url,
-        base64: input.base64,
-        crop: input.crop
+        base64: input.base64
       };
       if (data.allowDuplicateUrl) {
         formatted.data.image.allow_duplicate_url = true;
@@ -132,8 +131,7 @@ module.exports = {
       imageQuery = (image.url || image.base64) ? {
         image: {
           url: image.url,
-          base64: image.base64,
-          crop: image.crop
+          base64: image.base64
         }
       } : {};
     }
@@ -142,9 +140,6 @@ module.exports = {
     if (image.id) {
       input.input.id = image.id;
       input.input.data = {image: {}};
-      if(image.crop) {
-        input.input.data.image.crop = image.crop;
-      }
     }
     if (image.metadata !== undefined) {
       input.input.data.metadata = image.metadata;

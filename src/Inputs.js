@@ -57,7 +57,6 @@ class Inputs {
    *   @param {object|string}          inputs[].input                        If string, is given, this is assumed to be an image url
    *     @param {string}                 inputs[].input.(url|base64)           Can be a publicly accessibly url or base64 string representing image bytes (required)
    *     @param {string}                 inputs[].input.id                     ID of input (optional)
-   *     @param {number[]}               inputs[].input.crop                   An array containing the percent to be cropped from top, left, bottom and right (optional)
    *     @param {boolean}               inputs[].input.allowDuplicateUrl       Whether to allow duplicate URL
    *     @param {object[]}               inputs[].input.metadata               Object with key and values pair (value can be string, array or other objects) to attach to the input (optional)
    *     @param {object}                 inputs[].input.geo                    Object with latitude and longitude coordinates to associate with an input. Can be used in search query as the proximity of an input to a reference point (optional)
@@ -245,7 +244,6 @@ class Inputs {
    *       @param {string}                 queries[].input.id            The input id
    *       @param {string}                 queries[].input.type          Search over 'input' to get input matches to criteria or 'output' to get inputs that are visually similar to the criteria (default: 'output')
    *       @param {string}                 queries[].input.(base64|url)  Can be a publicly accessibly url or base64 string representing image bytes (required)
-   *       @param {number[]}               queries[].input.crop          An array containing the percent to be cropped from top, left, bottom and right (optional)
    *       @param {object}                 queries[].input.metadata      An object with key and value specified by user to refine search with (optional)
    * @param {Object}                   options       Object with keys explained below: (optional)
    *    @param {Number}                  options.page          The page number (optional, default: 1)
