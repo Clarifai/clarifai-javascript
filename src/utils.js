@@ -106,7 +106,7 @@ module.exports = {
     if (media.hasOwnProperty('file')) {
       const bitmap = fs.readFileSync(media['file']);
       media = {
-        base64: new Buffer(bitmap).toString('base64')
+        base64: Buffer.from(bitmap).toString('base64')
       };
     }
 
