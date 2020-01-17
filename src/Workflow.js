@@ -1,5 +1,5 @@
 let axios = require('axios');
-let {formatObjectForSnakeCase} = require("./utils");
+let {formatObjectForSnakeCase} = require('./utils');
 let {API, replaceVars} = require('./constants');
 let {WORKFLOWS_PATH, WORKFLOW_PATH, WORKFLOW_RESULTS_PATH} = API;
 let {wrapToken, formatInput} = require('./utils');
