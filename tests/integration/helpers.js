@@ -23,6 +23,9 @@ function errorHandler(err) {
     console.log(err);
   }
 
+  console.log("Full response object:");
+  console.log(JSON.stringify(err, null, 4));
+
   this(err);
 }
 
