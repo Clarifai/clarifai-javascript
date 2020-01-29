@@ -118,23 +118,20 @@ function failOnError() {
     }));
 }
 
-gulp.task('test', function() {
-  var testsFiles = ['./tests/integration*.js', './tests/unit/*.js'];
-  var tests = testsFiles.map(function (element) {
-    return gulp.src(element)
-      .pipe(jasmine({
-        'includeStackTrace': false,
-        'verbose': true,
-        'timeout': 60000,
-        'config': {
-          'helpers': [
-            './node_modules/babel-register/lib/node.js'
-          ],
-          'random': false,
-        }
-      }));
-  });
-  return merge(tests);
+gulp.task('test', gulp.series('unittest', 'integrationtest'));
+
+gulp.task('integrationtest', function() {
+  return gulp.src('./tests/integration/*.js')
+    .pipe(jasmine({
+      'includeStackTrace': true,
+      'verbose': true,
+      'timeout': 60000,
+      'config': {
+        'helpers': [
+          './node_modules/babel-register/lib/node.js'
+        ]
+      }
+    }));
 });
 
 gulp.task('unittest', (done, error) => {
