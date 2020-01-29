@@ -117,8 +117,6 @@ function failOnError() {
     }));
 }
 
-gulp.task('test', gulp.series('unittest', 'integrationtest'));
-
 gulp.task('integrationtest', function() {
   return gulp.src('./tests/integration/*.js')
     .pipe(jasmine({
@@ -146,6 +144,8 @@ gulp.task('unittest', (done, error) => {
       }
     }));
 });
+
+gulp.task('test', gulp.series('unittest', 'integrationtest'));
 
 gulp.task('jslint', function() {
   const buildVars = getBuildVars();
