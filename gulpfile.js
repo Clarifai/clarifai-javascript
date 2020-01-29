@@ -9,6 +9,7 @@ const rename = require('gulp-rename');
 const insert = require('gulp-insert');
 const eslint = require('gulp-eslint');
 const jasmine = require('gulp-jasmine');
+const merge = require('merge-stream');
 const del = require('del');
 const VERSION = require('./package.json').version;
 
@@ -118,18 +119,22 @@ function failOnError() {
 }
 
 gulp.task('test', function() {
-  return gulp.src('./tests/*/*.js')
-    .pipe(jasmine({
-      'includeStackTrace': false,
-      'verbose': true,
-      'timeout': 60000,
-      'config': {
-        'helpers': [
-          './node_modules/babel-register/lib/node.js'
-        ],
-        'random': false,
-      }
-    }));
+  var testsFiles = ['./tests/integration*.js', './tests/unit/*.js'];
+  var tests = testsFiles.map(function (element) {
+    return gulp.src(element)
+      .pipe(jasmine({
+        'includeStackTrace': false,
+        'verbose': true,
+        'timeout': 60000,
+        'config': {
+          'helpers': [
+            './node_modules/babel-register/lib/node.js'
+          ],
+          'random': false,
+        }
+      }));
+  });
+  return merge(tests);
 });
 
 gulp.task('unittest', (done, error) => {
