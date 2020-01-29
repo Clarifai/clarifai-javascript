@@ -120,13 +120,14 @@ function failOnError() {
 gulp.task('integrationtest', function() {
   return gulp.src('./tests/integration/*.js')
     .pipe(jasmine({
-      'includeStackTrace': true,
+      'includeStackTrace': false,
       'verbose': true,
       'timeout': 60000,
       'config': {
         'helpers': [
           './node_modules/babel-register/lib/node.js'
-        ]
+        ],
+        'random': false,
       }
     }));
 });
