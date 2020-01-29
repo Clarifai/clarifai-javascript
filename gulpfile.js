@@ -145,7 +145,7 @@ gulp.task('unittest', (done, error) => {
     }));
 });
 
-gulp.task('test', gulp.series('unittest', 'integrationtest'));
+gulp.task('test', gulp.series('integrationtest', 'unittest'));
 
 gulp.task('jslint', function() {
   const buildVars = getBuildVars();
