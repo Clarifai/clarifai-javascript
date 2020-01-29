@@ -9,7 +9,6 @@ const rename = require('gulp-rename');
 const insert = require('gulp-insert');
 const eslint = require('gulp-eslint');
 const jasmine = require('gulp-jasmine');
-const merge = require('merge-stream');
 const del = require('del');
 const VERSION = require('./package.json').version;
 

@@ -41,7 +41,6 @@
     "gulp-replace-task": "^0.11.0",
     "gulp-uglify": "^3.0.2",
     "gulp-util": "^3.0.8",
-    "merge-stream": "^2.0.0",
     "jsdoc": "^3.4.1",
     "minami": "^1.1.1",
     "release-it": "^2.9.0"
