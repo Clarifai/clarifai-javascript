@@ -82,41 +82,31 @@ describe('Unit Tests - Model Search', () => {
   "status": {
     "code": 10000,
     "description": "Ok",
-    "req_id":
-    "300ceac8704748a592da50d77ad44253"
+    "req_id": "300ceac8704748a592da50d77ad44253"
   },
   "models": [
     {
-      "id":
-      "eeed0b6733a644cea07cf4c60f87ebb7",
+      "id": "@modelID",
       "name": "color",
       "created_at":
       "2016-05-11T18:05:45.924367Z",
       "app_id": "main",
       "output_info": {
-        "message": "Show
-
+        "message": "Show output_info with: GET /models/{model_id}/output_info",
         "type": "color",
         "type_ext": "color"
       },
       "model_version": {
-        "id":
-        "dd9458324b4b45c2be1a7ba84d27cd04",
-        "created_at":
-        "2016-07-13T01:19:12.147644Z",
+        "id": "@modelVersionID",
+        "created_at": "2016-07-13T01:19:12.147644Z",
         "status": {
           "code": 21100,
-          "description":
-          "Model is trained and
-
+          "description": "Model is trained and ready"
         },
-        "active_concept_count":
-        140,
-        "worker_id":
-        "1fbfdd7213a04628a387730b57b5baeb"
+        "active_concept_count": 140,
+        "worker_id": "1fbfdd7213a04628a387730b57b5baeb"
       },
-      "display_name":
-      "Color"
+      "display_name": "Color"
     }
   ]
 }
