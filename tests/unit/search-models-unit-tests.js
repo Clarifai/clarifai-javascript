@@ -84,31 +84,27 @@ describe('Unit Tests - Model Search', () => {
     "description": "Ok",
     "req_id": "300ceac8704748a592da50d77ad44253"
   },
-  "models": [
-    {
-      "id": "@modelID",
-      "name": "color",
-      "created_at":
-      "2016-05-11T18:05:45.924367Z",
-      "app_id": "main",
-      "output_info": {
-        "message": "Show output_info with: GET /models/{model_id}/output_info",
-        "type": "color",
-        "type_ext": "color"
-      },
-      "model_version": {
-        "id": "@modelVersionID",
-        "created_at": "2016-07-13T01:19:12.147644Z",
-        "status": {
-          "code": 21100,
-          "description": "Model is trained and ready"
-        },
-        "active_concept_count": 140,
-        "worker_id": "1fbfdd7213a04628a387730b57b5baeb"
-      },
-      "display_name": "Color"
-    }
-  ]
+
+  "models": [{
+    "id": "@modelID",
+    "name": "color",
+    "created_at": "2017-03-06T22:57:00.660603Z",
+    "app_id": "main",
+    "output_info": {
+      "message": "Show output_info with: GET /models/{model_id}/output_info",
+      "type": "blur",
+      "type_ext": "color"
+    },
+    "model_version": {
+      "id": "@modelVersionID",
+      "created_at": "2017-03-06T22:57:00.684652Z",
+      "status": {
+        "code": 21100,
+        "description": "Model trained successfully"
+      }
+    },
+    "display_name": "Color"
+  }]
 }
     `));
 
