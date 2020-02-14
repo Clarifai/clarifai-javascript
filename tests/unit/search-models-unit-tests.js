@@ -81,13 +81,13 @@ describe('Unit Tests - Model Search', () => {
   },
   "models": [{
     "id": "@modelID",
-    "name": "focus",
+    "name": "color",
     "created_at": "2017-03-06T22:57:00.660603Z",
     "app_id": "main",
     "output_info": {
       "message": "Show output_info with: GET /models/{model_id}/output_info",
       "type": "blur",
-      "type_ext": "focus"
+      "type_ext": "color"
     },
     "model_version": {
       "id": "@modelVersionID",
@@ -97,20 +97,20 @@ describe('Unit Tests - Model Search', () => {
         "description": "Model trained successfully"
       }
     },
-    "display_name": "Focus"
+    "display_name": "Color"
   }]
 }
     `));
 
 
-    app.models.search("*", "focus")
+    app.models.search("*", "color")
       .then(models => {
         expect(mock.history.post.length).toBe(1);
         expect(JSON.parse(mock.history.post[0].data)).toEqual(JSON.parse(`
 {
   "model_query": {
     "name": "*",
-    "type": "focus"
+    "type": "color"
   }
 }
         `));
