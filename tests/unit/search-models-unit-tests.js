@@ -23,42 +23,46 @@ describe('Unit Tests - Model Search', () => {
   it('Search models by name', done => {
     mock.onPost(BASE_URL + '/v2/models/searches').reply(200, JSON.parse(`
 {
-  "status": {
-    "code": 10000,
-    "description": "Ok"
-  },
-  "models": [{
-    "id": "@modelID",
-    "name": "celeb-v1.3",
-    "created_at": "2016-10-25T19:30:38.541073Z",
-    "app_id": "main",
-    "output_info": {
-      "message": "Show output_info with: GET /models/{model_id}/output_info",
-      "type": "concept",
-      "type_ext": "facedetect-identity"
+    "status": {
+        "code": 10000,
+        "description": "Ok",
+        "req_id": "08e649a6116f4f56992e1676b25dcde6"
     },
-    "model_version": {
-      "id": "@modelVersionID",
-      "created_at": "2016-10-25T19:30:38.541073Z",
-      "status": {
-        "code": 21100,
-        "description": "Model trained successfully"
-      },
-      "active_concept_count": 10554
-    },
-    "display_name": "Celebrity"
-  }]
+    "models": [
+        {
+            "id": "@modelID",
+            "name": "moderation",
+            "created_at": "2017-05-12T21:28:00.471607Z",
+            "app_id": "main",
+            "output_info": {
+                "message": "Show output_info with: GET /models/{model_id}/output_info",
+                "type": "concept",
+                "type_ext": "concept"
+            },
+            "model_version": {
+                "id": "@modelVersionID",
+                "created_at": "2017-10-26T20:29:09.263232Z",
+                "status": {
+                    "code": 21100,
+                    "description": "Model is trained and ready"
+                },
+                "active_concept_count": 5,
+                "worker_id": "8b7c05a25ce04d0490367390665f1526"
+            },
+            "display_name": "Moderation"
+        }
+    ]
 }
     `));
 
 
-    app.models.search("celeb*")
+    app.models.search("moderation*")
       .then(models => {
         expect(mock.history.post.length).toBe(1);
         expect(JSON.parse(mock.history.post[0].data)).toEqual(JSON.parse(`
 {
   "model_query": {
-    "name": "celeb*",
+    "name": "moderation*",
     "type": null
   }
 }
@@ -77,8 +81,10 @@ describe('Unit Tests - Model Search', () => {
 {
   "status": {
     "code": 10000,
-    "description": "Ok"
+    "description": "Ok",
+    "req_id": "300ceac8704748a592da50d77ad44253"
   },
+
   "models": [{
     "id": "@modelID",
     "name": "color",

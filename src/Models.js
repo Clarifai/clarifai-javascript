@@ -27,7 +27,7 @@ class Models {
    *   @param {string}           model.id          Model id
    *   @param {string}           model.name        Model name
    *   @param {string}           model.version     Model version
-   *   @param {string}           model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+   *   @param {string}           model.type        This can be "concept", "color", "embed", "detect", "cluster", etc.
    * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
    */
   initModel(model) {
@@ -63,7 +63,7 @@ class Models {
    *   @param {string}                   model.name        Model name
    *   @param {string}                   model.version     Model version
    *   @param {string}                   model.language    Model language (only for Clarifai's public models)
-   *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+   *   @param {string}                   model.type        This can be "concept", "color", "embed", "detect", "cluster", etc.
    * @param {object[]|object|string}   inputs    An array of objects/object/string pointing to an image resource. A string can either be a url or base64 image bytes. Object keys explained below:
    *    @param {object}                  inputs[].image     Object with keys explained below:
    *       @param {string}                 inputs[].image.(url|base64|file)  Can be a publicly accessibly url, base64 string representing image bytes, or file path (required)
@@ -95,7 +95,7 @@ class Models {
    *   @param {string}                   model.id          Model id
    *   @param {string}                   model.name        Model name
    *   @param {string}                   model.version     Model version
-   *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+   *   @param {string}                   model.type        This can be "concept", "color", "embed", "detect", "cluster", etc.
    * @param {boolean}                  sync        If true, this returns after model has completely trained. If false, this immediately returns default api response.
    * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
    */
@@ -115,7 +115,7 @@ class Models {
    *   @param {string}                   model.id          Model id
    *   @param {string}                   model.name        Model name
    *   @param {string}                   model.version     Model version
-   *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+   *   @param {string}                   model.type        This can be "concept", "color", "embed", "detect", "cluster", etc.
    * @param {string}     versionId   The model's id
    * @return {Promise(response, error)} A Promise that is fulfilled with the API response or rejected with an error
    */
@@ -135,7 +135,7 @@ class Models {
    *   @param {string}                   model.id          Model id
    *   @param {string}                   model.name        Model name
    *   @param {string}                   model.version     Model version
-   *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+   *   @param {string}                   model.type        This can be "concept", "color", "embed", "detect", "cluster", etc.
    * @param {object}                   options     Object with keys explained below: (optional)
    *   @param {number}                   options.page        The page number (optional, default: 1)
    *   @param {number}                   options.perPage     Number of images to return per page (optional, default: 20)
@@ -157,7 +157,7 @@ class Models {
    *   @param {string}                   model.id          Model id
    *   @param {string}                   model.name        Model name
    *   @param {string}                   model.version     Model version
-   *   @param {string}                   model.type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+   *   @param {string}                   model.type        This can be "concept", "color", "embed", "detect", "cluster", etc.
    * @return {Promise(Model, error)} A Promise that is fulfilled with a Model instance or rejected with an error
    */
   getOutputInfo(model) {
@@ -395,7 +395,7 @@ class Models {
   /**
    * Search for models by name or type
    * @param {String}     name        The model name
-   * @param {String}     type        This can be "concept", "color", "embed", "facedetect", "cluster" or "blur"
+   * @param {String}     type        This can be "concept", "color", "embed", "detect", "cluster", etc.
    * @return {Promise(models, error)} A Promise that is fulfilled with an instance of Models or rejected with an error
    */
   search(name, type = null) {

@@ -85,12 +85,12 @@ describe('Unit Tests - Models', () => {
         ]
       },
       "output_config": {
-        "concepts_mutually_exclusive": false, 
+        "concepts_mutually_exclusive": false,
         "closed_environment": false
       }
     }
   }
-} 
+}
         `));
 
         expect(model.id).toBe('@modelID');
@@ -167,8 +167,8 @@ describe('Unit Tests - Models', () => {
       "app_id": "main",
       "output_info": {
         "message": "Show output_info with: GET /models/{model_id}/output_info",
-        "type": "facedetect",
-        "type_ext": "facedetect"
+        "type": "detect",
+        "type_ext": "detect"
       },
       "model_version": {
         "id": "28b2ff6148684aa2b18a34cd004b4fac",
@@ -212,7 +212,7 @@ describe('Unit Tests - Models', () => {
       const model1 = models[0];
       expect(model1.id).toBe('@modelID1');
       expect(model1.name).toBe('@modelName1');
-      expect(model1.outputInfo.type_ext).toBe('facedetect');
+      expect(model1.outputInfo.type_ext).toBe('detect');
 
       const model2 = models[1];
       expect(model2.id).toBe('@modelID2');
