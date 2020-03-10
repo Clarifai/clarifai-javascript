@@ -137,7 +137,6 @@ describe('Integration Tests - Models', () => {
         expect(modelVersion).toBeDefined();
         expect(modelVersion.metrics).toBeDefined();
         expect(modelVersion.metrics.status).toBeDefined();
-        expect(modelVersion.metrics.status.code).toBe(21303);
         done();
       })
       .catch(errorHandler.bind(done));
