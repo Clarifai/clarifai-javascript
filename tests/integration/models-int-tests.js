@@ -271,7 +271,7 @@ describe('Integration Tests - Models', () => {
           expect(frame.frame_info.index).toBeDefined();
           expect(frame.frame_info.time).toBeDefined();
 
-          expect((frame.frame_info.time-1000) % 2000).toEqual(0);
+          expect((frame.frame_info.time+1000) % 2000).toEqual(0);
         }
 
         done();
