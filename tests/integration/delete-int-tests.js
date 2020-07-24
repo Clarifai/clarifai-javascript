@@ -1,10 +1,9 @@
 const Clarifai = require('./../../src');
 const Model = require('./../../src/Model');
-const {errorHandler, pollStatus} = require('./helpers');
+const {errorHandler, waitForInputsUpload} = require('./helpers');
 const {sampleImages} = require('../assets/test-data');
 
 let app;
-let lastCount;
 let testModelVersionId;
 let inputsIDs = [];
 let d = Date.now();
@@ -32,21 +31,12 @@ describe('Integration Tests - Delete Resources', () => {
         for (var i=0; i<inputs.length; i++) {
           inputsIDs.push(inputs[i].id);
         }
-        pollStatus(interval => {
-          app.inputs.getStatus()
-            .then(data => {
-              lastCount = data['counts']['processed'];
-              if (data['counts']['to_process'] === 0 && data['counts']['processing'] === 0) {
-                clearInterval(interval);
-                if (data['errors'] > 0) {
-                  throw new Error('Error processing inputs', data);
-                } else {
-                  done();
-                }
-              }
-            })
-            .catch(errorHandler.bind(done));
-        });
+      })
+      .then(() => {
+        return waitForInputsUpload(app);
+      })
+      .then(() => {
+        done();
       })
       .catch(errorHandler.bind(done));
   });
