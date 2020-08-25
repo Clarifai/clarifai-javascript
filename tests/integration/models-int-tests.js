@@ -63,12 +63,20 @@ describe('Integration Tests - Models', () => {
     done();
   });
 
-  it('Throws an error if no data found for training', done => {
-    expect(() => {
-      testModel.versionId = null;
-      testModel.train(true)
-    }).toThrow(new Error('No data found for training'));
-    done();
+  it('Gets status_code 21110 if train with no data', done => {
+    testModel.versionId = null;
+    testModel.train(true)
+      .then(model => {
+        expect(model).toBeDefined();
+        expect(model.modelVersion).toBeDefined();
+        expect(model.rawData).toBeDefined();
+        var version = model.modelVersion;
+        expect(version.id).toBeDefined();
+        expect(version.created_at).toBeDefined();
+        expect(version.status.code).toBe(21110);
+        done();
+      })
+      .catch(errorHandler.bind(done));
   });
 
   it('Adds inputs and trains the model', done => {
