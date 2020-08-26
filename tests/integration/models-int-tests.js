@@ -63,7 +63,7 @@ describe('Integration Tests - Models', () => {
     done();
   });
 
-  it('Creates a new model version and returns after it has finished', done => {
+  it('Gets status_code 21110 if train with no data', done => {
     testModel.versionId = null;
     testModel.train(true)
       .then(model => {
@@ -73,7 +73,7 @@ describe('Integration Tests - Models', () => {
         var version = model.modelVersion;
         expect(version.id).toBeDefined();
         expect(version.created_at).toBeDefined();
-        expect(version.status.code).toBe(21100);
+        expect(version.status.code).toBe(21110);
         done();
       })
       .catch(errorHandler.bind(done));
