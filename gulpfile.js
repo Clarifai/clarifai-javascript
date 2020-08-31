@@ -98,7 +98,7 @@ const lintOptions = {
 function getBuildVars() {
   const stageString = process.env.CLARIFAI_DEPLOY || gutil.env.stage || 'dev';
   if (!buildVars.hasOwnProperty(stageString)) {
-    throw'There are no defined build variables for stage `' + stageString + '`';
+    throw 'There are no defined build variables for stage `' + stageString + '`';
   }
 
   return buildVars[stageString];
