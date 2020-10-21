@@ -2,7 +2,7 @@
 
 # NOTE: For node.js users, this API Client is no longer supported. 
 
-Please use https://github.com/Clarifai/clarifai-nodejs-grpc instead which is more feature rich, faster and supported. We will be introducing a new web grpc client shortly as well to fully deprecate this javascript client. Stay tuned at https://github.com/Clarifai/clarifai-web-grpc
+Please use https://github.com/Clarifai/clarifai-nodejs-grpc instead which is more feature rich, faster and supported. We will be introducing a new web grpc client shortly as well to fully deprecate this javascript client. Stay tuned.
 
 
 # Clarifai API JavaScript Client
