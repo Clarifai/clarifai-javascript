@@ -1,4 +1,4 @@
-let axios = require('axios');
+import axios from 'axios';
 let ModelVersion = require('./ModelVersion');
 let {isSuccess, checkType, clone} = require('./helpers');
 let {
