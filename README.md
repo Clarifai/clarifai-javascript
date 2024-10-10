@@ -1,7 +1,7 @@
-![Clarifai logo](logo.png)
+![image](https://github.com/user-attachments/assets/f440f534-7ff1-4189-8d07-38210810534f)
 
-# NOTE: For node.js users, this API Client is no longer supported. 
-
+# Deprecated
+For node.js users, this API Client is no longer supported. 
 Please use https://github.com/Clarifai/clarifai-nodejs-grpc instead which is more feature rich, faster and supported. We will be introducing a new web grpc client shortly as well to fully deprecate this javascript client. Stay tuned.
 
 
